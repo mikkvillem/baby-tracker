@@ -1,0 +1,182 @@
+.sessionDetailsContainer {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.sessionDetailsHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.backButton {
+  background: white;
+  border: 1px solid #e5e7eb;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.backButton:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.sessionDetailsHeader h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.sessionInfo {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.sessionInfoRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.sessionInfoRow:last-child {
+  border-bottom: none;
+}
+
+.infoLabel {
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.infoValue {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.sideTotals {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.sideTotal {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+
+.sideTotal h3 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.totalTime {
+  font-size: 36px;
+  font-weight: 700;
+  font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+  color: #1f2937;
+}
+
+.intervalHistory {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.intervalHistory h3 {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.emptyHistory {
+  text-align: center;
+  color: #6b7280;
+  padding: 20px;
+  margin: 0;
+}
+
+.intervalsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.intervalItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.intervalSide {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.intervalSide.left {
+  background: #3b82f6;
+}
+
+.intervalSide.right {
+  background: #8b5cf6;
+}
+
+.intervalDuration {
+  margin-left: auto;
+  font-weight: 600;
+  color: #10b981;
+}
+
+.deleteIntervalButton {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: #fee2e2;
+  color: #dc2626;
+  border-radius: 6px;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.deleteIntervalButton:hover {
+  background: #fecaca;
+  transform: scale(1.1);
+}
+
+.deleteIntervalButton:active {
+  transform: scale(0.95);
+}
+

@@ -1,0 +1,81 @@
+import type { Session } from './app'
+
+const DB_NAME = 'baby-tracker-db'
+const DB_VERSION = 1
+const STORE_NAME = 'sessions'
+
+let db: IDBDatabase | null = null
+
+export const initDB = (): Promise<IDBDatabase> => {
+  return new Promise((resolve, reject) => {
+    if (db) {
+      resolve(db)
+      return
+    }
+
+    const request = indexedDB.open(DB_NAME, DB_VERSION)
+
+    request.onerror = () => reject(request.error)
+    request.onsuccess = () => {
+      db = request.result
+      resolve(db)
+    }
+
+    request.onupgradeneeded = (event) => {
+      const database = (event.target as IDBOpenDBRequest).result
+      if (!database.objectStoreNames.contains(STORE_NAME)) {
+        database.createObjectStore(STORE_NAME, { keyPath: 'id' })
+      }
+    }
+  })
+}
+
+export const saveSessions = async (sessions: Session[]): Promise<void> => {
+  const database = await initDB()
+  const transaction = database.transaction([STORE_NAME], 'readwrite')
+  const store = transaction.objectStore(STORE_NAME)
+
+  store.clear()
+
+  for (const session of sessions) {
+    const sessionToStore = {
+      ...session,
+      startTime: session.startTime.toISOString(),
+      intervals: session.intervals.map(interval => ({
+        ...interval,
+        startTime: interval.startTime.toISOString(),
+        endTime: interval.endTime ? interval.endTime.toISOString() : undefined
+      }))
+    }
+    store.add(sessionToStore)
+  }
+
+  return new Promise((resolve, reject) => {
+    transaction.oncomplete = () => resolve()
+    transaction.onerror = () => reject(transaction.error)
+  })
+}
+
+export const loadSessions = async (): Promise<Session[]> => {
+  const database = await initDB()
+  const transaction = database.transaction([STORE_NAME], 'readonly')
+  const store = transaction.objectStore(STORE_NAME)
+  const request = store.getAll()
+
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => {
+      const sessions = request.result.map((session: any) => ({
+        ...session,
+        startTime: new Date(session.startTime),
+        intervals: session.intervals.map((interval: any) => ({
+          ...interval,
+          startTime: new Date(interval.startTime),
+          endTime: interval.endTime ? new Date(interval.endTime) : undefined
+        }))
+      }))
+      resolve(sessions)
+    }
+    request.onerror = () => reject(request.error)
+  })
+}
+
