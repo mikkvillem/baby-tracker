@@ -30,7 +30,7 @@ function SessionDetailsRoute() {
 
   const updateSession = (sessionId: string, intervals: Interval[]) => {
     loadSessions().then(sessions => {
-      const updatedSessions = sessions.map(s => 
+      const updatedSessions = sessions.map(s =>
         s.id === sessionId ? { ...s, intervals } : s
       )
       saveSessions(updatedSessions).then(() => {
