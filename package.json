@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@preact/signals": "^2.5.1",
     "@tanstack/react-router": "^1.144.0",
     "preact": "^10.27.2"
   },

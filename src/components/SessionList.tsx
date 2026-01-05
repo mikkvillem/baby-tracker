@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'preact/hooks'
 import type { Session } from '../app'
 import { ManualSessionModal } from './ManualSessionModal'
+import { FeedingSettingsModal } from './FeedingSettingsModal'
+import { NextFeedingCard } from './NextFeedingCard'
 import './SessionList.css'
 import { useNavigate } from '@tanstack/react-router'
 
@@ -20,6 +22,7 @@ export function SessionList({ sessions, onStartNewSession, onAddManualSession }:
   const navigate = useNavigate()
   const [visibleDays, setVisibleDays] = useState(1)
   const [showManualModal, setShowManualModal] = useState(false)
+  const [showSettingsModal, setShowSettingsModal] = useState(false)
   const formatDuration = (intervals: Session['intervals']) => {
     const total = intervals.reduce((sum, interval) => {
       if (!interval.endTime) return sum
@@ -108,6 +111,7 @@ export function SessionList({ sessions, onStartNewSession, onAddManualSession }:
     onAddManualSession(session)
     setShowManualModal(false)
   }
+
   return (
     <div class="sessionListContainer">
       <header class="sessionListHeader">
@@ -121,6 +125,11 @@ export function SessionList({ sessions, onStartNewSession, onAddManualSession }:
           </button>
         </div>
       </header>
+
+      <NextFeedingCard
+        sessions={sessions}
+        onOpenSettings={() => setShowSettingsModal(true)}
+      />
 
       <div class="sessionsList">
         {sessions.length === 0 ? (
@@ -169,6 +178,12 @@ export function SessionList({ sessions, onStartNewSession, onAddManualSession }:
         <ManualSessionModal
           onClose={() => setShowManualModal(false)}
           onSave={handleManualSave}
+        />
+      )}
+
+      {showSettingsModal && (
+        <FeedingSettingsModal
+          onClose={() => setShowSettingsModal(false)}
         />
       )}
     </div>
