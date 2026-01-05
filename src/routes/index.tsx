@@ -16,7 +16,7 @@ function SessionListRoute() {
   useEffect(() => {
     initDB().then(() => {
       loadSessions().then(loadedSessions => {
-        const sortedSessions = loadedSessions.sort((a, b) => 
+        const sortedSessions = loadedSessions.sort((a, b) =>
           b.startTime.getTime() - a.startTime.getTime()
         )
         setSessions(sortedSessions)
@@ -41,18 +41,22 @@ function SessionListRoute() {
     const updatedSessions = [newSession, ...sessions]
     setSessions(updatedSessions)
     await saveSessions(updatedSessions)
-    navigate({ to: '/session/$sessionId', params: { sessionId: newSession.id } })
+    navigate({ to: '/session/$sessionId/active', params: { sessionId: newSession.id } })
   }
 
-  const viewSession = (sessionId: string) => {
-    navigate({ to: '/session/$sessionId/details', params: { sessionId } })
+  const addManualSession = async (session: Session) => {
+    const updatedSessions = [session, ...sessions].sort((a, b) =>
+      b.startTime.getTime() - a.startTime.getTime()
+    )
+    setSessions(updatedSessions)
+    await saveSessions(updatedSessions)
+    navigate({ to: '/session/$sessionId/details', params: { sessionId: session.id } })
   }
-
   return (
-    <SessionList 
+    <SessionList
       sessions={sessions}
       onStartNewSession={startNewSession}
-      onViewSession={viewSession}
+      onAddManualSession={addManualSession}
     />
   )
 }

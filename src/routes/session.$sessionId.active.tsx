@@ -4,7 +4,7 @@ import { ActiveSession } from '../components/ActiveSession'
 import { loadSessions, saveSessions } from '../db'
 import type { Session, Interval } from '../app'
 
-export const Route = createFileRoute('/session/$sessionId')({
+export const Route = createFileRoute('/session/$sessionId/active')({
   component: ActiveSessionRoute
 })
 
@@ -27,7 +27,7 @@ function ActiveSessionRoute() {
   const endSession = () => {
     if (session) {
       loadSessions().then(sessions => {
-        const updatedSessions = sessions.map(s => 
+        const updatedSessions = sessions.map(s =>
           s.id === sessionId ? { ...s, isActive: false } : s
         )
         saveSessions(updatedSessions).then(() => {
@@ -39,7 +39,7 @@ function ActiveSessionRoute() {
 
   const updateSession = (sessionId: string, intervals: Interval[]) => {
     loadSessions().then(sessions => {
-      const updatedSessions = sessions.map(s => 
+      const updatedSessions = sessions.map(s =>
         s.id === sessionId ? { ...s, intervals } : s
       )
       saveSessions(updatedSessions).then(() => {
@@ -54,9 +54,9 @@ function ActiveSessionRoute() {
   if (!session) {
     return <div>Loading...</div>
   }
-
+  console.log("active session", session)
   return (
-    <ActiveSession 
+    <ActiveSession
       session={session}
       onEndSession={endSession}
       onUpdateSession={updateSession}

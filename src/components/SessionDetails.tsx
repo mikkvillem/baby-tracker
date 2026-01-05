@@ -1,13 +1,18 @@
+import { useState } from 'preact/hooks'
 import type { Session, Interval } from '../app'
+import { IntervalModal } from './IntervalModal'
 import './SessionDetails.css'
 
 type Props = {
   session: Session
   onBack: () => void
   onUpdateSession: (sessionId: string, intervals: Interval[]) => void
+  onDeleteSession: (sessionId: string) => void
 }
 
-export function SessionDetails({ session, onBack, onUpdateSession }: Props) {
+export function SessionDetails({ session, onBack, onUpdateSession, onDeleteSession }: Props) {
+  const [editingIndex, setEditingIndex] = useState<number | null>(null)
+  const [showAddModal, setShowAddModal] = useState(false)
   const formatDuration = (intervals: Interval[]) => {
     const total = intervals.reduce((sum, interval) => {
       if (!interval.endTime) return sum
@@ -22,7 +27,7 @@ export function SessionDetails({ session, onBack, onUpdateSession }: Props) {
     const completedTime = session.intervals
       .filter(i => i.side === side && i.endTime)
       .reduce((sum, i) => sum + (i.endTime!.getTime() - i.startTime.getTime()), 0)
-    
+
     return Math.floor(completedTime / 1000)
   }
 
@@ -44,6 +49,35 @@ export function SessionDetails({ session, onBack, onUpdateSession }: Props) {
     return `${mins}m ${secs}s`
   }
 
+  const handleSaveInterval = (interval: Interval) => {
+    if (editingIndex !== null) {
+      const updatedIntervals = session.intervals.map((int, idx) =>
+        idx === editingIndex ? interval : int
+      )
+      onUpdateSession(session.id, updatedIntervals)
+      setEditingIndex(null)
+    } else {
+      const updatedIntervals = [...session.intervals, interval].sort(
+        (a, b) => a.startTime.getTime() - b.startTime.getTime()
+      )
+      onUpdateSession(session.id, updatedIntervals)
+      setShowAddModal(false)
+    }
+  }
+
+  const handleDeleteFromModal = () => {
+    if (editingIndex !== null) {
+      deleteInterval(editingIndex)
+      setEditingIndex(null)
+    }
+  }
+
+  const handleDeleteSession = () => {
+    if (confirm('Are you sure you want to delete this entire session? This cannot be undone.')) {
+      onDeleteSession(session.id)
+    }
+  }
+
   const getSideCounts = () => {
     const left = session.intervals.filter(i => i.side === 'left').length
     const right = session.intervals.filter(i => i.side === 'right').length
@@ -59,19 +93,22 @@ export function SessionDetails({ session, onBack, onUpdateSession }: Props) {
           ← Back
         </button>
         <h1>Session Details</h1>
+        <button class="deleteSessionButton" onClick={handleDeleteSession}>
+          Delete Session
+        </button>
       </header>
 
       <div class="sessionInfo">
         <div class="sessionInfoRow">
           <span class="infoLabel">Started:</span>
           <span class="infoValue">
-            {session.intervals.length > 0 
-              ? session.intervals[0].startTime.toLocaleString('en-US', { 
-                  month: 'short', 
-                  day: 'numeric', 
-                  hour: '2-digit', 
-                  minute: '2-digit' 
-                })
+            {session.intervals.length > 0
+              ? session.intervals[0].startTime.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })
               : '-'}
           </span>
         </div>
@@ -97,36 +134,48 @@ export function SessionDetails({ session, onBack, onUpdateSession }: Props) {
       </div>
 
       <div class="intervalHistory">
-        <h3>Session History</h3>
+        <div class="historyHeader">
+          <h3>Session History</h3>
+          <button class="addIntervalButton" onClick={() => setShowAddModal(true)}>
+            + Add Interval
+          </button>
+        </div>
         {session.intervals.length === 0 ? (
           <p class="emptyHistory">No intervals recorded</p>
         ) : (
           <div class="intervalsList">
             {session.intervals.map((interval, idx) => (
-              <div key={idx} class="intervalItem">
+              <div
+                key={idx}
+                class="intervalItem clickable"
+                onClick={() => interval.endTime && setEditingIndex(idx)}
+              >
                 <span class={`intervalSide ${interval.side}`}>
                   {interval.side === 'left' ? 'L' : 'R'}
                 </span>
                 <span>{interval.startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
                 {interval.endTime && (
-                  <>
-                    <span class="intervalDuration">
-                      {formatIntervalDuration(interval.startTime, interval.endTime)}
-                    </span>
-                    <button 
-                      class="deleteIntervalButton"
-                      onClick={() => deleteInterval(idx)}
-                      title="Delete interval"
-                    >
-                      ×
-                    </button>
-                  </>
+                  <span class="intervalDuration">
+                    {formatIntervalDuration(interval.startTime, interval.endTime)}
+                  </span>
                 )}
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {(editingIndex !== null || showAddModal) && (
+        <IntervalModal
+          interval={editingIndex !== null ? session.intervals[editingIndex] : undefined}
+          onClose={() => {
+            setEditingIndex(null)
+            setShowAddModal(false)
+          }}
+          onSave={handleSaveInterval}
+          onDelete={editingIndex !== null ? handleDeleteFromModal : undefined}
+        />
+      )}
     </div>
   )
 }

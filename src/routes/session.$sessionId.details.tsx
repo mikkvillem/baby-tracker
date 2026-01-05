@@ -15,6 +15,7 @@ function SessionDetailsRoute() {
 
   useEffect(() => {
     loadSessions().then(sessions => {
+      console.log(sessionId)
       const foundSession = sessions.find(s => s.id === sessionId)
       if (foundSession) {
         setSession(foundSession)
@@ -42,15 +43,27 @@ function SessionDetailsRoute() {
     })
   }
 
+  const deleteSession = (sessionId: string) => {
+    loadSessions().then(sessions => {
+      const updatedSessions = sessions.filter(s => s.id !== sessionId)
+      saveSessions(updatedSessions).then(() => {
+        navigate({ to: '/' })
+      })
+    })
+  }
+
   if (!session) {
     return <div>Loading...</div>
   }
 
   return (
-    <SessionDetails
-      session={session}
-      onBack={backToList}
-      onUpdateSession={updateSession}
-    />
+    <>
+      <SessionDetails
+        session={session}
+        onBack={backToList}
+        onUpdateSession={updateSession}
+        onDeleteSession={deleteSession}
+      />
+    </>
   )
 }

@@ -17,6 +17,31 @@
   font-weight: 600;
 }
 
+.headerButtons {
+  display: flex;
+  gap: 12px;
+}
+
+.manualSessionButton {
+  background: #6b7280;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.manualSessionButton:hover {
+  background: #4b5563;
+}
+
+.manualSessionButton:active {
+  transform: scale(0.98);
+}
+
 .startSessionButton {
   background: #10b981;
   color: white;

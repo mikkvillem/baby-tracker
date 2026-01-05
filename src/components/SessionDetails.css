@@ -31,6 +31,27 @@
   margin: 0;
   font-size: 28px;
   font-weight: 600;
+  flex: 1;
+}
+
+.deleteSessionButton {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.deleteSessionButton:hover {
+  background: #dc2626;
+}
+
+.deleteSessionButton:active {
+  transform: scale(0.98);
 }
 
 .sessionInfo {
@@ -98,10 +119,33 @@
   padding: 20px;
 }
 
-.intervalHistory h3 {
-  margin: 0 0 16px 0;
+.historyHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.historyHeader h3 {
+  margin: 0;
   font-size: 18px;
   font-weight: 600;
+}
+
+.addIntervalButton {
+  padding: 8px 16px;
+  border: none;
+  background: #3b82f6;
+  color: white;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.addIntervalButton:hover {
+  background: #2563eb;
 }
 
 .emptyHistory {
@@ -125,6 +169,16 @@
   background: #f9fafb;
   border-radius: 8px;
   font-size: 14px;
+  transition: all 0.2s;
+}
+
+.intervalItem.clickable {
+  cursor: pointer;
+}
+
+.intervalItem.clickable:hover {
+  background: #f3f4f6;
+  transform: translateX(4px);
 }
 
 .intervalSide {
@@ -153,30 +207,4 @@
   color: #10b981;
 }
 
-.deleteIntervalButton {
-  width: 28px;
-  height: 28px;
-  border: none;
-  background: #fee2e2;
-  color: #dc2626;
-  border-radius: 6px;
-  font-size: 20px;
-  line-height: 1;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  flex-shrink: 0;
-}
-
-.deleteIntervalButton:hover {
-  background: #fecaca;
-  transform: scale(1.1);
-}
-
-.deleteIntervalButton:active {
-  transform: scale(0.95);
-}
 

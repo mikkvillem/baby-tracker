@@ -1,11 +1,13 @@
 import { useState, useMemo } from 'preact/hooks'
 import type { Session } from '../app'
+import { ManualSessionModal } from './ManualSessionModal'
 import './SessionList.css'
+import { useNavigate } from '@tanstack/react-router'
 
 type Props = {
   sessions: Session[]
   onStartNewSession: () => void
-  onViewSession: (sessionId: string) => void
+  onAddManualSession: (session: Session) => void
 }
 
 type GroupedSessions = {
@@ -14,8 +16,10 @@ type GroupedSessions = {
   sessions: Session[]
 }
 
-export function SessionList({ sessions, onStartNewSession, onViewSession }: Props) {
+export function SessionList({ sessions, onStartNewSession, onAddManualSession }: Props) {
+  const navigate = useNavigate()
   const [visibleDays, setVisibleDays] = useState(1)
+  const [showManualModal, setShowManualModal] = useState(false)
   const formatDuration = (intervals: Session['intervals']) => {
     const total = intervals.reduce((sum, interval) => {
       if (!interval.endTime) return sum
@@ -26,9 +30,9 @@ export function SessionList({ sessions, onStartNewSession, onViewSession }: Prop
   }
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
     })
   }
 
@@ -40,60 +44,82 @@ export function SessionList({ sessions, onStartNewSession, onViewSession }: Prop
 
   const groupedSessions = useMemo(() => {
     const groups = new Map<string, GroupedSessions>()
-    
+
     sessions.forEach(session => {
       const date = new Date(session.startTime)
       date.setHours(0, 0, 0, 0)
       const dateKey = date.toISOString()
-      
+
       if (!groups.has(dateKey)) {
         const today = new Date()
         today.setHours(0, 0, 0, 0)
         const yesterday = new Date(today)
         yesterday.setDate(yesterday.getDate() - 1)
-        
+
         let displayDate: string
         if (date.getTime() === today.getTime()) {
           displayDate = 'Today'
         } else if (date.getTime() === yesterday.getTime()) {
           displayDate = 'Yesterday'
         } else {
-          displayDate = date.toLocaleDateString('en-US', { 
-            weekday: 'long', 
-            month: 'short', 
-            day: 'numeric' 
+          displayDate = date.toLocaleDateString('en-US', {
+            weekday: 'long',
+            month: 'short',
+            day: 'numeric'
           })
         }
-        
+
         groups.set(dateKey, {
           date: dateKey,
           displayDate,
           sessions: []
         })
       }
-      
+
       groups.get(dateKey)!.sessions.push(session)
     })
-    
-    return Array.from(groups.values()).sort((a, b) => 
+
+    return Array.from(groups.values()).sort((a, b) =>
       new Date(b.date).getTime() - new Date(a.date).getTime()
     )
   }, [sessions])
 
-  const visibleGroups = groupedSessions.slice(0, visibleDays)
-  const hasMore = visibleDays < groupedSessions.length
+  const getInitialVisibleDays = () => {
+    let sessionCount = 0
+    let daysNeeded = 0
+    for (const group of groupedSessions) {
+      daysNeeded++
+      sessionCount += group.sessions.length
+      if (sessionCount >= 4) break
+    }
+    return Math.max(daysNeeded, 1)
+  }
+
+  const initialDays = useMemo(() => getInitialVisibleDays(), [groupedSessions])
+
+  const visibleGroups = groupedSessions.slice(0, Math.max(visibleDays, initialDays))
+  const hasMore = Math.max(visibleDays, initialDays) < groupedSessions.length
 
   const loadMore = () => {
     setVisibleDays(prev => prev + 1)
   }
 
+  const handleManualSave = (session: Session) => {
+    onAddManualSession(session)
+    setShowManualModal(false)
+  }
   return (
     <div class="sessionListContainer">
       <header class="sessionListHeader">
         <h1>Feeding Sessions</h1>
-        <button class="startSessionButton" onClick={onStartNewSession}>
-          + New Session
-        </button>
+        <div class="headerButtons">
+          <button class="manualSessionButton" onClick={() => setShowManualModal(true)}>
+            + Manual
+          </button>
+          <button class="startSessionButton" onClick={onStartNewSession}>
+            + New Session
+          </button>
+        </div>
       </header>
 
       <div class="sessionsList">
@@ -111,10 +137,10 @@ export function SessionList({ sessions, onStartNewSession, onViewSession }: Prop
                   {group.sessions.map(session => {
                     const { left, right } = getSideCounts(session.intervals)
                     return (
-                      <div 
-                        key={session.id} 
-                        class={`sessionCard ${!session.isActive ? 'clickable' : ''}`}
-                        onClick={() => !session.isActive && onViewSession(session.id)}
+                      <div
+                        key={session.id}
+                        class='sessionCard clickable'
+                        onClick={() => navigate({ to: `/session/${session.id}/${session.isActive ? 'active' : 'details'}` })}
                       >
                         <div class="sessionCardHeader">
                           <span class="sessionTime">{formatTime(session.startTime)}</span>
@@ -138,6 +164,13 @@ export function SessionList({ sessions, onStartNewSession, onViewSession }: Prop
           </>
         )}
       </div>
+
+      {showManualModal && (
+        <ManualSessionModal
+          onClose={() => setShowManualModal(false)}
+          onSave={handleManualSave}
+        />
+      )}
     </div>
   )
 }
