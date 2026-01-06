@@ -20,6 +20,9 @@ importers:
       preact:
         specifier: ^10.27.2
         version: 10.28.1
+      wrangler:
+        specifier: ^4.54.0
+        version: 4.54.0
     devDependencies:
       '@biomejs/biome':
         specifier: 2.3.10
