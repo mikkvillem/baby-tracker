@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@cloudflare/vite-plugin": "^1.17.1",
     "@preact/signals": "^2.5.1",
     "@tanstack/react-router": "^1.144.0",
     "preact": "^10.27.2"
