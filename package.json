@@ -12,8 +12,10 @@
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.17.1",
     "@preact/signals": "^2.5.1",
+    "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-router": "^1.144.0",
     "preact": "^10.27.2",
+    "tailwindcss": "^4.1.18",
     "wrangler": "^4.54.0"
   },
   "devDependencies": {
