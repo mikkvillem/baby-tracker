@@ -1,3 +1,5 @@
+import './app.css'
+
 export type Session = {
   id: string
   startTime: Date

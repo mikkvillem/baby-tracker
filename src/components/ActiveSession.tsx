@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'preact/hooks'
 import type { Session, Interval } from '../app'
 import { useBeforeUnload } from '../hooks/useBeforeUnload'
-import './ActiveSession.css'
 
 type Props = {
   session: Session
@@ -146,36 +145,51 @@ export function ActiveSession({ session, onEndSession, onUpdateSession }: Props)
   }
 
   return (
-    <div class="activeSessionContainer">
-      <header class="activeSessionHeader">
-        <h1>Active Session</h1>
-        <button class="endSessionButton" onClick={onEndSession}>
+    <div class="max-w-2xl mx-auto px-4 sm:px-5">
+      <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+        <h1 class="text-2xl sm:text-3xl font-semibold m-0">Active Session</h1>
+        <button 
+          class="w-full sm:w-auto bg-red-500 text-white border-none px-5 sm:px-6 py-3 rounded-lg text-base font-semibold cursor-pointer transition-all duration-200 hover:bg-red-600"
+          onClick={onEndSession}
+        >
           End Session
         </button>
       </header>
 
-      <div class="sessionSummary">
-        <p>Total: {getTotalDuration()}</p>
-        <p>Started: {intervals.length > 0 ? intervals[0].startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : ' - '}</p>
+      <div class="bg-gray-50 rounded-xl p-4 mb-6 sm:mb-8 flex justify-around text-base flex-wrap gap-2">
+        <p class="m-0 font-medium">Total: {getTotalDuration()}</p>
+        <p class="m-0 font-medium">Started: {intervals.length > 0 ? intervals[0].startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : ' - '}</p>
       </div>
 
-      <div class="timerControls">
-        <div class="timerControl">
-          <h2>Left</h2>
-          <div class="timerDisplay">{formatTimer(getTotalTimeForSide('left'))}</div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 mb-8 sm:mb-10">
+        <div class="bg-white border-2 border-gray-200 rounded-2xl p-5 sm:p-6 text-center">
+          <h2 class="m-0 mb-4 text-xl font-semibold">Left</h2>
+          <div class="text-5xl sm:text-6xl font-bold font-mono mb-4 text-gray-800">
+            {formatTimer(getTotalTimeForSide('left'))}
+          </div>
           <button 
-            class={`timerButton ${activeLeft ? 'active' : ''}`}
+            class={`w-full py-3 border-none rounded-lg text-base font-semibold cursor-pointer transition-all duration-200 ${
+              activeLeft 
+                ? 'bg-red-500 hover:bg-red-600 text-white' 
+                : 'bg-blue-500 hover:bg-blue-600 text-white'
+            }`}
             onClick={toggleLeft}
           >
             {activeLeft ? 'Stop' : 'Start'}
           </button>
         </div>
 
-        <div class="timerControl">
-          <h2>Right</h2>
-          <div class="timerDisplay">{formatTimer(getTotalTimeForSide('right'))}</div>
+        <div class="bg-white border-2 border-gray-200 rounded-2xl p-5 sm:p-6 text-center">
+          <h2 class="m-0 mb-4 text-xl font-semibold">Right</h2>
+          <div class="text-5xl sm:text-6xl font-bold font-mono mb-4 text-gray-800">
+            {formatTimer(getTotalTimeForSide('right'))}
+          </div>
           <button 
-            class={`timerButton ${activeRight ? 'active' : ''}`}
+            class={`w-full py-3 border-none rounded-lg text-base font-semibold cursor-pointer transition-all duration-200 ${
+              activeRight 
+                ? 'bg-red-500 hover:bg-red-600 text-white' 
+                : 'bg-blue-500 hover:bg-blue-600 text-white'
+            }`}
             onClick={toggleRight}
           >
             {activeRight ? 'Stop' : 'Start'}
@@ -183,26 +197,28 @@ export function ActiveSession({ session, onEndSession, onUpdateSession }: Props)
         </div>
       </div>
 
-      <div class="intervalHistory">
-        <h3>Session History</h3>
+      <div class="bg-white border border-gray-200 rounded-xl p-4 sm:p-5">
+        <h3 class="m-0 mb-4 text-lg font-semibold">Session History</h3>
         {intervals.length === 0 ? (
-          <p class="emptyHistory">No intervals yet</p>
+          <p class="text-center text-gray-500 py-5 m-0">No intervals yet</p>
         ) : (
-          <div class="intervalsList">
+          <div class="flex flex-col gap-2">
             {intervals.map((interval, idx) => (
-              <div key={idx} class="intervalItem">
-                <span class={`intervalSide ${interval.side}`}>
+              <div key={idx} class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg text-sm">
+                <span class={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white shrink-0 ${
+                  interval.side === 'left' ? 'bg-blue-500' : 'bg-purple-500'
+                }`}>
                   {interval.side === 'left' ? 'L' : 'R'}
                 </span>
-                <span>{interval.startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                <span class="text-xs sm:text-sm">{interval.startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
                 {interval.endTime && (
-                  <span class="intervalDuration">
+                  <span class="ml-auto font-semibold text-emerald-500">
                     {formatIntervalDuration(interval.startTime, interval.endTime)}
                   </span>
                 )}
                 {interval.endTime && (
                   <button 
-                    class="deleteIntervalButton"
+                    class="w-7 h-7 border-none bg-red-100 text-red-600 rounded-md text-xl leading-none cursor-pointer transition-all duration-200 hover:bg-red-200 hover:scale-110 active:scale-95 flex items-center justify-center p-0"
                     onClick={() => deleteInterval(idx)}
                     title="Delete interval"
                   >

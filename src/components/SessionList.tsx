@@ -3,7 +3,6 @@ import type { Session } from '../app'
 import { ManualSessionModal } from './ManualSessionModal'
 import { FeedingSettingsModal } from './FeedingSettingsModal'
 import { NextFeedingCard } from './NextFeedingCard'
-import './SessionList.css'
 import { useNavigate } from '@tanstack/react-router'
 
 type Props = {
@@ -113,14 +112,20 @@ export function SessionList({ sessions, onStartNewSession, onAddManualSession }:
   }
 
   return (
-    <div class="sessionListContainer">
-      <header class="sessionListHeader">
-        <h1>Feeding Sessions</h1>
-        <div class="headerButtons">
-          <button class="manualSessionButton" onClick={() => setShowManualModal(true)}>
+    <div class="max-w-2xl mx-auto px-4 sm:px-5">
+      <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+        <h1 class="text-2xl sm:text-3xl font-semibold m-0">Feeding Sessions</h1>
+        <div class="flex gap-3 w-full sm:w-auto">
+          <button
+            class="flex-1 sm:flex-none bg-gray-500 text-white border-none px-4 sm:px-5 py-3 rounded-lg text-base font-semibold cursor-pointer transition-all duration-200 hover:bg-gray-600 active:scale-[0.98]"
+            onClick={() => setShowManualModal(true)}
+          >
             + Manual
           </button>
-          <button class="startSessionButton" onClick={onStartNewSession}>
+          <button
+            class="flex-1 sm:flex-none bg-emerald-500 text-white border-none px-5 sm:px-6 py-3 rounded-lg text-base font-semibold cursor-pointer transition-all duration-200 hover:bg-emerald-600 active:scale-[0.98]"
+            onClick={onStartNewSession}
+          >
             + New Session
           </button>
         </div>
@@ -131,31 +136,35 @@ export function SessionList({ sessions, onStartNewSession, onAddManualSession }:
         onOpenSettings={() => setShowSettingsModal(true)}
       />
 
-      <div class="sessionsList">
+      <div class="flex flex-col gap-6">
         {sessions.length === 0 ? (
-          <div class="emptyState">
-            <p>No sessions yet</p>
-            <p>Start tracking your baby's feeding</p>
+          <div class="text-center py-12 sm:py-15 px-5 text-gray-500">
+            <p class="text-lg font-medium mb-2">No sessions yet</p>
+            <p class="text-sm">Start tracking your baby's feeding</p>
           </div>
         ) : (
           <>
             {visibleGroups.map(group => (
-              <div key={group.date} class="sessionGroup">
-                <h2 class="dateHeader">{group.displayDate}</h2>
-                <div class="groupSessions">
+              <div key={group.date} class="flex flex-col gap-3">
+                <h2 class="m-0 text-lg font-semibold text-gray-700 pl-1">{group.displayDate}</h2>
+                <div class="flex flex-col gap-3">
                   {group.sessions.map(session => {
                     const { left, right } = getSideCounts(session.intervals)
                     return (
                       <div
                         key={session.id}
-                        class='sessionCard clickable'
+                        class="bg-white border border-gray-200 rounded-xl p-4 transition-all duration-200 cursor-pointer hover:shadow-md hover:border-gray-300"
                         onClick={() => navigate({ to: `/session/${session.id}/${session.isActive ? 'active' : 'details'}` })}
                       >
-                        <div class="sessionCardHeader">
-                          <span class="sessionTime">{formatTime(session.startTime)}</span>
-                          {session.isActive && <span class="activeIndicator">Active</span>}
+                        <div class="flex justify-between items-center mb-3">
+                          <span class="text-lg font-semibold">{formatTime(session.startTime)}</span>
+                          {session.isActive && (
+                            <span class="bg-emerald-500 text-white px-3 py-1 rounded-xl text-xs font-medium">
+                              Active
+                            </span>
+                          )}
                         </div>
-                        <div class="sessionStats">
+                        <div class="flex gap-4 text-gray-500 text-sm">
                           <span>Duration: {formatDuration(session.intervals)}</span>
                           <span>Left: {left} | Right: {right}</span>
                         </div>
@@ -166,7 +175,10 @@ export function SessionList({ sessions, onStartNewSession, onAddManualSession }:
               </div>
             ))}
             {hasMore && (
-              <button class="loadMoreButton" onClick={loadMore}>
+              <button
+                class="w-full bg-white text-gray-500 border border-gray-200 px-5 sm:px-6 py-3 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 active:scale-[0.98]"
+                onClick={loadMore}
+              >
                 Load Previous Day
               </button>
             )}
