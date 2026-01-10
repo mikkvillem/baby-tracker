@@ -3,6 +3,7 @@ import type { Session } from '../app'
 import { ManualSessionModal } from './ManualSessionModal'
 import { FeedingSettingsModal } from './FeedingSettingsModal'
 import { NextFeedingCard } from './NextFeedingCard'
+import { DailyStats } from './DailyStats'
 import { useNavigate } from '@tanstack/react-router'
 
 type Props = {
@@ -135,6 +136,8 @@ export function SessionList({ sessions, onStartNewSession, onAddManualSession }:
         sessions={sessions}
         onOpenSettings={() => setShowSettingsModal(true)}
       />
+
+      <DailyStats sessions={sessions} />
 
       <div class="flex flex-col gap-6">
         {sessions.length === 0 ? (
