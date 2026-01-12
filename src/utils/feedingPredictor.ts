@@ -7,16 +7,38 @@ export type FeedingPrediction = {
   reasoning: string
 }
 
+function getLastFeedingReferenceTime(sessions: Session[]): Date | null {
+  if (sessions.length === 0) return null
+  
+  const lastSession = sessions[0]
+  
+  // Check for intervals of at least 10 minutes
+  const significantIntervals = lastSession.intervals.filter(interval => {
+    if (!interval.endTime) return false
+    const duration = interval.endTime.getTime() - interval.startTime.getTime()
+    return duration >= 10 * 60000 // 10 minutes in milliseconds
+  })
+  
+  // If we have significant intervals, use the end time of the most recent one
+  if (significantIntervals.length > 0) {
+    const lastSignificantInterval = significantIntervals[significantIntervals.length - 1]
+    return lastSignificantInterval.endTime!
+  }
+  
+  // Otherwise, use the session start time
+  return lastSession.startTime
+}
+
 function calculateSimpleInterval(
   sessions: Session[],
   settings: FeedingSettings
 ): Date | null {
-  if (sessions.length === 0) return null
+  const referenceTime = getLastFeedingReferenceTime(sessions)
+  if (!referenceTime) return null
   
-  const lastSession = sessions[0]
   const intervalMinutes = settings.simpleIntervalMinutes
   
-  return new Date(lastSession.startTime.getTime() + intervalMinutes * 60000)
+  return new Date(referenceTime.getTime() + intervalMinutes * 60000)
 }
 
 function calculateDistribution(
@@ -54,14 +76,14 @@ function calculateDistribution(
   
   const intervalMinutes = remainingMinutes / (sessionsRemaining + 1)
   
-  if (sessions.length === 0) {
+  const referenceTime = getLastFeedingReferenceTime(sessions)
+  if (!referenceTime) {
     return new Date(now.getTime() + intervalMinutes * 60000)
   }
   
-  const lastSession = sessions[0]
   return new Date(
     Math.max(
-      lastSession.startTime.getTime() + intervalMinutes * 60000,
+      referenceTime.getTime() + intervalMinutes * 60000,
       now.getTime() + 30 * 60000
     )
   )
@@ -104,6 +126,9 @@ function calculateAdaptive(
     adjustedInterval *= 1.5
   }
   
+  const referenceTime = getLastFeedingReferenceTime(sessions)
+  if (!referenceTime) return null
+  
   const lastSession = sessions[0]
   const totalDuration = lastSession.intervals.reduce((sum, interval) => {
     if (!interval.endTime) return sum
@@ -117,7 +142,7 @@ function calculateAdaptive(
   }
   
   return new Date(
-    lastSession.startTime.getTime() + adjustedInterval * 60000
+    referenceTime.getTime() + adjustedInterval * 60000
   )
 }
 
