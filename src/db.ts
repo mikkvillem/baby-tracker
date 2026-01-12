@@ -79,3 +79,34 @@ export const loadSessions = async (): Promise<Session[]> => {
   })
 }
 
+export const exportDataAsJSON = async (): Promise<void> => {
+  const sessions = await loadSessions()
+  
+  const exportData = {
+    exportDate: new Date().toISOString(),
+    version: '1.0',
+    sessions: sessions.map(session => ({
+      ...session,
+      startTime: session.startTime.toISOString(),
+      intervals: session.intervals.map(interval => ({
+        ...interval,
+        startTime: interval.startTime.toISOString(),
+        endTime: interval.endTime ? interval.endTime.toISOString() : undefined
+      }))
+    }))
+  }
+
+  const jsonString = JSON.stringify(exportData, null, 2)
+  const blob = new Blob([jsonString], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `baby-tracker-backup-${new Date().toISOString().slice(0, 10)}.json`
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  
+  URL.revokeObjectURL(url)
+}
+
