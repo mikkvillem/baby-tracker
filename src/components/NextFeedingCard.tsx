@@ -6,10 +6,9 @@ import { suggestNextFeeding, formatTimeUntil } from '../utils/feedingPredictor'
 
 type Props = {
   sessions: Session[]
-  onOpenSettings: () => void
 }
 
-export function NextFeedingCard({ sessions, onOpenSettings }: Props) {
+export function NextFeedingCard({ sessions }: Props) {
   const [, forceUpdate] = useState(0)
   
   const prediction = computed(() => 
@@ -30,30 +29,25 @@ export function NextFeedingCard({ sessions, onOpenSettings }: Props) {
   const isOverdue = pred.suggestedTime.getTime() < Date.now()
 
   return (
-    <div class={`rounded-2xl p-4 sm:p-5 mb-6 text-white shadow-md ${
+    <div class={`rounded-xl p-3 mb-4 text-white shadow-sm flex items-center justify-between ${
       isOverdue 
-        ? 'bg-gradient-to-br from-pink-400 to-rose-500' 
-        : 'bg-gradient-to-br from-indigo-500 to-purple-600'
+        ? 'bg-gradient-to-r from-pink-400 to-rose-500' 
+        : 'bg-gradient-to-r from-indigo-500 to-purple-600'
     }`}>
-      <div class="flex items-center gap-2 mb-3">
-        <span class="text-xl">⏰</span>
-        <h3 class="m-0 text-base font-semibold flex-1">Next Feeding</h3>
-        <button 
-          class="bg-white/20 border-none w-8 h-8 rounded-lg text-base cursor-pointer transition-all duration-200 hover:bg-white/30 hover:scale-105 flex items-center justify-center"
-          onClick={onOpenSettings}
-        >
-          ⚙️
-        </button>
+      <div class="flex items-center gap-2">
+        <span class="text-lg">⏰</span>
+        <div>
+          <div class="text-xs opacity-80">Next Feeding</div>
+          <div class="text-lg font-bold font-mono">
+            {pred.suggestedTime.toLocaleTimeString('en-US', {
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </div>
+        </div>
       </div>
-      <div class="text-center">
-        <p class="text-4xl sm:text-5xl font-bold my-2 font-mono">
-          {pred.suggestedTime.toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit'
-          })}
-        </p>
-        <p class="text-lg font-medium my-1 opacity-90">{formatTimeUntil(pred.suggestedTime)}</p>
-        <p class="text-sm opacity-80 mt-2 mb-0">{pred.reasoning}</p>
+      <div class="text-right">
+        <div class="text-sm font-medium">{formatTimeUntil(pred.suggestedTime)}</div>
       </div>
     </div>
   )
