@@ -109,4 +109,3 @@ export const exportDataAsJSON = async (): Promise<void> => {
   
   URL.revokeObjectURL(url)
 }
-

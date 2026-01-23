@@ -1,21 +1,11 @@
 import { signal, effect } from '@preact/signals'
 
-export type PredictorMethod = 'simple' | 'distribution' | 'adaptive'
-
 export type FeedingSettings = {
-  predictorMethod: PredictorMethod
-  simpleIntervalMinutes: number
-  targetDailySessions: number
-  wakingStartHour: number
-  wakingEndHour: number
+  intervalMinutes: number
 }
 
 const DEFAULT_SETTINGS: FeedingSettings = {
-  predictorMethod: 'distribution',
-  simpleIntervalMinutes: 150,
-  targetDailySessions: 10,
-  wakingStartHour: 6,
-  wakingEndHour: 22
+  intervalMinutes: 180 // 3 hours
 }
 
 const loadSettings = (): FeedingSettings => {

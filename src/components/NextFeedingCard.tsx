@@ -12,7 +12,7 @@ export function NextFeedingCard({ sessions }: Props) {
   const [, forceUpdate] = useState(0)
   
   const prediction = computed(() => 
-    suggestNextFeeding(sessions, feedingSettings.value)
+    suggestNextFeeding(sessions, feedingSettings.value.intervalMinutes)
   )
 
   useEffect(() => {
