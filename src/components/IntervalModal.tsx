@@ -51,14 +51,30 @@ export function IntervalModal({ interval, onClose, onSave, onDelete }: Props) {
         <form onSubmit={handleSubmit}>
           <div class="mb-4">
             <label class="block text-sm font-medium mb-1.5 text-gray-700">Side</label>
-            <select
-              value={side}
-              onChange={(e) => setSide((e.target as HTMLSelectElement).value as 'left' | 'right')}
-              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)]"
-            >
-              <option value="left">Left</option>
-              <option value="right">Right</option>
-            </select>
+            <div class="flex gap-2">
+              <button
+                type="button"
+                class={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-200 ${
+                  side === 'left'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+                onClick={() => setSide('left')}
+              >
+                Left
+              </button>
+              <button
+                type="button"
+                class={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-200 ${
+                  side === 'right'
+                    ? 'bg-purple-500 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+                onClick={() => setSide('right')}
+              >
+                Right
+              </button>
+            </div>
           </div>
           
           <div class="mb-4">
