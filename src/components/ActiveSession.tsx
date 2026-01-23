@@ -158,7 +158,7 @@ export function ActiveSession({ session, onEndSession, onUpdateSession }: Props)
 
       <div class="bg-gray-50 rounded-xl p-4 mb-6 sm:mb-8 flex justify-around text-base flex-wrap gap-2">
         <p class="m-0 font-medium">Total: {getTotalDuration()}</p>
-        <p class="m-0 font-medium">Started: {intervals.length > 0 ? intervals[0].startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : ' - '}</p>
+        <p class="m-0 font-medium">Started: {intervals.length > 0 ? intervals[0].startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) : ' - '}</p>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 mb-8 sm:mb-10">
@@ -210,7 +210,7 @@ export function ActiveSession({ session, onEndSession, onUpdateSession }: Props)
                 }`}>
                   {interval.side === 'left' ? 'L' : 'R'}
                 </span>
-                <span class="text-xs sm:text-sm">{interval.startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                <span class="text-xs sm:text-sm">{interval.startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}</span>
                 {interval.endTime && (
                   <span class="ml-auto font-semibold text-emerald-500">
                     {formatIntervalDuration(interval.startTime, interval.endTime)}

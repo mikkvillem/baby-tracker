@@ -41,7 +41,8 @@ export function NextFeedingCard({ sessions }: Props) {
           <div class="text-lg font-bold font-mono">
             {pred.suggestedTime.toLocaleTimeString('en-US', {
               hour: '2-digit',
-              minute: '2-digit'
+              minute: '2-digit',
+              hour12: false
             })}
           </div>
         </div>

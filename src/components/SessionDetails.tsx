@@ -112,7 +112,8 @@ export function SessionDetails({ session, onBack, onUpdateSession, onDeleteSessi
                 month: 'short',
                 day: 'numeric',
                 hour: '2-digit',
-                minute: '2-digit'
+                minute: '2-digit',
+                hour12: false
               })
               : '-'}
           </span>
@@ -169,7 +170,7 @@ export function SessionDetails({ session, onBack, onUpdateSession, onDeleteSessi
                 }`}>
                   {interval.side === 'left' ? 'L' : 'R'}
                 </span>
-                <span class="text-xs sm:text-sm">{interval.startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                <span class="text-xs sm:text-sm">{interval.startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}</span>
                 {interval.endTime && (
                   <span class="ml-auto font-semibold text-emerald-500">
                     {formatIntervalDuration(interval.startTime, interval.endTime)}
