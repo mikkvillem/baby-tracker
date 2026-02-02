@@ -199,7 +199,7 @@ function HistoryRoute() {
               <div key={group.date} class="flex flex-col gap-3">
                 <h2 class="m-0 text-lg font-semibold text-gray-700 pl-1">{group.displayDate}</h2>
                 <div class="flex flex-col gap-3">
-                  {group.items.map((item, idx) => {
+                  {group.items.map((item) => {
                     if (item.type === 'session') {
                       const session = item.data
                       const { left, right } = getSideCounts(session.intervals)
