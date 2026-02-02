@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState, useEffect } from 'preact/hooks'
 import { SessionList } from '../components/SessionList'
-import { loadSessions, saveSessions, initDB } from '../db'
-import type { Session } from '../app'
+import { loadSessions, saveSessions, saveMiscEvent, initDB } from '../db'
+import type { Session, MiscEvent } from '../app'
 
 export const Route = createFileRoute('/')({
   component: SessionListRoute
@@ -52,11 +52,17 @@ function SessionListRoute() {
     await saveSessions(updatedSessions)
     navigate({ to: '/session/$sessionId/details', params: { sessionId: session.id } })
   }
+
+  const addMiscEvent = async (event: MiscEvent) => {
+    await saveMiscEvent(event)
+  }
+
   return (
     <SessionList
       sessions={sessions}
       onStartNewSession={startNewSession}
       onAddManualSession={addManualSession}
+      onAddMiscEvent={addMiscEvent}
     />
   )
 }

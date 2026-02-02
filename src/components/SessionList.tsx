@@ -1,6 +1,7 @@
 import { useState } from 'preact/hooks'
-import type { Session } from '../app'
+import type { Session, MiscEvent } from '../app'
 import { ManualSessionModal } from './ManualSessionModal'
+import { MiscEventModal } from './MiscEventModal'
 import { NextFeedingCard } from './NextFeedingCard'
 import { DailyStats } from './DailyStats'
 import { useNavigate } from '@tanstack/react-router'
@@ -9,14 +10,21 @@ type Props = {
   sessions: Session[]
   onStartNewSession: () => void
   onAddManualSession: (session: Session) => void
+  onAddMiscEvent: (event: MiscEvent) => void
 }
 
-export function SessionList({ sessions, onStartNewSession, onAddManualSession }: Props) {
+export function SessionList({ sessions, onStartNewSession, onAddManualSession, onAddMiscEvent }: Props) {
   const navigate = useNavigate()
   const [showManualModal, setShowManualModal] = useState(false)
+  const [showMiscEventModal, setShowMiscEventModal] = useState(false)
   const handleManualSave = (session: Session) => {
     onAddManualSession(session)
     setShowManualModal(false)
+  }
+
+  const handleMiscEventSave = (event: MiscEvent) => {
+    onAddMiscEvent(event)
+    setShowMiscEventModal(false)
   }
 
   return (
@@ -47,11 +55,10 @@ export function SessionList({ sessions, onStartNewSession, onAddManualSession }:
 
         <button
           class="bg-amber-500 text-white border-none p-6 sm:p-8 rounded-2xl font-semibold text-base sm:text-lg cursor-pointer transition-all duration-200 hover:bg-amber-600 active:scale-[0.98] shadow-md flex flex-col items-center gap-2"
-          disabled
-          style={{ opacity: 0.5, cursor: 'not-allowed' }}
+          onClick={() => setShowMiscEventModal(true)}
         >
-          <span class="text-3xl sm:text-4xl">🚼</span>
-          <span>Diaper Track</span>
+          <span class="text-3xl sm:text-4xl">➕</span>
+          <span>Add Event</span>
         </button>
 
         <button
@@ -67,6 +74,13 @@ export function SessionList({ sessions, onStartNewSession, onAddManualSession }:
         <ManualSessionModal
           onClose={() => setShowManualModal(false)}
           onSave={handleManualSave}
+        />
+      )}
+
+      {showMiscEventModal && (
+        <MiscEventModal
+          onClose={() => setShowMiscEventModal(false)}
+          onSave={handleMiscEventSave}
         />
       )}
     </div>

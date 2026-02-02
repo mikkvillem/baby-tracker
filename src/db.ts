@@ -1,8 +1,9 @@
-import type { Session } from './app'
+import type { Session, MiscEvent } from './app'
 
 const DB_NAME = 'baby-tracker-db'
-const DB_VERSION = 1
-const STORE_NAME = 'sessions'
+const DB_VERSION = 2
+const SESSIONS_STORE = 'sessions'
+const MISC_EVENTS_STORE = 'misc-events'
 
 let db: IDBDatabase | null = null
 
@@ -23,8 +24,13 @@ export const initDB = (): Promise<IDBDatabase> => {
 
     request.onupgradeneeded = (event) => {
       const database = (event.target as IDBOpenDBRequest).result
-      if (!database.objectStoreNames.contains(STORE_NAME)) {
-        database.createObjectStore(STORE_NAME, { keyPath: 'id' })
+      
+      if (!database.objectStoreNames.contains(SESSIONS_STORE)) {
+        database.createObjectStore(SESSIONS_STORE, { keyPath: 'id' })
+      }
+      
+      if (!database.objectStoreNames.contains(MISC_EVENTS_STORE)) {
+        database.createObjectStore(MISC_EVENTS_STORE, { keyPath: 'id' })
       }
     }
   })
@@ -32,8 +38,8 @@ export const initDB = (): Promise<IDBDatabase> => {
 
 export const saveSessions = async (sessions: Session[]): Promise<void> => {
   const database = await initDB()
-  const transaction = database.transaction([STORE_NAME], 'readwrite')
-  const store = transaction.objectStore(STORE_NAME)
+  const transaction = database.transaction([SESSIONS_STORE], 'readwrite')
+  const store = transaction.objectStore(SESSIONS_STORE)
 
   store.clear()
 
@@ -58,8 +64,8 @@ export const saveSessions = async (sessions: Session[]): Promise<void> => {
 
 export const loadSessions = async (): Promise<Session[]> => {
   const database = await initDB()
-  const transaction = database.transaction([STORE_NAME], 'readonly')
-  const store = transaction.objectStore(STORE_NAME)
+  const transaction = database.transaction([SESSIONS_STORE], 'readonly')
+  const store = transaction.objectStore(SESSIONS_STORE)
   const request = store.getAll()
 
   return new Promise((resolve, reject) => {
@@ -79,12 +85,62 @@ export const loadSessions = async (): Promise<Session[]> => {
   })
 }
 
+export const saveMiscEvent = async (event: MiscEvent): Promise<void> => {
+  const database = await initDB()
+  const transaction = database.transaction([MISC_EVENTS_STORE], 'readwrite')
+  const store = transaction.objectStore(MISC_EVENTS_STORE)
+
+  const eventToStore = {
+    ...event,
+    timestamp: event.timestamp.toISOString()
+  }
+  
+  store.add(eventToStore)
+
+  return new Promise((resolve, reject) => {
+    transaction.oncomplete = () => resolve()
+    transaction.onerror = () => reject(transaction.error)
+  })
+}
+
+export const loadMiscEvents = async (): Promise<MiscEvent[]> => {
+  const database = await initDB()
+  const transaction = database.transaction([MISC_EVENTS_STORE], 'readonly')
+  const store = transaction.objectStore(MISC_EVENTS_STORE)
+  const request = store.getAll()
+
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => {
+      const events = request.result.map((event: any) => ({
+        ...event,
+        timestamp: new Date(event.timestamp)
+      }))
+      resolve(events)
+    }
+    request.onerror = () => reject(request.error)
+  })
+}
+
+export const deleteMiscEvent = async (eventId: string): Promise<void> => {
+  const database = await initDB()
+  const transaction = database.transaction([MISC_EVENTS_STORE], 'readwrite')
+  const store = transaction.objectStore(MISC_EVENTS_STORE)
+  
+  store.delete(eventId)
+
+  return new Promise((resolve, reject) => {
+    transaction.oncomplete = () => resolve()
+    transaction.onerror = () => reject(transaction.error)
+  })
+}
+
 export const exportDataAsJSON = async (): Promise<void> => {
   const sessions = await loadSessions()
+  const miscEvents = await loadMiscEvents()
   
   const exportData = {
     exportDate: new Date().toISOString(),
-    version: '1.0',
+    version: '2.0',
     sessions: sessions.map(session => ({
       ...session,
       startTime: session.startTime.toISOString(),
@@ -93,6 +149,10 @@ export const exportDataAsJSON = async (): Promise<void> => {
         startTime: interval.startTime.toISOString(),
         endTime: interval.endTime ? interval.endTime.toISOString() : undefined
       }))
+    })),
+    miscEvents: miscEvents.map(event => ({
+      ...event,
+      timestamp: event.timestamp.toISOString()
     }))
   }
 
