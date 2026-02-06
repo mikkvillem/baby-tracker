@@ -22,6 +22,7 @@ function HistoryRoute() {
   const [sessions, setSessions] = useState<Session[]>([])
   const [miscEvents, setMiscEvents] = useState<MiscEvent[]>([])
   const [visibleDays, setVisibleDays] = useState(3)
+  const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set())
 
   const loadData = () => {
     initDB().then(() => {
@@ -155,8 +156,66 @@ function HistoryRoute() {
   const visibleGroups = groupedTimeline.slice(0, visibleDays)
   const hasMore = visibleDays < groupedTimeline.length
 
+  // Auto-expand the first day (today/most recent)
+  useEffect(() => {
+    if (visibleGroups.length > 0 && expandedDays.size === 0) {
+      setExpandedDays(new Set([visibleGroups[0].date]))
+    }
+  }, [visibleGroups.length])
+
   const loadMore = () => {
     setVisibleDays(prev => prev + 1)
+  }
+
+  const toggleDay = (dateKey: string) => {
+    setExpandedDays(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(dateKey)) {
+        newSet.delete(dateKey)
+      } else {
+        newSet.add(dateKey)
+      }
+      return newSet
+    })
+  }
+
+  const getFeedTimesForDay = (items: TimelineItem[]) => {
+    let leftMs = 0
+    let rightMs = 0
+
+    items.forEach(item => {
+      if (item.type === 'session') {
+        item.data.intervals.forEach(interval => {
+          if (interval.endTime) {
+            const duration = interval.endTime.getTime() - interval.startTime.getTime()
+            if (interval.side === 'left') {
+              leftMs += duration
+            } else {
+              rightMs += duration
+            }
+          }
+        })
+      }
+    })
+
+    const formatTime = (ms: number) => {
+      const totalMinutes = Math.floor(ms / 60000)
+      const hours = Math.floor(totalMinutes / 60)
+      const minutes = totalMinutes % 60
+
+      if (hours > 0) {
+        return `${hours}h ${minutes}m`
+      }
+      return `${minutes}m`
+    }
+
+    const totalMs = leftMs + rightMs
+
+    return {
+      left: formatTime(leftMs),
+      right: formatTime(rightMs),
+      total: formatTime(totalMs)
+    }
   }
 
   const handleExport = async () => {
@@ -195,81 +254,108 @@ function HistoryRoute() {
           </div>
         ) : (
           <>
-            {visibleGroups.map(group => (
-              <div key={group.date} class="flex flex-col gap-3">
-                <h2 class="m-0 text-lg font-semibold text-gray-700 pl-1">{group.displayDate}</h2>
-                <div class="flex flex-col gap-3">
-                  {group.items.map((item) => {
-                    if (item.type === 'session') {
-                      const session = item.data
-                      const { left, right } = getSideCounts(session.intervals)
-                      return (
-                        <div
-                          key={session.id}
-                          class="bg-white border border-gray-200 rounded-xl p-4 transition-all duration-200 cursor-pointer hover:shadow-md hover:border-gray-300"
-                          onClick={() => navigate({ to: `/session/${session.id}/${session.isActive ? 'active' : 'details'}` })}
-                        >
-                          <div class="flex justify-between items-center mb-3">
-                            <div class="flex items-center gap-2">
-                              <span class="text-lg">🍼</span>
-                              <span class="text-lg font-semibold">{formatTime(session.startTime)}</span>
-                            </div>
-                            {session.isActive && (
-                              <span class="bg-emerald-500 text-white px-3 py-1 rounded-xl text-xs font-medium">
-                                Active
-                              </span>
-                            )}
-                          </div>
-                          <div class="flex gap-4 text-gray-500 text-sm">
-                            <span>Duration: {formatDuration(session.intervals)}</span>
-                            <span>Left: {left} | Right: {right}</span>
-                          </div>
-                        </div>
-                      )
-                    } else {
-                      const event = item.data
-                      const emoji = event.type === 'diaper' ? '🚼' :
-                        event.type === 'vitamin' ? '💊' :
-                          event.type === 'probiotic' ? '🦠' : '✏️'
-                      const label = event.type === 'custom' ? event.customLabel :
-                        event.type === 'vitamin' ? 'Vitamin D' :
-                          event.type === 'probiotic' ? 'Probiotic' :
-                            'Diaper'
-                      return (
-                        <div
-                          key={event.id}
-                          class="bg-white border border-gray-200 rounded-xl p-4 transition-all duration-200"
-                        >
-                          <div class="flex justify-between items-center">
-                            <div class="flex items-center gap-2">
-                              <span class="text-lg">{emoji}</span>
-                              <span class="text-base font-semibold">{formatTime(event.timestamp)}</span>
-                              <span class="text-gray-600">•</span>
-                              <span class="text-gray-700">{label}</span>
-                            </div>
-                            <button
-                              class="text-gray-400 hover:text-red-500 text-xl leading-none transition-colors duration-200"
-                              onClick={async (e) => {
-                                e.stopPropagation()
-                                if (confirm('Delete this event?')) {
-                                  await deleteMiscEvent(event.id)
-                                  loadData()
-                                }
-                              }}
+            {visibleGroups.map(group => {
+              const isExpanded = expandedDays.has(group.date)
+              const feedTimes = getFeedTimesForDay(group.items)
+
+              return (
+                <div key={group.date} class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                  <button
+                    class="w-full px-4 py-4 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors duration-200 gap-4"
+                    onClick={() => toggleDay(group.date)}
+                  >
+                    <div class="flex items-center gap-3">
+                      <span class={`text-lg transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}>
+                        ▶
+                      </span>
+                      <h2 class="m-0 text-lg font-semibold text-gray-700">{group.displayDate}</h2>
+                    </div>
+                    <div class="flex items-center gap-3 text-sm font-medium shrink-0">
+                      <div class="flex items-center gap-1.5">
+                        <span class="text-blue-600">L: {feedTimes.left}</span>
+                        <span class="text-gray-400">|</span>
+                        <span class="text-purple-600">R: {feedTimes.right}</span>
+                      </div>
+                      <span class="text-gray-400 hidden sm:inline">•</span>
+                      <span class="text-gray-700 hidden sm:inline">Total: {feedTimes.total}</span>
+                    </div>
+                  </button>
+
+                  {isExpanded && (
+                    <div class="flex flex-col gap-3 p-4 pt-0">
+                      {group.items.map((item) => {
+                        if (item.type === 'session') {
+                          const session = item.data
+                          const { left, right } = getSideCounts(session.intervals)
+                          return (
+                            <div
+                              key={session.id}
+                              class="bg-gray-50 border border-gray-200 rounded-xl p-4 transition-all duration-200 cursor-pointer hover:shadow-sm hover:bg-white hover:border-gray-300"
+                              onClick={() => navigate({ to: `/session/${session.id}/${session.isActive ? 'active' : 'details'}` })}
                             >
-                              ×
-                            </button>
-                          </div>
-                          {event.notes && (
-                            <p class="text-sm text-gray-500 mt-2 mb-0 ml-7">{event.notes}</p>
-                          )}
-                        </div>
-                      )
-                    }
-                  })}
+                              <div class="flex justify-between items-center mb-3">
+                                <div class="flex items-center gap-2">
+                                  <span class="text-lg">🍼</span>
+                                  <span class="text-lg font-semibold">{formatTime(session.startTime)}</span>
+                                </div>
+                                {session.isActive && (
+                                  <span class="bg-emerald-500 text-white px-3 py-1 rounded-xl text-xs font-medium">
+                                    Active
+                                  </span>
+                                )}
+                              </div>
+                              <div class="flex gap-4 text-gray-500 text-sm">
+                                <span>Duration: {formatDuration(session.intervals)}</span>
+                                <span>Left: {left} | Right: {right}</span>
+                              </div>
+                            </div>
+                          )
+                        } else {
+                          const event = item.data
+                          const emoji = event.type === 'diaper' ? '🚼' :
+                            event.type === 'vitamin' ? '💊' :
+                              event.type === 'probiotic' ? '🦠' : '✏️'
+                          const label = event.type === 'custom' ? event.customLabel :
+                            event.type === 'vitamin' ? 'Vitamin D' :
+                              event.type === 'probiotic' ? 'Probiotic' :
+                                'Diaper'
+                          return (
+                            <div
+                              key={event.id}
+                              class="bg-gray-50 border border-gray-200 rounded-xl p-4 transition-all duration-200"
+                            >
+                              <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-2">
+                                  <span class="text-lg">{emoji}</span>
+                                  <span class="text-base font-semibold">{formatTime(event.timestamp)}</span>
+                                  <span class="text-gray-600">•</span>
+                                  <span class="text-gray-700">{label}</span>
+                                </div>
+                                <button
+                                  class="text-gray-400 hover:text-red-500 text-xl leading-none transition-colors duration-200"
+                                  onClick={async (e) => {
+                                    e.stopPropagation()
+                                    if (confirm('Delete this event?')) {
+                                      await deleteMiscEvent(event.id)
+                                      loadData()
+                                    }
+                                  }}
+                                >
+                                  ×
+                                </button>
+                              </div>
+                              {event.notes && (
+                                <p class="text-sm text-gray-500 mt-2 mb-0 ml-7">{event.notes}</p>
+                              )}
+                            </div>
+                          )
+                        }
+                      })}
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
+              )
+            })}
             {hasMore && (
               <button
                 class="w-full bg-white text-gray-500 border border-gray-200 px-5 sm:px-6 py-3 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 active:scale-[0.98]"
