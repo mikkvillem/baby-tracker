@@ -25,6 +25,8 @@ export type MiscEvent = {
   measurementKind?: MeasurementKind
   measurementValue?: number
   measurementUnit?: string
+  diaperPoop?: boolean
+  diaperPee?: boolean
   timestamp: Date
   notes?: string
 }

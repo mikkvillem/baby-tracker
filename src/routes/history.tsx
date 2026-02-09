@@ -294,8 +294,13 @@ function HistoryRoute() {
                             const kindLabels = { weight: 'Weight', height: 'Height', headCircumference: 'Head' }
                             const unit = event.measurementUnit ?? (event.measurementKind === 'weight' ? 'kg' : 'cm')
                             label = `${kindLabels[event.measurementKind]} ${event.measurementValue} ${unit}`
-                          } else if (event.type === 'measurement') label = 'Measurement'
-                          else label = 'Diaper'
+                          }                           else if (event.type === 'measurement') label = 'Measurement'
+                          else if (event.type === 'diaper') {
+                            const parts = []
+                            if (event.diaperPoop) parts.push('poop')
+                            if (event.diaperPee) parts.push('pee')
+                            label = parts.length > 0 ? `Diaper (${parts.join(', ')})` : 'Diaper'
+                          } else label = 'Diaper'
                           return (
                             <div
                               key={event.id}

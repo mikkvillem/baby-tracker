@@ -26,7 +26,7 @@ function SessionDetailsRoute() {
   }, [sessionId, navigate])
 
   const backToList = () => {
-    navigate({ to: '/' })
+    navigate({ to: '/history' })
   }
 
   const updateSession = async (id: string, intervals: Interval[]) => {

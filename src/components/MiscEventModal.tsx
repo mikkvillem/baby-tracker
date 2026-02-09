@@ -40,6 +40,8 @@ const DEFAULT_UNITS: Record<MeasurementKind, string> = {
 export function MiscEventModal({ onClose, onSave }: Props) {
   const [selectedType, setSelectedType] = useState<MiscEventType | null>(null)
   const [customLabel, setCustomLabel] = useState('')
+  const [diaperPoop, setDiaperPoop] = useState(true)
+  const [diaperPee, setDiaperPee] = useState(true)
   const [medicineName, setMedicineName] = useState('')
   const [measurementTab, setMeasurementTab] = useState<MeasurementKind>('weight')
   const [measurementValue, setMeasurementValue] = useState('')
@@ -80,6 +82,8 @@ export function MiscEventModal({ onClose, onSave }: Props) {
       id: Date.now().toString(),
       type: selectedType,
       customLabel: selectedType === 'custom' ? customLabel : undefined,
+      diaperPoop: selectedType === 'diaper' ? diaperPoop : undefined,
+      diaperPee: selectedType === 'diaper' ? diaperPee : undefined,
       medicineName: selectedType === 'medicine' ? medicineName : undefined,
       measurementKind: selectedType === 'measurement' ? measurementTab : undefined,
       measurementValue: selectedType === 'measurement' ? parseFloat(measurementValue) : undefined,
@@ -126,6 +130,32 @@ export function MiscEventModal({ onClose, onSave }: Props) {
               ))}
             </div>
           </div>
+
+          {selectedType === 'diaper' && (
+            <div class="mb-4">
+              <label class="block text-sm font-medium mb-2 text-gray-700">What was in the diaper?</label>
+              <div class="flex flex-wrap gap-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={diaperPoop}
+                    onChange={(e) => setDiaperPoop((e.target as HTMLInputElement).checked)}
+                    class="w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                  />
+                  <span class="text-sm text-gray-700">Poop (stool)</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={diaperPee}
+                    onChange={(e) => setDiaperPee((e.target as HTMLInputElement).checked)}
+                    class="w-4 h-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
+                  />
+                  <span class="text-sm text-gray-700">Pee (wet)</span>
+                </label>
+              </div>
+            </div>
+          )}
 
           {selectedType === 'custom' && (
             <div class="mb-4">
