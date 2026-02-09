@@ -1,6 +1,13 @@
 import { useState } from 'preact/hooks'
 import type { Session, Interval } from '../app'
 import { IntervalModal } from './IntervalModal'
+import {
+  formatDuration,
+  getTotalTimeForSide,
+  formatTimer,
+  getSideCounts
+} from '../utils/sessionFormatters'
+import { IntervalRow } from './IntervalRow'
 
 type Props = {
   session: Session
@@ -12,40 +19,10 @@ type Props = {
 export function SessionDetails({ session, onBack, onUpdateSession, onDeleteSession }: Props) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
-  const formatDuration = (intervals: Interval[]) => {
-    const total = intervals.reduce((sum, interval) => {
-      if (!interval.endTime) return sum
-      return sum + (interval.endTime.getTime() - interval.startTime.getTime())
-    }, 0)
-    const minutes = Math.floor(total / 60000)
-    const seconds = Math.floor((total % 60000) / 1000)
-    return `${minutes}m ${seconds}s`
-  }
-
-  const getTotalTimeForSide = (side: 'left' | 'right'): number => {
-    const completedTime = session.intervals
-      .filter(i => i.side === side && i.endTime)
-      .reduce((sum, i) => sum + (i.endTime!.getTime() - i.startTime.getTime()), 0)
-
-    return Math.floor(completedTime / 1000)
-  }
-
-  const formatTimer = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${secs.toString().padStart(2, '0')}`
-  }
 
   const deleteInterval = (index: number) => {
     const updatedIntervals = session.intervals.filter((_, idx) => idx !== index)
     onUpdateSession(session.id, updatedIntervals)
-  }
-
-  const formatIntervalDuration = (startTime: Date, endTime: Date) => {
-    const totalSeconds = Math.floor((endTime.getTime() - startTime.getTime()) / 1000)
-    const mins = Math.floor(totalSeconds / 60)
-    const secs = totalSeconds % 60
-    return `${mins}m ${secs}s`
   }
 
   const handleSaveInterval = (interval: Interval) => {
@@ -77,13 +54,7 @@ export function SessionDetails({ session, onBack, onUpdateSession, onDeleteSessi
     }
   }
 
-  const getSideCounts = () => {
-    const left = session.intervals.filter(i => i.side === 'left').length
-    const right = session.intervals.filter(i => i.side === 'right').length
-    return { left, right }
-  }
-
-  const { left, right } = getSideCounts()
+  const { left, right } = getSideCounts(session.intervals)
 
   return (
     <div class="max-w-2xl mx-auto px-4 sm:px-5">
@@ -132,13 +103,13 @@ export function SessionDetails({ session, onBack, onUpdateSession, onDeleteSessi
         <div class="bg-white border-2 border-gray-200 rounded-xl p-4 sm:p-5 text-center">
           <h3 class="m-0 mb-3 text-lg font-semibold text-gray-500">Left</h3>
           <div class="text-4xl sm:text-5xl font-bold font-mono text-gray-800">
-            {formatTimer(getTotalTimeForSide('left'))}
+            {formatTimer(getTotalTimeForSide(session.intervals, 'left'))}
           </div>
         </div>
         <div class="bg-white border-2 border-gray-200 rounded-xl p-4 sm:p-5 text-center">
           <h3 class="m-0 mb-3 text-lg font-semibold text-gray-500">Right</h3>
           <div class="text-4xl sm:text-5xl font-bold font-mono text-gray-800">
-            {formatTimer(getTotalTimeForSide('right'))}
+            {formatTimer(getTotalTimeForSide(session.intervals, 'right'))}
           </div>
         </div>
       </div>
@@ -158,25 +129,11 @@ export function SessionDetails({ session, onBack, onUpdateSession, onDeleteSessi
         ) : (
           <div class="flex flex-col gap-2">
             {session.intervals.map((interval, idx) => (
-              <div
+              <IntervalRow
                 key={idx}
-                class={`flex items-center gap-3 p-3 bg-gray-50 rounded-lg text-sm transition-all duration-200 ${
-                  interval.endTime ? 'cursor-pointer hover:bg-gray-100 hover:translate-x-1' : ''
-                }`}
-                onClick={() => interval.endTime && setEditingIndex(idx)}
-              >
-                <span class={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white shrink-0 ${
-                  interval.side === 'left' ? 'bg-blue-500' : 'bg-purple-500'
-                }`}>
-                  {interval.side === 'left' ? 'L' : 'R'}
-                </span>
-                <span class="text-xs sm:text-sm">{interval.startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}</span>
-                {interval.endTime && (
-                  <span class="ml-auto font-semibold text-emerald-500">
-                    {formatIntervalDuration(interval.startTime, interval.endTime)}
-                  </span>
-                )}
-              </div>
+                interval={interval}
+                onEdit={interval.endTime ? () => setEditingIndex(idx) : undefined}
+              />
             ))}
           </div>
         )}

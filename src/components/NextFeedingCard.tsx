@@ -1,37 +1,24 @@
-import { useState, useEffect } from 'preact/hooks'
-import { computed } from '@preact/signals'
 import type { Session } from '../app'
 import { feedingSettings } from '../store/settings'
 import { suggestNextFeeding, formatTimeUntil } from '../utils/feedingPredictor'
+import { useCurrentTime } from '../hooks/useCurrentTime'
 
 type Props = {
   sessions: Session[]
 }
 
 export function NextFeedingCard({ sessions }: Props) {
-  const [, forceUpdate] = useState(0)
-  
-  const prediction = computed(() => 
-    suggestNextFeeding(sessions, feedingSettings.value.intervalMinutes)
-  )
+  useCurrentTime(60000)
+  const prediction = suggestNextFeeding(sessions, feedingSettings.value.intervalMinutes)
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      forceUpdate(prev => prev + 1)
-    }, 60000)
-    return () => clearInterval(timer)
-  }, [])
+  if (!prediction.suggestedTime) return null
 
-  const pred = prediction.value
-  
-  if (!pred.suggestedTime) return null
-
-  const isOverdue = pred.suggestedTime.getTime() < Date.now()
+  const isOverdue = prediction.suggestedTime.getTime() < Date.now()
 
   return (
     <div class={`rounded-xl p-3 mb-4 text-white shadow-sm flex items-center justify-between ${
-      isOverdue 
-        ? 'bg-gradient-to-r from-pink-400 to-rose-500' 
+      isOverdue
+        ? 'bg-gradient-to-r from-pink-400 to-rose-500'
         : 'bg-gradient-to-r from-indigo-500 to-purple-600'
     }`}>
       <div class="flex items-center gap-2">
@@ -39,7 +26,7 @@ export function NextFeedingCard({ sessions }: Props) {
         <div>
           <div class="text-xs opacity-80">Next Feeding</div>
           <div class="text-lg font-bold font-mono">
-            {pred.suggestedTime.toLocaleTimeString('en-US', {
+            {prediction.suggestedTime.toLocaleTimeString('en-US', {
               hour: '2-digit',
               minute: '2-digit',
               hour12: false
@@ -48,9 +35,8 @@ export function NextFeedingCard({ sessions }: Props) {
         </div>
       </div>
       <div class="text-right">
-        <div class="text-sm font-medium">{formatTimeUntil(pred.suggestedTime)}</div>
+        <div class="text-sm font-medium">{formatTimeUntil(prediction.suggestedTime)}</div>
       </div>
     </div>
   )
 }
-

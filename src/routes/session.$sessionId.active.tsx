@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState, useEffect } from 'preact/hooks'
 import { ActiveSession } from '../components/ActiveSession'
-import { loadSessions, saveSessions } from '../db'
+import { loadSessions } from '../db'
+import { updateSessionIntervals, endSession as endSessionService } from '../services/sessionService'
 import type { Session, Interval } from '../app'
 
 export const Route = createFileRoute('/session/$sessionId/active')({
@@ -24,37 +25,22 @@ function ActiveSessionRoute() {
     })
   }, [sessionId, navigate])
 
-  const endSession = () => {
+  const endSession = async () => {
     if (session) {
-      loadSessions().then(sessions => {
-        const updatedSessions = sessions.map(s =>
-          s.id === sessionId ? { ...s, isActive: false } : s
-        )
-        saveSessions(updatedSessions).then(() => {
-          navigate({ to: '/' })
-        })
-      })
+      await endSessionService(sessionId)
+      navigate({ to: '/' })
     }
   }
 
-  const updateSession = (sessionId: string, intervals: Interval[]) => {
-    loadSessions().then(sessions => {
-      const updatedSessions = sessions.map(s =>
-        s.id === sessionId ? { ...s, intervals } : s
-      )
-      saveSessions(updatedSessions).then(() => {
-        const updatedSession = updatedSessions.find(s => s.id === sessionId)
-        if (updatedSession) {
-          setSession(updatedSession)
-        }
-      })
-    })
+  const updateSession = async (id: string, intervals: Interval[]) => {
+    const updated = await updateSessionIntervals(id, intervals)
+    if (updated) setSession(updated)
   }
 
   if (!session) {
     return <div>Loading...</div>
   }
-  console.log("active session", session)
+
   return (
     <ActiveSession
       session={session}
@@ -63,4 +49,3 @@ function ActiveSessionRoute() {
     />
   )
 }
-

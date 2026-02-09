@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState, useEffect, useMemo } from 'preact/hooks'
 import { loadSessions, loadMiscEvents, deleteMiscEvent, initDB, exportDataAsJSON } from '../db'
 import type { Session, MiscEvent } from '../app'
+import { formatDurationMin, formatDurationShort, getSideCounts } from '../utils/sessionFormatters'
 
 export const Route = createFileRoute('/history')({
   component: HistoryRoute
@@ -43,27 +44,12 @@ function HistoryRoute() {
     loadData()
   }, [])
 
-  const formatDuration = (intervals: Session['intervals']) => {
-    const total = intervals.reduce((sum, interval) => {
-      if (!interval.endTime) return sum
-      return sum + (interval.endTime.getTime() - interval.startTime.getTime())
-    }, 0)
-    const minutes = Math.floor(total / 60000)
-    return `${minutes} min`
-  }
-
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false
     })
-  }
-
-  const getSideCounts = (intervals: Session['intervals']) => {
-    const left = intervals.filter(i => i.side === 'left').length
-    const right = intervals.filter(i => i.side === 'right').length
-    return { left, right }
   }
 
   const groupedTimeline = useMemo(() => {
@@ -182,39 +168,22 @@ function HistoryRoute() {
   const getFeedTimesForDay = (items: TimelineItem[]) => {
     let leftMs = 0
     let rightMs = 0
-
     items.forEach(item => {
       if (item.type === 'session') {
         item.data.intervals.forEach(interval => {
           if (interval.endTime) {
             const duration = interval.endTime.getTime() - interval.startTime.getTime()
-            if (interval.side === 'left') {
-              leftMs += duration
-            } else {
-              rightMs += duration
-            }
+            if (interval.side === 'left') leftMs += duration
+            else rightMs += duration
           }
         })
       }
     })
-
-    const formatTime = (ms: number) => {
-      const totalMinutes = Math.floor(ms / 60000)
-      const hours = Math.floor(totalMinutes / 60)
-      const minutes = totalMinutes % 60
-
-      if (hours > 0) {
-        return `${hours}h ${minutes}m`
-      }
-      return `${minutes}m`
-    }
-
     const totalMs = leftMs + rightMs
-
     return {
-      left: formatTime(leftMs),
-      right: formatTime(rightMs),
-      total: formatTime(totalMs)
+      left: formatDurationShort(leftMs),
+      right: formatDurationShort(rightMs),
+      total: formatDurationShort(totalMs)
     }
   }
 
@@ -305,7 +274,7 @@ function HistoryRoute() {
                                 )}
                               </div>
                               <div class="flex gap-4 text-gray-500 text-sm">
-                                <span>Duration: {formatDuration(session.intervals)}</span>
+                                <span>Duration: {formatDurationMin(session.intervals)}</span>
                                 <span>Left: {left} | Right: {right}</span>
                               </div>
                             </div>
@@ -313,12 +282,20 @@ function HistoryRoute() {
                         } else {
                           const event = item.data
                           const emoji = event.type === 'diaper' ? '🚼' :
-                            event.type === 'vitamin' ? '💊' :
-                              event.type === 'probiotic' ? '🦠' : '✏️'
-                          const label = event.type === 'custom' ? event.customLabel :
-                            event.type === 'vitamin' ? 'Vitamin D' :
-                              event.type === 'probiotic' ? 'Probiotic' :
-                                'Diaper'
+                            event.type === 'medicine' || event.type === 'vitamin' ? '💊' :
+                              event.type === 'probiotic' ? '🦠' :
+                                event.type === 'measurement' ? '📏' : '✏️'
+                          let label: string
+                          if (event.type === 'custom') label = event.customLabel ?? 'Custom'
+                          else if (event.type === 'medicine') label = event.medicineName ?? 'Medicine'
+                          else if (event.type === 'vitamin') label = 'Vitamin D'
+                          else if (event.type === 'probiotic') label = 'Probiotic'
+                          else if (event.type === 'measurement' && event.measurementKind != null && event.measurementValue != null) {
+                            const kindLabels = { weight: 'Weight', height: 'Height', headCircumference: 'Head' }
+                            const unit = event.measurementUnit ?? (event.measurementKind === 'weight' ? 'kg' : 'cm')
+                            label = `${kindLabels[event.measurementKind]} ${event.measurementValue} ${unit}`
+                          } else if (event.type === 'measurement') label = 'Measurement'
+                          else label = 'Diaper'
                           return (
                             <div
                               key={event.id}

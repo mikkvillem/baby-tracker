@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState, useEffect } from 'preact/hooks'
 import { SessionDetails } from '../components/SessionDetails'
-import { loadSessions, saveSessions } from '../db'
+import { loadSessions } from '../db'
+import { updateSessionIntervals, deleteSession as deleteSessionService } from '../services/sessionService'
 import type { Session, Interval } from '../app'
 
 export const Route = createFileRoute('/session/$sessionId/details')({
@@ -15,7 +16,6 @@ function SessionDetailsRoute() {
 
   useEffect(() => {
     loadSessions().then(sessions => {
-      console.log(sessionId)
       const foundSession = sessions.find(s => s.id === sessionId)
       if (foundSession) {
         setSession(foundSession)
@@ -29,27 +29,14 @@ function SessionDetailsRoute() {
     navigate({ to: '/' })
   }
 
-  const updateSession = (sessionId: string, intervals: Interval[]) => {
-    loadSessions().then(sessions => {
-      const updatedSessions = sessions.map(s =>
-        s.id === sessionId ? { ...s, intervals } : s
-      )
-      saveSessions(updatedSessions).then(() => {
-        const updatedSession = updatedSessions.find(s => s.id === sessionId)
-        if (updatedSession) {
-          setSession(updatedSession)
-        }
-      })
-    })
+  const updateSession = async (id: string, intervals: Interval[]) => {
+    const updated = await updateSessionIntervals(id, intervals)
+    if (updated) setSession(updated)
   }
 
-  const deleteSession = (sessionId: string) => {
-    loadSessions().then(sessions => {
-      const updatedSessions = sessions.filter(s => s.id !== sessionId)
-      saveSessions(updatedSessions).then(() => {
-        navigate({ to: '/' })
-      })
-    })
+  const deleteSession = async (id: string) => {
+    await deleteSessionService(id)
+    navigate({ to: '/' })
   }
 
   if (!session) {
