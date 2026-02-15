@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from 'preact/hooks'
 import { loadSessions, loadMiscEvents, deleteMiscEvent, initDB, exportDataAsJSON } from '../db'
 import type { Session, MiscEvent } from '../app'
 import { formatDurationMin, formatDurationShort, getSideCounts } from '../utils/sessionFormatters'
+import { Download, ChevronRight, X, Baby, Pill, Ruler, PenLine, Droplets } from 'lucide-preact'
 
 export const Route = createFileRoute('/history')({
   component: HistoryRoute
@@ -179,11 +180,10 @@ function HistoryRoute() {
         })
       }
     })
-    const totalMs = leftMs + rightMs
     return {
       left: formatDurationShort(leftMs),
       right: formatDurationShort(rightMs),
-      total: formatDurationShort(totalMs)
+      total: formatDurationShort(leftMs + rightMs)
     }
   }
 
@@ -196,160 +196,165 @@ function HistoryRoute() {
     }
   }
 
+  const getEventIcon = (type: string) => {
+    switch (type) {
+      case 'diaper': return <Droplets size={16} />
+      case 'medicine':
+      case 'vitamin':
+      case 'probiotic': return <Pill size={16} />
+      case 'measurement': return <Ruler size={16} />
+      default: return <PenLine size={16} />
+    }
+  }
+
+  const getEventColor = (type: string) => {
+    switch (type) {
+      case 'diaper': return 'bg-warning-500'
+      case 'medicine':
+      case 'vitamin':
+      case 'probiotic': return 'bg-event-medicine'
+      case 'measurement': return 'bg-success-500'
+      default: return 'bg-event-custom'
+    }
+  }
+
   return (
-    <div class="max-w-2xl mx-auto px-4 sm:px-5">
-      <header class="flex items-center gap-3 mb-6 flex-wrap">
+    <div class="max-w-lg mx-auto px-4 pt-4 pb-6 flex flex-col gap-4">
+      {/* Top bar */}
+      <div class="flex items-center justify-between">
+        <h1 class="m-0 text-xl font-semibold text-surface-800 dark:text-surface-100">History</h1>
         <button
-          class="bg-white border border-gray-200 px-3 sm:px-4 py-2 rounded-lg text-base font-medium cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:border-gray-300"
-          onClick={() => navigate({ to: '/' })}
-        >
-          ← Back
-        </button>
-        <h1 class="m-0 text-2xl sm:text-3xl font-semibold flex-1">History</h1>
-        <button
-          class="bg-blue-500 text-white border-none px-3 sm:px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-blue-600 flex items-center gap-2"
+          class="flex items-center gap-1.5 text-primary-500 bg-transparent border-none cursor-pointer text-sm font-medium hover:text-primary-600 transition-colors p-0"
           onClick={handleExport}
         >
-          <span>📥</span>
-          <span>Export</span>
+          <Download size={16} />
+          Export
         </button>
-      </header>
+      </div>
 
-      <div class="flex flex-col gap-6">
-        {sessions.length === 0 && miscEvents.length === 0 ? (
-          <div class="text-center py-12 px-5 text-gray-500 bg-white rounded-xl border border-gray-200">
-            <p class="text-lg font-medium mb-2">No activity yet</p>
-            <p class="text-sm">Start tracking your baby's feeding and events</p>
-          </div>
-        ) : (
-          <>
-            {visibleGroups.map(group => {
-              const isExpanded = expandedDays.has(group.date)
-              const feedTimes = getFeedTimesForDay(group.items)
+      {sessions.length === 0 && miscEvents.length === 0 ? (
+        <div class="text-center py-16 px-5 text-surface-400">
+          <Baby size={40} class="mx-auto mb-3 opacity-50" />
+          <p class="text-base font-medium mb-1 m-0">No activity yet</p>
+          <p class="text-sm m-0">Start tracking to see your history</p>
+        </div>
+      ) : (
+        <>
+          {visibleGroups.map(group => {
+            const isExpanded = expandedDays.has(group.date)
+            const feedTimes = getFeedTimesForDay(group.items)
 
-              return (
-                <div key={group.date} class="bg-white border border-gray-200 rounded-xl overflow-hidden">
-                  <button
-                    class="w-full px-4 py-4 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors duration-200 gap-4"
-                    onClick={() => toggleDay(group.date)}
-                  >
-                    <div class="flex items-center gap-3">
-                      <span class={`text-lg transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}>
-                        ▶
-                      </span>
-                      <h2 class="m-0 text-lg font-semibold text-gray-700">{group.displayDate}</h2>
-                    </div>
-                    <div class="flex items-center gap-3 text-sm font-medium shrink-0">
-                      <div class="flex items-center gap-1.5">
-                        <span class="text-blue-600">L: {feedTimes.left}</span>
-                        <span class="text-gray-400">|</span>
-                        <span class="text-purple-600">R: {feedTimes.right}</span>
-                      </div>
-                      <span class="text-gray-400 hidden sm:inline">•</span>
-                      <span class="text-gray-700 hidden sm:inline">Total: {feedTimes.total}</span>
-                    </div>
-                  </button>
+            return (
+              <div key={group.date} class="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl overflow-hidden">
+                <button
+                  class="w-full px-4 py-3.5 flex justify-between items-center cursor-pointer hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors duration-200 gap-3 bg-transparent border-none text-left"
+                  onClick={() => toggleDay(group.date)}
+                >
+                  <div class="flex items-center gap-2.5">
+                    <ChevronRight size={16} class={`text-surface-400 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
+                    <h2 class="m-0 text-base font-semibold text-surface-800 dark:text-surface-100">{group.displayDate}</h2>
+                  </div>
+                  <div class="flex items-center gap-2 text-xs font-medium shrink-0">
+                    <span class="text-side-left-500">{feedTimes.left}</span>
+                    <span class="text-surface-300 dark:text-surface-600">/</span>
+                    <span class="text-side-right-500">{feedTimes.right}</span>
+                  </div>
+                </button>
 
-                  {isExpanded && (
-                    <div class="flex flex-col gap-3 p-4 pt-0">
-                      {group.items.map((item) => {
-                        if (item.type === 'session') {
-                          const session = item.data
-                          const { left, right } = getSideCounts(session.intervals)
-                          return (
-                            <div
-                              key={session.id}
-                              class="bg-gray-50 border border-gray-200 rounded-xl p-4 transition-all duration-200 cursor-pointer hover:shadow-sm hover:bg-white hover:border-gray-300"
-                              onClick={() => navigate({ to: `/session/${session.id}/${session.isActive ? 'active' : 'details'}` })}
-                            >
-                              <div class="flex justify-between items-center mb-3">
-                                <div class="flex items-center gap-2">
-                                  <span class="text-lg">🍼</span>
-                                  <span class="text-lg font-semibold">{formatTime(session.startTime)}</span>
-                                </div>
+                {isExpanded && (
+                  <div class="flex flex-col divide-y divide-surface-100 dark:divide-surface-700 border-t border-surface-100 dark:border-surface-700">
+                    {group.items.map((item) => {
+                      if (item.type === 'session') {
+                        const session = item.data
+                        const { left, right } = getSideCounts(session.intervals)
+                        return (
+                          <div
+                            key={session.id}
+                            class="px-4 py-3 flex items-center gap-3 cursor-pointer hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors duration-200"
+                            onClick={() => navigate({ to: `/session/${session.id}/${session.isActive ? 'active' : 'details'}` })}
+                          >
+                            <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-500/15 flex items-center justify-center shrink-0">
+                              <Baby size={16} class="text-primary-500" />
+                            </div>
+                            <div class="flex-1 min-w-0">
+                              <div class="flex items-center gap-2">
+                                <span class="text-sm font-semibold text-surface-800 dark:text-surface-100">{formatTime(session.startTime)}</span>
                                 {session.isActive && (
-                                  <span class="bg-emerald-500 text-white px-3 py-1 rounded-xl text-xs font-medium">
+                                  <span class="bg-success-500 text-white px-2 py-0.5 rounded-full text-[10px] font-semibold">
                                     Active
                                   </span>
                                 )}
                               </div>
-                              <div class="flex gap-4 text-gray-500 text-sm">
-                                <span>Duration: {formatDurationMin(session.intervals)}</span>
-                                <span>Left: {left} | Right: {right}</span>
+                              <div class="text-xs text-surface-500 mt-0.5">
+                                {formatDurationMin(session.intervals)} · L{left} R{right}
                               </div>
                             </div>
-                          )
-                        } else {
-                          const event = item.data
-                          const emoji = event.type === 'diaper' ? '🚼' :
-                            event.type === 'medicine' || event.type === 'vitamin' ? '💊' :
-                              event.type === 'probiotic' ? '🦠' :
-                                event.type === 'measurement' ? '📏' : '✏️'
-                          let label: string
-                          if (event.type === 'custom') label = event.customLabel ?? 'Custom'
-                          else if (event.type === 'medicine') label = event.medicineName ?? 'Medicine'
-                          else if (event.type === 'vitamin') label = 'Vitamin D'
-                          else if (event.type === 'probiotic') label = 'Probiotic'
-                          else if (event.type === 'measurement' && event.measurementKind != null && event.measurementValue != null) {
-                            const kindLabels = { weight: 'Weight', height: 'Height', headCircumference: 'Head' }
-                            const unit = event.measurementUnit ?? (event.measurementKind === 'weight' ? 'kg' : 'cm')
-                            label = `${kindLabels[event.measurementKind]} ${event.measurementValue} ${unit}`
-                          }                           else if (event.type === 'measurement') label = 'Measurement'
-                          else if (event.type === 'diaper') {
-                            const parts = []
-                            if (event.diaperPoop) parts.push('poop')
-                            if (event.diaperPee) parts.push('pee')
-                            label = parts.length > 0 ? `Diaper (${parts.join(', ')})` : 'Diaper'
-                          } else label = 'Diaper'
-                          return (
-                            <div
-                              key={event.id}
-                              class="bg-gray-50 border border-gray-200 rounded-xl p-4 transition-all duration-200"
+                            <ChevronRight size={16} class="text-surface-300 dark:text-surface-600 shrink-0" />
+                          </div>
+                        )
+                      } else {
+                        const event = item.data
+                        let label: string
+                        if (event.type === 'custom') label = event.customLabel ?? 'Custom'
+                        else if (event.type === 'medicine') label = event.medicineName ?? 'Medicine'
+                        else if (event.type === 'vitamin') label = 'Vitamin D'
+                        else if (event.type === 'probiotic') label = 'Probiotic'
+                        else if (event.type === 'measurement' && event.measurementKind != null && event.measurementValue != null) {
+                          const kindLabels = { weight: 'Weight', height: 'Height', headCircumference: 'Head' }
+                          const unit = event.measurementUnit ?? (event.measurementKind === 'weight' ? 'kg' : 'cm')
+                          label = `${kindLabels[event.measurementKind]} ${event.measurementValue} ${unit}`
+                        } else if (event.type === 'measurement') label = 'Measurement'
+                        else if (event.type === 'diaper') {
+                          const parts = []
+                          if (event.diaperPoop) parts.push('poop')
+                          if (event.diaperPee) parts.push('pee')
+                          label = parts.length > 0 ? `Diaper (${parts.join(', ')})` : 'Diaper'
+                        } else label = 'Diaper'
+                        return (
+                          <div
+                            key={event.id}
+                            class="px-4 py-3 flex items-center gap-3"
+                          >
+                            <div class={`w-8 h-8 rounded-full ${getEventColor(event.type)} flex items-center justify-center text-white shrink-0`}>
+                              {getEventIcon(event.type)}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                              <div class="flex items-center gap-2">
+                                <span class="text-sm font-semibold text-surface-800 dark:text-surface-100">{formatTime(event.timestamp)}</span>
+                              </div>
+                              <div class="text-xs text-surface-500 mt-0.5">{label}</div>
+                            </div>
+                            <button
+                              class="w-7 h-7 flex items-center justify-center bg-transparent border-none text-surface-300 dark:text-surface-600 hover:text-danger-500 cursor-pointer transition-colors rounded-md p-0"
+                              onClick={async (e) => {
+                                e.stopPropagation()
+                                if (confirm('Delete this event?')) {
+                                  await deleteMiscEvent(event.id)
+                                  loadData()
+                                }
+                              }}
                             >
-                              <div class="flex justify-between items-center">
-                                <div class="flex items-center gap-2">
-                                  <span class="text-lg">{emoji}</span>
-                                  <span class="text-base font-semibold">{formatTime(event.timestamp)}</span>
-                                  <span class="text-gray-600">•</span>
-                                  <span class="text-gray-700">{label}</span>
-                                </div>
-                                <button
-                                  class="text-gray-400 hover:text-red-500 text-xl leading-none transition-colors duration-200"
-                                  onClick={async (e) => {
-                                    e.stopPropagation()
-                                    if (confirm('Delete this event?')) {
-                                      await deleteMiscEvent(event.id)
-                                      loadData()
-                                    }
-                                  }}
-                                >
-                                  ×
-                                </button>
-                              </div>
-                              {event.notes && (
-                                <p class="text-sm text-gray-500 mt-2 mb-0 ml-7">{event.notes}</p>
-                              )}
-                            </div>
-                          )
-                        }
-                      })}
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-            {hasMore && (
-              <button
-                class="w-full bg-white text-gray-500 border border-gray-200 px-5 sm:px-6 py-3 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 active:scale-[0.98]"
-                onClick={loadMore}
-              >
-                Load Previous Day
-              </button>
-            )}
-          </>
-        )}
-      </div>
+                              <X size={14} />
+                            </button>
+                          </div>
+                        )
+                      }
+                    })}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+          {hasMore && (
+            <button
+              class="w-full bg-white dark:bg-surface-800 text-surface-500 border border-surface-200 dark:border-surface-700 py-3 rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-surface-50 dark:hover:bg-surface-700 hover:border-surface-300 active:scale-[0.98]"
+              onClick={loadMore}
+            >
+              Load Previous Day
+            </button>
+          )}
+        </>
+      )}
     </div>
   )
 }
-

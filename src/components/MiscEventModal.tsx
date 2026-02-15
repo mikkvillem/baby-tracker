@@ -1,17 +1,18 @@
 import { useState } from 'preact/hooks'
 import type { MiscEvent, MiscEventType, MeasurementKind } from '../app'
 import { Modal } from './Modal'
+import { Droplets, Pill, Ruler, PenLine } from 'lucide-preact'
 
 type Props = {
   onClose: () => void
   onSave: (event: MiscEvent) => void
 }
 
-const EVENT_OPTIONS: { type: MiscEventType; label: string; emoji: string; color: string }[] = [
-  { type: 'diaper', label: 'Diaper', emoji: '🚼', color: 'bg-amber-500 hover:bg-amber-600' },
-  { type: 'medicine', label: 'Medicine', emoji: '💊', color: 'bg-orange-500 hover:bg-orange-600' },
-  { type: 'measurement', label: 'Measurement', emoji: '📏', color: 'bg-green-500 hover:bg-green-600' },
-  { type: 'custom', label: 'Custom', emoji: '✏️', color: 'bg-gray-500 hover:bg-gray-600' }
+const EVENT_OPTIONS: { type: MiscEventType; label: string; icon: typeof Droplets; color: string; activeColor: string }[] = [
+  { type: 'diaper', label: 'Diaper', icon: Droplets, color: 'bg-warning-50 dark:bg-warning-500/10 text-warning-600 dark:text-warning-500 border-warning-200 dark:border-warning-500/20', activeColor: 'bg-warning-500 text-white border-warning-500' },
+  { type: 'medicine', label: 'Medicine', icon: Pill, color: 'bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-500 border-orange-200 dark:border-orange-500/20', activeColor: 'bg-event-medicine text-white border-event-medicine' },
+  { type: 'measurement', label: 'Measure', icon: Ruler, color: 'bg-success-50 dark:bg-success-500/10 text-success-600 dark:text-success-500 border-success-200 dark:border-success-500/20', activeColor: 'bg-success-500 text-white border-success-500' },
+  { type: 'custom', label: 'Custom', icon: PenLine, color: 'bg-side-right-50 dark:bg-side-right-500/10 text-side-right-600 dark:text-side-right-500 border-side-right-100 dark:border-side-right-500/20', activeColor: 'bg-event-custom text-white border-event-custom' }
 ]
 
 const MEDICINE_OPTIONS = [
@@ -36,6 +37,8 @@ const DEFAULT_UNITS: Record<MeasurementKind, string> = {
   height: 'cm',
   headCircumference: 'cm'
 }
+
+const inputClass = 'w-full px-3 py-2.5 border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-800 dark:text-surface-100 rounded-xl text-sm focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 transition-all'
 
 export function MiscEventModal({ onClose, onSave }: Props) {
   const [selectedType, setSelectedType] = useState<MiscEventType | null>(null)
@@ -109,49 +112,52 @@ export function MiscEventModal({ onClose, onSave }: Props) {
   }
 
   return (
-    <Modal title="Add Event" onClose={onClose}>
+    <Modal title="Log Event" onClose={onClose}>
       <form onSubmit={handleSubmit}>
           <div class="mb-5">
-            <label class="block text-sm font-medium mb-3 text-gray-700">Event Type</label>
-            <div class="grid grid-cols-2 gap-3">
-              {EVENT_OPTIONS.map(option => (
-                <button
-                  key={option.type}
-                  type="button"
-                  class={`p-4 rounded-xl font-semibold text-white transition-all duration-200 active:scale-[0.98] flex flex-col items-center gap-2 ${selectedType === option.type
-                    ? option.color + ' ring-4 ring-offset-2 ring-blue-300'
-                    : option.color
-                  }`}
-                  onClick={() => handleTypeSelect(option.type)}
-                >
-                  <span class="text-3xl">{option.emoji}</span>
-                  <span class="text-sm">{option.label}</span>
-                </button>
-              ))}
+            <label class="block text-sm font-medium mb-2.5 text-surface-600 dark:text-surface-400">Event Type</label>
+            <div class="grid grid-cols-4 gap-2">
+              {EVENT_OPTIONS.map(option => {
+                const Icon = option.icon
+                const isSelected = selectedType === option.type
+                return (
+                  <button
+                    key={option.type}
+                    type="button"
+                    class={`p-3 rounded-xl font-medium transition-all duration-200 active:scale-[0.96] flex flex-col items-center gap-1.5 border ${
+                      isSelected ? option.activeColor : option.color
+                    }`}
+                    onClick={() => handleTypeSelect(option.type)}
+                  >
+                    <Icon size={20} />
+                    <span class="text-xs">{option.label}</span>
+                  </button>
+                )
+              })}
             </div>
           </div>
 
           {selectedType === 'diaper' && (
             <div class="mb-4">
-              <label class="block text-sm font-medium mb-2 text-gray-700">What was in the diaper?</label>
+              <label class="block text-sm font-medium mb-2 text-surface-600 dark:text-surface-400">What was in the diaper?</label>
               <div class="flex flex-wrap gap-4">
                 <label class="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={diaperPoop}
                     onChange={(e) => setDiaperPoop((e.target as HTMLInputElement).checked)}
-                    class="w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                    class="w-4 h-4 rounded border-surface-300 text-primary-500 focus:ring-primary-400"
                   />
-                  <span class="text-sm text-gray-700">Poop (stool)</span>
+                  <span class="text-sm text-surface-700 dark:text-surface-300">Poop</span>
                 </label>
                 <label class="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={diaperPee}
                     onChange={(e) => setDiaperPee((e.target as HTMLInputElement).checked)}
-                    class="w-4 h-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
+                    class="w-4 h-4 rounded border-surface-300 text-primary-500 focus:ring-primary-400"
                   />
-                  <span class="text-sm text-gray-700">Pee (wet)</span>
+                  <span class="text-sm text-surface-700 dark:text-surface-300">Pee</span>
                 </label>
               </div>
             </div>
@@ -159,25 +165,25 @@ export function MiscEventModal({ onClose, onSave }: Props) {
 
           {selectedType === 'custom' && (
             <div class="mb-4">
-              <label class="block text-sm font-medium mb-1.5 text-gray-700">Custom Label</label>
+              <label class="block text-sm font-medium mb-1.5 text-surface-600 dark:text-surface-400">Label</label>
               <input
                 type="text"
                 value={customLabel}
                 onInput={(e) => setCustomLabel((e.target as HTMLInputElement).value)}
                 placeholder="e.g., Bath time, Tummy time"
-                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)]"
+                class={inputClass}
               />
             </div>
           )}
 
           {selectedType === 'medicine' && (
             <div class="mb-4">
-              <label class="block text-sm font-medium mb-1.5 text-gray-700">Medicine</label>
+              <label class="block text-sm font-medium mb-1.5 text-surface-600 dark:text-surface-400">Medicine</label>
               <select
                 value={medicineName}
                 onInput={(e) => setMedicineName((e.target as HTMLSelectElement).value)}
                 required
-                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)]"
+                class={inputClass}
               >
                 <option value="">Select...</option>
                 {MEDICINE_OPTIONS.map(name => (
@@ -189,15 +195,15 @@ export function MiscEventModal({ onClose, onSave }: Props) {
 
           {selectedType === 'measurement' && (
             <div class="mb-4">
-              <label class="block text-sm font-medium mb-2 text-gray-700">Measurement</label>
-              <div class="flex gap-1 p-1 bg-gray-100 rounded-lg mb-3">
+              <label class="block text-sm font-medium mb-2 text-surface-600 dark:text-surface-400">Measurement</label>
+              <div class="flex gap-1 p-1 bg-surface-100 dark:bg-surface-700 rounded-xl mb-3">
                 {MEASUREMENT_TABS.map(({ kind, label }) => (
                   <button
                     key={kind}
                     type="button"
-                    class={`flex-1 py-2 rounded-md text-sm font-medium transition-colors ${measurementTab === kind
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                    class={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${measurementTab === kind
+                      ? 'bg-white dark:bg-surface-600 text-surface-900 dark:text-surface-100 shadow-sm'
+                      : 'text-surface-500 hover:text-surface-700 dark:hover:text-surface-300'
                     }`}
                     onClick={() => handleMeasurementTabChange(kind)}
                   >
@@ -213,63 +219,63 @@ export function MiscEventModal({ onClose, onSave }: Props) {
                   value={measurementValue}
                   onInput={(e) => setMeasurementValue((e.target as HTMLInputElement).value)}
                   placeholder={measurementTab === 'weight' ? 'e.g. 4.2' : 'e.g. 55'}
-                  class="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)]"
+                  class={`flex-1 ${inputClass.replace('w-full ', '')}`}
                 />
                 <input
                   type="text"
                   value={measurementUnit}
                   onInput={(e) => setMeasurementUnit((e.target as HTMLInputElement).value)}
                   placeholder="Unit"
-                  class="w-16 px-2 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500"
+                  class="w-16 px-2 py-2.5 border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-800 dark:text-surface-100 rounded-xl text-sm text-center focus:outline-none focus:border-primary-400"
                 />
               </div>
             </div>
           )}
 
           <div class="mb-4">
-            <label class="block text-sm font-medium mb-1.5 text-gray-700">Date</label>
+            <label class="block text-sm font-medium mb-1.5 text-surface-600 dark:text-surface-400">Date</label>
             <input
               type="date"
               value={date}
               onInput={(e) => setDate((e.target as HTMLInputElement).value)}
               required
-              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)]"
+              class={inputClass}
             />
           </div>
 
           <div class="mb-4">
-            <label class="block text-sm font-medium mb-1.5 text-gray-700">Time</label>
+            <label class="block text-sm font-medium mb-1.5 text-surface-600 dark:text-surface-400">Time</label>
             <input
               type="time"
               value={time}
               onInput={(e) => setTime((e.target as HTMLInputElement).value)}
               required
-              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)]"
+              class={inputClass}
             />
           </div>
 
           <div class="mb-4">
-            <label class="block text-sm font-medium mb-1.5 text-gray-700">Notes (optional)</label>
+            <label class="block text-sm font-medium mb-1.5 text-surface-600 dark:text-surface-400">Notes (optional)</label>
             <textarea
               value={notes}
               onInput={(e) => setNotes((e.target as HTMLTextAreaElement).value)}
               placeholder="Add any additional notes..."
               rows={2}
-              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] resize-none"
+              class={`${inputClass} resize-none`}
             />
           </div>
 
           <div class="flex gap-3 justify-end mt-6">
             <button
               type="button"
-              class="px-4 sm:px-5 py-2.5 border border-gray-300 bg-white text-gray-700 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-gray-50"
+              class="px-4 py-2.5 border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-700 dark:text-surface-300 rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-surface-50 dark:hover:bg-surface-700"
               onClick={onClose}
             >
               Cancel
             </button>
             <button
               type="submit"
-              class="px-4 sm:px-5 py-2.5 border-none bg-blue-500 text-white rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-blue-600"
+              class="px-4 py-2.5 border-none bg-primary-500 text-white rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-primary-600"
             >
               Add Event
             </button>

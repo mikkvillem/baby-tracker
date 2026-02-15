@@ -3,9 +3,7 @@ import type { Interval } from '../app'
 import { Modal } from './Modal'
 import { SideSelector } from './SideSelector'
 
-const inputClass = 'w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)]'
-const buttonSecondaryClass = 'px-4 sm:px-5 py-2.5 border border-gray-300 bg-white text-gray-700 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-gray-50'
-const buttonPrimaryClass = 'px-4 sm:px-5 py-2.5 border-none bg-blue-500 text-white rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-blue-600'
+const inputClass = 'w-full px-3 py-2.5 border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-800 dark:text-surface-100 rounded-xl text-sm focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 transition-all'
 
 type Props = {
   interval?: Interval
@@ -47,34 +45,33 @@ export function IntervalModal({ interval, onClose, onSave, onDelete }: Props) {
       <form onSubmit={handleSubmit}>
         <SideSelector value={side} onChange={setSide} />
         <div class="mb-4">
-          <label class="block text-sm font-medium mb-1.5 text-gray-700">Start Date</label>
+          <label class="block text-sm font-medium mb-1.5 text-surface-600 dark:text-surface-400">Start Date</label>
           <input type="date" value={startDate} onInput={(e) => setStartDate((e.target as HTMLInputElement).value)} required class={inputClass} />
         </div>
         <div class="mb-4">
-          <label class="block text-sm font-medium mb-1.5 text-gray-700">Start Time</label>
+          <label class="block text-sm font-medium mb-1.5 text-surface-600 dark:text-surface-400">Start Time</label>
           <input type="time" value={startTime} onInput={(e) => setStartTime((e.target as HTMLInputElement).value)} required class={inputClass} />
         </div>
         <div class="mb-4">
-          <label class="block text-sm font-medium mb-1.5 text-gray-700">End Date</label>
+          <label class="block text-sm font-medium mb-1.5 text-surface-600 dark:text-surface-400">End Date</label>
           <input type="date" value={endDate} onInput={(e) => setEndDate((e.target as HTMLInputElement).value)} required class={inputClass} />
         </div>
         <div class="mb-4">
-          <label class="block text-sm font-medium mb-1.5 text-gray-700">End Time</label>
+          <label class="block text-sm font-medium mb-1.5 text-surface-600 dark:text-surface-400">End Time</label>
           <input type="time" value={endTime} onInput={(e) => setEndTime((e.target as HTMLInputElement).value)} required class={inputClass} />
         </div>
         <div class="flex mt-6 gap-3">
           {isEdit && onDelete && (
-            <button type="button" class="px-4 sm:px-5 py-2.5 border-none bg-red-500 text-white rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-red-600" onClick={onDelete}>
+            <button type="button" class="px-4 py-2.5 border-none bg-danger-500 text-white rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-danger-600" onClick={onDelete}>
               Delete
             </button>
           )}
           <div class="ml-auto flex gap-3">
-            <button type="button" class={buttonSecondaryClass} onClick={onClose}>Cancel</button>
-            <button type="submit" class={buttonPrimaryClass}>{isEdit ? 'Save' : 'Add'}</button>
+            <button type="button" class="px-4 py-2.5 border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-700 dark:text-surface-300 rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-surface-50 dark:hover:bg-surface-700" onClick={onClose}>Cancel</button>
+            <button type="submit" class="px-4 py-2.5 border-none bg-primary-500 text-white rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-primary-600">{isEdit ? 'Save' : 'Add'}</button>
           </div>
         </div>
       </form>
     </Modal>
   )
 }
-

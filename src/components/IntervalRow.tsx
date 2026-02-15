@@ -1,5 +1,6 @@
 import type { Interval } from '../app'
 import { formatIntervalDuration } from '../utils/sessionFormatters'
+import { Trash2 } from 'lucide-preact'
 
 type Props = {
   interval: Interval
@@ -20,37 +21,43 @@ export function IntervalRow({ interval, onDelete, onEdit }: Props) {
 
   return (
     <div
-      class={`flex items-center gap-3 p-3 bg-gray-50 rounded-lg text-sm ${
-        canEdit ? 'cursor-pointer hover:bg-gray-100 hover:translate-x-1 transition-all duration-200' : ''
+      class={`flex items-center gap-3 px-4 py-3 text-sm ${
+        canEdit ? 'cursor-pointer hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors duration-200' : ''
       }`}
       onClick={canEdit ? onEdit : undefined}
     >
       <span
-        class={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white shrink-0 ${
-          interval.side === 'left' ? 'bg-blue-500' : 'bg-purple-500'
+        class={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0 ${
+          interval.side === 'left' ? 'bg-side-left-500' : 'bg-side-right-500'
         }`}
       >
         {interval.side === 'left' ? 'L' : 'R'}
       </span>
-      <span class="text-xs sm:text-sm">
+      <span class="text-surface-600 dark:text-surface-400">
         {interval.startTime.toLocaleTimeString('en-US', timeFormat)}
       </span>
       {interval.endTime && (
-        <span class="ml-auto font-semibold text-emerald-500">
+        <span class="ml-auto font-semibold text-surface-800 dark:text-surface-200">
           {formatIntervalDuration(interval.startTime, interval.endTime)}
+        </span>
+      )}
+      {!interval.endTime && (
+        <span class="ml-auto flex items-center gap-1.5 text-success-500">
+          <span class="w-1.5 h-1.5 rounded-full bg-success-500 animate-pulse" />
+          <span class="font-medium text-xs">Recording</span>
         </span>
       )}
       {showDelete && (
         <button
           type="button"
-          class="w-7 h-7 border-none bg-red-100 text-red-600 rounded-md text-xl leading-none cursor-pointer transition-all duration-200 hover:bg-red-200 hover:scale-110 active:scale-95 flex items-center justify-center p-0"
+          class="w-7 h-7 border-none bg-transparent text-surface-400 hover:text-danger-500 rounded-md cursor-pointer transition-colors duration-200 flex items-center justify-center p-0"
           onClick={(e) => {
             e.stopPropagation()
             onDelete!()
           }}
           title="Delete interval"
         >
-          ×
+          <Trash2 size={14} />
         </button>
       )}
     </div>

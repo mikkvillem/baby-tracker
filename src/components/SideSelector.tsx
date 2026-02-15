@@ -7,12 +7,14 @@ type Props = {
 export function SideSelector({ value, onChange, label = 'Side' }: Props) {
   return (
     <div class="mb-4">
-      <label class="block text-sm font-medium mb-1.5 text-gray-700">{label}</label>
+      <label class="block text-sm font-medium mb-2 text-surface-600 dark:text-surface-400">{label}</label>
       <div class="flex gap-2">
         <button
           type="button"
-          class={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-200 ${
-            value === 'left' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          class={`flex-1 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 border-2 ${
+            value === 'left'
+              ? 'bg-side-left-50 dark:bg-side-left-500/15 border-side-left-500 text-side-left-600 dark:text-side-left-500'
+              : 'bg-surface-50 dark:bg-surface-800 border-surface-200 dark:border-surface-700 text-surface-600 dark:text-surface-400 hover:border-surface-300'
           }`}
           onClick={() => onChange('left')}
         >
@@ -20,8 +22,10 @@ export function SideSelector({ value, onChange, label = 'Side' }: Props) {
         </button>
         <button
           type="button"
-          class={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-200 ${
-            value === 'right' ? 'bg-purple-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          class={`flex-1 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 border-2 ${
+            value === 'right'
+              ? 'bg-side-right-50 dark:bg-side-right-500/15 border-side-right-500 text-side-right-600 dark:text-side-right-500'
+              : 'bg-surface-50 dark:bg-surface-800 border-surface-200 dark:border-surface-700 text-surface-600 dark:text-surface-400 hover:border-surface-300'
           }`}
           onClick={() => onChange('right')}
         >

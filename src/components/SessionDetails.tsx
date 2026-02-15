@@ -8,6 +8,7 @@ import {
   getSideCounts
 } from '../utils/sessionFormatters'
 import { IntervalRow } from './IntervalRow'
+import { ChevronLeft, Trash2, Plus } from 'lucide-preact'
 
 type Props = {
   session: Session
@@ -57,86 +58,100 @@ export function SessionDetails({ session, onBack, onUpdateSession, onDeleteSessi
   const { left, right } = getSideCounts(session.intervals)
 
   return (
-    <div class="max-w-2xl mx-auto px-4 sm:px-5">
-      <header class="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8 flex-wrap">
-        <button 
-          class="bg-white border border-gray-200 px-3 sm:px-4 py-2 rounded-lg text-base font-medium cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:border-gray-300"
+    <div class="max-w-lg mx-auto px-4 pt-4 pb-6 flex flex-col gap-5">
+      {/* Top bar */}
+      <div class="flex items-center justify-between">
+        <button
+          class="flex items-center gap-1.5 text-surface-500 dark:text-surface-400 bg-transparent border-none cursor-pointer text-sm font-medium hover:text-surface-700 dark:hover:text-surface-200 transition-colors p-0"
           onClick={onBack}
         >
-          ← Back
+          <ChevronLeft size={18} />
+          Back
         </button>
-        <h1 class="m-0 text-2xl sm:text-3xl font-semibold flex-1">Session Details</h1>
-        <button 
-          class="bg-red-500 text-white border-none px-3 sm:px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-red-600 active:scale-[0.98]"
+        <button
+          class="flex items-center gap-1.5 text-danger-500 bg-transparent border-none cursor-pointer text-sm font-medium hover:text-danger-600 transition-colors p-0"
           onClick={handleDeleteSession}
         >
-          Delete Session
+          <Trash2 size={15} />
+          Delete
         </button>
-      </header>
+      </div>
 
-      <div class="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 mb-6">
-        <div class="flex justify-between py-3 border-b border-gray-100">
-          <span class="font-medium text-gray-500">Started:</span>
-          <span class="font-semibold text-gray-800">
-            {session.intervals.length > 0
-              ? session.intervals[0].startTime.toLocaleString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-              })
-              : '-'}
-          </span>
-        </div>
-        <div class="flex justify-between py-3 border-b border-gray-100">
-          <span class="font-medium text-gray-500">Total Duration:</span>
-          <span class="font-semibold text-gray-800">{formatDuration(session.intervals)}</span>
-        </div>
-        <div class="flex justify-between py-3">
-          <span class="font-medium text-gray-500">Intervals:</span>
-          <span class="font-semibold text-gray-800">Left: {left} | Right: {right}</span>
+      {/* Session summary */}
+      <div class="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl overflow-hidden">
+        <div class="flex divide-x divide-surface-100 dark:divide-surface-700">
+          <div class="flex-1 p-4 text-center">
+            <div class="text-xs font-medium text-surface-500 mb-1">Started</div>
+            <div class="text-base font-semibold text-surface-800 dark:text-surface-100">
+              {session.intervals.length > 0
+                ? session.intervals[0].startTime.toLocaleString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: false
+                })
+                : '-'}
+            </div>
+          </div>
+          <div class="flex-1 p-4 text-center">
+            <div class="text-xs font-medium text-surface-500 mb-1">Duration</div>
+            <div class="text-base font-semibold text-surface-800 dark:text-surface-100">{formatDuration(session.intervals)}</div>
+          </div>
+          <div class="flex-1 p-4 text-center">
+            <div class="text-xs font-medium text-surface-500 mb-1">Intervals</div>
+            <div class="text-base font-semibold text-surface-800 dark:text-surface-100">
+              <span class="text-side-left-500">{left}L</span>
+              {' '}
+              <span class="text-side-right-500">{right}R</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 sm:mb-8">
-        <div class="bg-white border-2 border-gray-200 rounded-xl p-4 sm:p-5 text-center">
-          <h3 class="m-0 mb-3 text-lg font-semibold text-gray-500">Left</h3>
-          <div class="text-4xl sm:text-5xl font-bold font-mono text-gray-800">
+      {/* Side timers */}
+      <div class="grid grid-cols-2 gap-3">
+        <div class="bg-side-left-50 dark:bg-side-left-500/10 border border-side-left-100 dark:border-side-left-500/20 rounded-xl p-4 text-center">
+          <div class="text-xs font-semibold uppercase tracking-wider text-side-left-600 dark:text-side-left-500 mb-1">Left</div>
+          <div class="text-3xl sm:text-4xl font-bold font-mono text-side-left-600 dark:text-side-left-500">
             {formatTimer(getTotalTimeForSide(session.intervals, 'left'))}
           </div>
         </div>
-        <div class="bg-white border-2 border-gray-200 rounded-xl p-4 sm:p-5 text-center">
-          <h3 class="m-0 mb-3 text-lg font-semibold text-gray-500">Right</h3>
-          <div class="text-4xl sm:text-5xl font-bold font-mono text-gray-800">
+        <div class="bg-side-right-50 dark:bg-side-right-500/10 border border-side-right-100 dark:border-side-right-500/20 rounded-xl p-4 text-center">
+          <div class="text-xs font-semibold uppercase tracking-wider text-side-right-600 dark:text-side-right-500 mb-1">Right</div>
+          <div class="text-3xl sm:text-4xl font-bold font-mono text-side-right-600 dark:text-side-right-500">
             {formatTimer(getTotalTimeForSide(session.intervals, 'right'))}
           </div>
         </div>
       </div>
 
-      <div class="bg-white border border-gray-200 rounded-xl p-4 sm:p-5">
-        <div class="flex justify-between items-center mb-4 gap-3 flex-wrap">
-          <h3 class="m-0 text-lg font-semibold">Session History</h3>
-          <button 
-            class="px-3 sm:px-4 py-2 border-none bg-blue-500 text-white rounded-md text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-blue-600"
+      {/* Interval list */}
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider m-0">Intervals</h3>
+          <button
+            class="flex items-center gap-1.5 text-primary-500 bg-transparent border-none cursor-pointer text-sm font-medium hover:text-primary-600 transition-colors p-0"
             onClick={() => setShowAddModal(true)}
           >
-            + Add Interval
+            <Plus size={16} />
+            Add
           </button>
         </div>
-        {session.intervals.length === 0 ? (
-          <p class="text-center text-gray-500 py-5 m-0">No intervals recorded</p>
-        ) : (
-          <div class="flex flex-col gap-2">
-            {session.intervals.map((interval, idx) => (
-              <IntervalRow
-                key={idx}
-                interval={interval}
-                onEdit={interval.endTime ? () => setEditingIndex(idx) : undefined}
-              />
-            ))}
-          </div>
-        )}
+        <div class="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl overflow-hidden">
+          {session.intervals.length === 0 ? (
+            <p class="text-center text-surface-400 py-8 m-0 text-sm">No intervals recorded</p>
+          ) : (
+            <div class="flex flex-col divide-y divide-surface-100 dark:divide-surface-700">
+              {session.intervals.map((interval, idx) => (
+                <IntervalRow
+                  key={idx}
+                  interval={interval}
+                  onEdit={interval.endTime ? () => setEditingIndex(idx) : undefined}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {(editingIndex !== null || showAddModal) && (
@@ -153,4 +168,3 @@ export function SessionDetails({ session, onBack, onUpdateSession, onDeleteSessi
     </div>
   )
 }
-

@@ -1,1 +1,87 @@
 @import "tailwindcss";
+
+@theme {
+  /* Warm, soft palette for a baby app */
+  --color-primary-50: #fdf2f8;
+  --color-primary-100: #fce7f3;
+  --color-primary-200: #fbcfe8;
+  --color-primary-300: #f9a8d4;
+  --color-primary-400: #f472b6;
+  --color-primary-500: #ec4899;
+  --color-primary-600: #db2777;
+
+  /* Left side - soft teal */
+  --color-side-left-50: #f0fdfa;
+  --color-side-left-100: #ccfbf1;
+  --color-side-left-500: #14b8a6;
+  --color-side-left-600: #0d9488;
+
+  /* Right side - soft violet */
+  --color-side-right-50: #f5f3ff;
+  --color-side-right-100: #ede9fe;
+  --color-side-right-500: #8b5cf6;
+  --color-side-right-600: #7c3aed;
+
+  /* Surface colors */
+  --color-surface-50: #faf9f7;
+  --color-surface-100: #f5f3f0;
+  --color-surface-200: #ece8e3;
+  --color-surface-300: #ddd7cf;
+  --color-surface-400: #b8afa4;
+  --color-surface-500: #96897b;
+  --color-surface-600: #7a6e62;
+  --color-surface-700: #5c534a;
+  --color-surface-800: #3d3731;
+  --color-surface-900: #1f1b18;
+
+  /* Semantic colors */
+  --color-success-50: #f0fdf4;
+  --color-success-500: #22c55e;
+  --color-success-600: #16a34a;
+
+  --color-warning-50: #fffbeb;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+
+  --color-danger-50: #fef2f2;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+
+  /* Event type colors */
+  --color-event-diaper: #f59e0b;
+  --color-event-medicine: #f97316;
+  --color-event-measurement: #22c55e;
+  --color-event-custom: #8b5cf6;
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: var(--color-surface-100);
+    color: var(--color-surface-800);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body {
+      background: var(--color-surface-900);
+      color: var(--color-surface-200);
+    }
+  }
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  .card {
+    background: var(--color-surface-800);
+    border-color: var(--color-surface-700);
+  }
+}

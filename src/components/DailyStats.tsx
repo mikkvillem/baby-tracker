@@ -20,33 +20,35 @@ export function DailyStats({ sessions }: Props) {
   const lastSide = getLastOfferedSide(sessions)
 
   return (
-    <div class="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 mb-6">
-      <h2 class="text-lg font-semibold mb-4 m-0">Today's Summary</h2>
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div class="bg-gray-50 rounded-lg p-3 text-center">
-          <div class="text-2xl sm:text-3xl font-bold text-gray-800 mb-1">{totalSessions}</div>
-          <div class="text-xs sm:text-sm text-gray-600">Sessions</div>
-        </div>
-        <div class="bg-blue-50 rounded-lg p-3 text-center">
-          <div class="text-2xl sm:text-3xl font-bold text-blue-600 mb-1">{formatDurationShort(leftTime)}</div>
-          <div class="text-xs sm:text-sm text-gray-600">Left</div>
-        </div>
-        <div class="bg-purple-50 rounded-lg p-3 text-center">
-          <div class="text-2xl sm:text-3xl font-bold text-purple-600 mb-1">{formatDurationShort(rightTime)}</div>
-          <div class="text-xs sm:text-sm text-gray-600">Right</div>
-        </div>
-        <div class={`rounded-lg p-3 text-center ${
-          lastSide === 'left' ? 'bg-blue-50' : lastSide === 'right' ? 'bg-purple-50' : 'bg-gray-50'
+    <div class="grid grid-cols-4 gap-2">
+      <div class="bg-white dark:bg-surface-800 rounded-xl p-3 text-center border border-surface-200 dark:border-surface-700">
+        <div class="text-2xl font-bold text-surface-800 dark:text-surface-100">{totalSessions}</div>
+        <div class="text-[11px] font-medium text-surface-500 mt-0.5">Sessions</div>
+      </div>
+      <div class="bg-side-left-50 dark:bg-side-left-500/10 rounded-xl p-3 text-center border border-side-left-100 dark:border-side-left-500/20">
+        <div class="text-2xl font-bold text-side-left-600 dark:text-side-left-500">{formatDurationShort(leftTime)}</div>
+        <div class="text-[11px] font-medium text-surface-500 mt-0.5">Left</div>
+      </div>
+      <div class="bg-side-right-50 dark:bg-side-right-500/10 rounded-xl p-3 text-center border border-side-right-100 dark:border-side-right-500/20">
+        <div class="text-2xl font-bold text-side-right-600 dark:text-side-right-500">{formatDurationShort(rightTime)}</div>
+        <div class="text-[11px] font-medium text-surface-500 mt-0.5">Right</div>
+      </div>
+      <div class={`rounded-xl p-3 text-center border ${
+        lastSide === 'left'
+          ? 'bg-side-left-50 dark:bg-side-left-500/10 border-side-left-100 dark:border-side-left-500/20'
+          : lastSide === 'right'
+            ? 'bg-side-right-50 dark:bg-side-right-500/10 border-side-right-100 dark:border-side-right-500/20'
+            : 'bg-white dark:bg-surface-800 border-surface-200 dark:border-surface-700'
+      }`}>
+        <div class={`text-2xl font-bold ${
+          lastSide === 'left' ? 'text-side-left-600 dark:text-side-left-500'
+            : lastSide === 'right' ? 'text-side-right-600 dark:text-side-right-500'
+              : 'text-surface-400'
         }`}>
-          <div class={`text-2xl sm:text-3xl font-bold mb-1 ${
-            lastSide === 'left' ? 'text-blue-600' : lastSide === 'right' ? 'text-purple-600' : 'text-gray-600'
-          }`}>
-            {lastSide ? lastSide[0].toUpperCase() : '-'}
-          </div>
-          <div class="text-xs sm:text-sm text-gray-600">Last Side</div>
+          {lastSide ? lastSide[0].toUpperCase() : '-'}
         </div>
+        <div class="text-[11px] font-medium text-surface-500 mt-0.5">Last</div>
       </div>
     </div>
   )
 }
-

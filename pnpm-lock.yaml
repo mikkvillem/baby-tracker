@@ -20,6 +20,9 @@ importers:
       '@tanstack/react-router':
         specifier: ^1.144.0
         version: 1.144.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      lucide-preact:
+        specifier: ^0.564.0
+        version: 0.564.0(preact@10.28.1)
       preact:
         specifier: ^10.27.2
         version: 10.28.1
@@ -1342,6 +1345,11 @@ packages:
 
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
+
+  lucide-preact@0.564.0:
+    resolution: {integrity: sha512-p33ChuLVOHKlgpim2Sp1ky4zyPLfmq2W82bI4mXSpDCtgMOD3BZOsJmiE2/LBxkgcG4fi5hHn6r6PwYiVAqRbg==}
+    peerDependencies:
+      preact: ^10.27.2
 
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
@@ -2711,6 +2719,10 @@ snapshots:
   lru-cache@5.1.1:
     dependencies:
       yallist: 3.1.1
+
+  lucide-preact@0.564.0(preact@10.28.1):
+    dependencies:
+      preact: 10.28.1
 
   magic-string@0.30.21:
     dependencies:
