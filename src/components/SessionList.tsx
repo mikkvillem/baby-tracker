@@ -4,7 +4,10 @@ import { ManualSessionModal } from './ManualSessionModal'
 import { MiscEventModal } from './MiscEventModal'
 import { NextFeedingCard } from './NextFeedingCard'
 import { DailyStats } from './DailyStats'
-import { Play, PenLine, CalendarPlus } from 'lucide-preact'
+import { Play, PenLine, CalendarPlus, ChevronRight } from 'lucide-preact'
+import { useNavigate } from '@tanstack/react-router'
+import { useIntervalTick } from '../hooks/useIntervalTick'
+import { formatDurationMin } from '../utils/sessionFormatters'
 
 type Props = {
   sessions: Session[]
@@ -14,8 +17,13 @@ type Props = {
 }
 
 export function SessionList({ sessions, onStartNewSession, onAddManualSession, onAddMiscEvent }: Props) {
+  const navigate = useNavigate()
   const [showManualModal, setShowManualModal] = useState(false)
   const [showMiscEventModal, setShowMiscEventModal] = useState(false)
+
+  const activeSession = sessions.find(s => s.isActive)
+  useIntervalTick(!!activeSession, 1000)
+
   const handleManualSave = (session: Session) => {
     onAddManualSession(session)
     setShowManualModal(false)
@@ -28,6 +36,25 @@ export function SessionList({ sessions, onStartNewSession, onAddManualSession, o
 
   return (
     <div class="max-w-lg mx-auto px-4 pt-5 pb-4 flex flex-col gap-5">
+      {/* Active session banner */}
+      {activeSession && (
+        <button
+          class="w-full bg-success-500 text-white border-none p-4 rounded-2xl cursor-pointer transition-all duration-200 active:scale-[0.98] shadow-md flex items-center gap-3 text-left"
+          onClick={() => navigate({ to: '/session/$sessionId/active', params: { sessionId: activeSession.id } })}
+        >
+          <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+            <span class="w-3 h-3 rounded-full bg-white animate-pulse" />
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="text-xs font-medium opacity-80">Session in progress</div>
+            <div class="text-lg font-bold font-mono">
+              {formatDurationMin(activeSession.intervals)}
+            </div>
+          </div>
+          <ChevronRight size={20} class="opacity-60 shrink-0" />
+        </button>
+      )}
+
       <NextFeedingCard sessions={sessions} />
 
       {/* Primary action */}
