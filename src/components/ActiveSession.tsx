@@ -15,11 +15,20 @@ type Props = {
   onUpdateSession: (sessionId: string, intervals: Interval[]) => void
 }
 
+function getResumedState(intervals: Interval[]) {
+  const last = intervals[intervals.length - 1]
+  const open = last && !last.endTime
+  return open
+    ? { activeSide: last!.side as 'left' | 'right', startTime: last!.startTime }
+    : null
+}
+
 export function ActiveSession({ session, onEndSession, onUpdateSession }: Props) {
-  const [activeLeft, setActiveLeft] = useState(false)
-  const [activeRight, setActiveRight] = useState(false)
+  const resumed = getResumedState(session.intervals)
+  const [activeLeft, setActiveLeft] = useState(resumed?.activeSide === 'left')
+  const [activeRight, setActiveRight] = useState(resumed?.activeSide === 'right')
   const [intervals, setIntervals] = useState<Interval[]>(session.intervals)
-  const [currentIntervalStart, setCurrentIntervalStart] = useState<Date | null>(null)
+  const [currentIntervalStart, setCurrentIntervalStart] = useState<Date | null>(resumed?.startTime ?? null)
 
   const saveOnUnload = useCallback(() => {
     if (activeLeft || activeRight) {
