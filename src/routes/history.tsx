@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from 'preact/hooks'
 import { loadSessions, loadMiscEvents, deleteMiscEvent, initDB, exportDataAsJSON } from '../db'
 import type { Session, MiscEvent } from '../app'
 import { formatDurationMin, formatDurationShort, getSideCounts } from '../utils/sessionFormatters'
+import { ErrorBanner } from '../components/ErrorBanner'
 import { Download, ChevronRight, X, Baby, Pill, Ruler, PenLine, Droplets } from 'lucide-preact'
 
 export const Route = createFileRoute('/history')({
@@ -25,10 +26,12 @@ function HistoryRoute() {
   const [miscEvents, setMiscEvents] = useState<MiscEvent[]>([])
   const [visibleDays, setVisibleDays] = useState(3)
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set())
+  const [error, setError] = useState<string | null>(null)
 
   const loadData = () => {
-    initDB().then(() => {
-      Promise.all([loadSessions(), loadMiscEvents()]).then(([loadedSessions, loadedEvents]) => {
+    initDB()
+      .then(() => Promise.all([loadSessions(), loadMiscEvents()]))
+      .then(([loadedSessions, loadedEvents]) => {
         const sortedSessions = loadedSessions.sort((a, b) =>
           b.startTime.getTime() - a.startTime.getTime()
         )
@@ -37,8 +40,12 @@ function HistoryRoute() {
         )
         setSessions(sortedSessions)
         setMiscEvents(sortedEvents)
+        setError(null)
       })
-    })
+      .catch(err => {
+        console.error('Failed to load history:', err)
+        setError('Failed to load your history. Please reload the page and try again.')
+      })
   }
 
   useEffect(() => {
@@ -232,6 +239,8 @@ function HistoryRoute() {
         </button>
       </div>
 
+      {error && <ErrorBanner message={error} onDismiss={() => setError(null)} />}
+
       {sessions.length === 0 && miscEvents.length === 0 ? (
         <div class="text-center py-16 px-5 text-surface-400">
           <Baby size={40} class="mx-auto mb-3 opacity-50" />
@@ -329,8 +338,13 @@ function HistoryRoute() {
                               onClick={async (e) => {
                                 e.stopPropagation()
                                 if (confirm('Delete this event?')) {
-                                  await deleteMiscEvent(event.id)
-                                  loadData()
+                                  try {
+                                    await deleteMiscEvent(event.id)
+                                    loadData()
+                                  } catch (err) {
+                                    console.error('Failed to delete event:', err)
+                                    setError('Failed to delete the event. Please try again.')
+                                  }
                                 }
                               }}
                             >
