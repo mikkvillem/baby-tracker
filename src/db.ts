@@ -89,27 +89,99 @@ export const initDB = (): Promise<IDBDatabase> => {
   return dbPromise
 }
 
+const sessionToRecord = (session: Session) => ({
+  ...session,
+  startTime: session.startTime.toISOString(),
+  intervals: session.intervals.map(interval => ({
+    ...interval,
+    startTime: interval.startTime.toISOString(),
+    endTime: interval.endTime ? interval.endTime.toISOString() : undefined
+  }))
+})
+
+const recordToSession = (session: any): Session => ({
+  ...session,
+  startTime: new Date(session.startTime),
+  intervals: session.intervals.map((interval: any) => ({
+    ...interval,
+    startTime: new Date(interval.startTime),
+    endTime: interval.endTime ? new Date(interval.endTime) : undefined
+  }))
+})
+
+export const getSession = async (sessionId: string): Promise<Session | null> => {
+  const database = await initDB()
+
+  let request: IDBRequest<any>
+  try {
+    const transaction = database.transaction([SESSIONS_STORE], 'readonly')
+    const store = transaction.objectStore(SESSIONS_STORE)
+    request = store.get(sessionId)
+  } catch (error) {
+    throw new DBError('Failed to load session', error)
+  }
+
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => {
+      try {
+        resolve(request.result ? recordToSession(request.result) : null)
+      } catch (error) {
+        reject(new DBError('Failed to parse stored session', error))
+      }
+    }
+    request.onerror = () => reject(new DBError(describeRequestError(request.error, 'Failed to load session'), request.error))
+  })
+}
+
+export const putSession = async (session: Session): Promise<void> => {
+  const database = await initDB()
+
+  let transaction: IDBTransaction
+  try {
+    transaction = database.transaction([SESSIONS_STORE], 'readwrite')
+    const store = transaction.objectStore(SESSIONS_STORE)
+    store.put(sessionToRecord(session))
+  } catch (error) {
+    throw new DBError('Failed to save session', error)
+  }
+
+  return new Promise((resolve, reject) => {
+    transaction.oncomplete = () => resolve()
+    transaction.onerror = () => reject(new DBError(describeRequestError(transaction.error, 'Failed to save session'), transaction.error))
+    transaction.onabort = () => reject(new DBError(describeRequestError(transaction.error, 'Save session transaction was aborted'), transaction.error))
+  })
+}
+
+export const deleteSessionRecord = async (sessionId: string): Promise<void> => {
+  const database = await initDB()
+
+  let transaction: IDBTransaction
+  try {
+    transaction = database.transaction([SESSIONS_STORE], 'readwrite')
+    const store = transaction.objectStore(SESSIONS_STORE)
+    store.delete(sessionId)
+  } catch (error) {
+    throw new DBError('Failed to delete session', error)
+  }
+
+  return new Promise((resolve, reject) => {
+    transaction.oncomplete = () => resolve()
+    transaction.onerror = () => reject(new DBError(describeRequestError(transaction.error, 'Failed to delete session'), transaction.error))
+    transaction.onabort = () => reject(new DBError(describeRequestError(transaction.error, 'Delete session transaction was aborted'), transaction.error))
+  })
+}
+
+// Upserts each given session as its own record (no clear/rewrite of unrelated
+// sessions) — used for bulk seeding/import, not for single-session edits.
 export const saveSessions = async (sessions: Session[]): Promise<void> => {
   const database = await initDB()
 
   let transaction: IDBTransaction
-  let store: IDBObjectStore
   try {
     transaction = database.transaction([SESSIONS_STORE], 'readwrite')
-    store = transaction.objectStore(SESSIONS_STORE)
-    store.clear()
-
+    const store = transaction.objectStore(SESSIONS_STORE)
     for (const session of sessions) {
-      const sessionToStore = {
-        ...session,
-        startTime: session.startTime.toISOString(),
-        intervals: session.intervals.map(interval => ({
-          ...interval,
-          startTime: interval.startTime.toISOString(),
-          endTime: interval.endTime ? interval.endTime.toISOString() : undefined
-        }))
-      }
-      store.add(sessionToStore)
+      store.put(sessionToRecord(session))
     }
   } catch (error) {
     throw new DBError('Failed to save sessions', error)
@@ -285,7 +357,7 @@ export const importDataFromJSON = async (jsonString: string): Promise<ImportResu
   const existingSessionIds = new Set(existingSessions.map(s => s.id))
   const newSessions = importedSessions.filter(s => !existingSessionIds.has(s.id))
   if (newSessions.length > 0) {
-    await saveSessions([...existingSessions, ...newSessions])
+    await saveSessions(newSessions)
   }
 
   const existingEvents = await loadMiscEvents()
