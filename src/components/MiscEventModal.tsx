@@ -1,6 +1,7 @@
 import { useState } from 'preact/hooks'
 import type { MiscEvent, MiscEventType, MeasurementKind } from '../app'
 import { Modal } from './Modal'
+import { feedingSettings } from '../store/settings'
 import { Droplets, Pill, Ruler, PenLine } from 'lucide-preact'
 
 type Props = {
@@ -13,17 +14,6 @@ const EVENT_OPTIONS: { type: MiscEventType; label: string; icon: typeof Droplets
   { type: 'medicine', label: 'Medicine', icon: Pill, color: 'bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-500 border-orange-200 dark:border-orange-500/20', activeColor: 'bg-event-medicine text-white border-event-medicine' },
   { type: 'measurement', label: 'Measure', icon: Ruler, color: 'bg-success-50 dark:bg-success-500/10 text-success-600 dark:text-success-500 border-success-200 dark:border-success-500/20', activeColor: 'bg-success-500 text-white border-success-500' },
   { type: 'custom', label: 'Custom', icon: PenLine, color: 'bg-side-right-50 dark:bg-side-right-500/10 text-side-right-600 dark:text-side-right-500 border-side-right-100 dark:border-side-right-500/20', activeColor: 'bg-event-custom text-white border-event-custom' }
-]
-
-const MEDICINE_OPTIONS = [
-  'Vitamin D',
-  'Probiotic',
-  'Paracetamol',
-  'Ibuprofen',
-  'Gripe water',
-  'Gas drops',
-  'Iron supplement',
-  'Other'
 ]
 
 const MEASUREMENT_TABS: { kind: MeasurementKind; label: string }[] = [
@@ -186,7 +176,7 @@ export function MiscEventModal({ onClose, onSave }: Props) {
                 class={inputClass}
               >
                 <option value="">Select...</option>
-                {MEDICINE_OPTIONS.map(name => (
+                {feedingSettings.value.medicineOptions.map(name => (
                   <option key={name} value={name}>{name}</option>
                 ))}
               </select>

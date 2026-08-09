@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { feedingSettings, updateSettings } from '../store/settings'
-import { AlarmClock, Timer } from 'lucide-preact'
+import { useState } from 'preact/hooks'
+import { feedingSettings, updateSettings, DEFAULT_MEDICINE_OPTIONS } from '../store/settings'
+import { AlarmClock, Timer, Pill, X, Plus } from 'lucide-preact'
 
 export const Route = createFileRoute('/settings')({
   component: SettingsRoute
@@ -28,6 +29,24 @@ function SettingsRoute() {
     if (Number.isFinite(value) && value > 0) {
       updateSettings({ significantIntervalMinutes: Math.round(value) })
     }
+  }
+
+  const medicineOptions = feedingSettings.value.medicineOptions
+  const [newMedicine, setNewMedicine] = useState('')
+
+  const addMedicine = () => {
+    const trimmed = newMedicine.trim()
+    if (!trimmed || medicineOptions.includes(trimmed)) return
+    updateSettings({ medicineOptions: [...medicineOptions, trimmed] })
+    setNewMedicine('')
+  }
+
+  const removeMedicine = (name: string) => {
+    updateSettings({ medicineOptions: medicineOptions.filter(m => m !== name) })
+  }
+
+  const resetMedicineOptions = () => {
+    updateSettings({ medicineOptions: DEFAULT_MEDICINE_OPTIONS })
   }
 
   return (
@@ -143,6 +162,72 @@ function SettingsRoute() {
         <p class="m-0 text-xs text-surface-400">
           Side switches shorter than {significantIntervalMinutes}m are treated as noise and ignored when finding the last feeding time.
         </p>
+      </div>
+
+      <div class="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl p-4 flex flex-col gap-3">
+        <div class="flex items-center justify-between gap-2.5">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-500/15 flex items-center justify-center shrink-0">
+              <Pill size={16} class="text-primary-500" />
+            </div>
+            <div>
+              <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">Medicine List</h2>
+              <p class="m-0 text-xs text-surface-500">Options shown when logging a medicine event</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            class="text-xs font-medium text-surface-400 hover:text-surface-600 dark:hover:text-surface-300 bg-transparent border-none cursor-pointer p-0 shrink-0"
+            onClick={resetMedicineOptions}
+          >
+            Reset
+          </button>
+        </div>
+
+        {medicineOptions.length > 0 && (
+          <div class="flex flex-wrap gap-2">
+            {medicineOptions.map(name => (
+              <span
+                key={name}
+                class="flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full text-sm font-medium bg-surface-100 dark:bg-surface-700 text-surface-700 dark:text-surface-200"
+              >
+                {name}
+                <button
+                  type="button"
+                  class="w-4 h-4 flex items-center justify-center bg-transparent border-none text-surface-400 hover:text-danger-500 cursor-pointer p-0 rounded-full transition-colors"
+                  onClick={() => removeMedicine(name)}
+                  aria-label={`Remove ${name}`}
+                >
+                  <X size={12} />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div class="flex gap-2">
+          <input
+            type="text"
+            value={newMedicine}
+            onInput={(e) => setNewMedicine((e.target as HTMLInputElement).value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                addMedicine()
+              }
+            }}
+            placeholder="e.g. Teething gel"
+            class={`flex-1 ${inputClass}`}
+          />
+          <button
+            type="button"
+            class="px-3.5 rounded-xl border-none bg-primary-500 text-white cursor-pointer transition-all duration-200 hover:bg-primary-600 flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed"
+            onClick={addMedicine}
+            disabled={!newMedicine.trim()}
+          >
+            <Plus size={18} />
+          </button>
+        </div>
       </div>
     </div>
   )
