@@ -9,11 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SessionSessionIdDetailsRouteImport } from './routes/session.$sessionId.details'
 import { Route as SessionSessionIdActiveRouteImport } from './routes/session.$sessionId.active'
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HistoryRoute = HistoryRouteImport.update({
   id: '/history',
   path: '/history',
@@ -38,12 +44,14 @@ const SessionSessionIdActiveRoute = SessionSessionIdActiveRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/history': typeof HistoryRoute
+  '/settings': typeof SettingsRoute
   '/session/$sessionId/active': typeof SessionSessionIdActiveRoute
   '/session/$sessionId/details': typeof SessionSessionIdDetailsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/history': typeof HistoryRoute
+  '/settings': typeof SettingsRoute
   '/session/$sessionId/active': typeof SessionSessionIdActiveRoute
   '/session/$sessionId/details': typeof SessionSessionIdDetailsRoute
 }
@@ -51,6 +59,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/history': typeof HistoryRoute
+  '/settings': typeof SettingsRoute
   '/session/$sessionId/active': typeof SessionSessionIdActiveRoute
   '/session/$sessionId/details': typeof SessionSessionIdDetailsRoute
 }
@@ -59,18 +68,21 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/history'
+    | '/settings'
     | '/session/$sessionId/active'
     | '/session/$sessionId/details'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/history'
+    | '/settings'
     | '/session/$sessionId/active'
     | '/session/$sessionId/details'
   id:
     | '__root__'
     | '/'
     | '/history'
+    | '/settings'
     | '/session/$sessionId/active'
     | '/session/$sessionId/details'
   fileRoutesById: FileRoutesById
@@ -78,12 +90,20 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HistoryRoute: typeof HistoryRoute
+  SettingsRoute: typeof SettingsRoute
   SessionSessionIdActiveRoute: typeof SessionSessionIdActiveRoute
   SessionSessionIdDetailsRoute: typeof SessionSessionIdDetailsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/history': {
       id: '/history'
       path: '/history'
@@ -118,6 +138,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HistoryRoute: HistoryRoute,
+  SettingsRoute: SettingsRoute,
   SessionSessionIdActiveRoute: SessionSessionIdActiveRoute,
   SessionSessionIdDetailsRoute: SessionSessionIdDetailsRoute,
 }

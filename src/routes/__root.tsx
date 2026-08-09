@@ -1,5 +1,5 @@
 import { createRootRoute, Outlet, useNavigate, useMatches } from '@tanstack/react-router'
-import { Home, Clock } from 'lucide-preact'
+import { Home, Clock, Settings } from 'lucide-preact'
 import '../app.css'
 
 function AppShell() {
@@ -47,6 +47,18 @@ function AppShell() {
           >
             <Clock size={22} strokeWidth={currentPath === '/history' ? 2.5 : 2} />
             <span class="text-[11px] font-medium">History</span>
+          </button>
+
+          <button
+            class={`flex flex-col items-center gap-0.5 py-2 px-4 rounded-lg transition-colors duration-200 border-none bg-transparent cursor-pointer ${
+              currentPath === '/settings'
+                ? 'text-primary-500'
+                : 'text-surface-400 dark:text-surface-500 hover:text-surface-600 dark:hover:text-surface-300'
+            }`}
+            onClick={() => navigate({ to: '/settings' })}
+          >
+            <Settings size={22} strokeWidth={currentPath === '/settings' ? 2.5 : 2} />
+            <span class="text-[11px] font-medium">Settings</span>
           </button>
         </nav>
       )}
