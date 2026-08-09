@@ -36,25 +36,61 @@ export const initDB = (): Promise<IDBDatabase> => {
   })
 }
 
-export const saveSessions = async (sessions: Session[]): Promise<void> => {
+export const getSession = async (sessionId: string): Promise<Session | null> => {
+  const database = await initDB()
+  const transaction = database.transaction([SESSIONS_STORE], 'readonly')
+  const store = transaction.objectStore(SESSIONS_STORE)
+  const request = store.get(sessionId)
+
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => {
+      const session = request.result
+      if (!session) {
+        resolve(null)
+        return
+      }
+      resolve({
+        ...session,
+        startTime: new Date(session.startTime),
+        intervals: session.intervals.map((interval: any) => ({
+          ...interval,
+          startTime: new Date(interval.startTime),
+          endTime: interval.endTime ? new Date(interval.endTime) : undefined
+        }))
+      })
+    }
+    request.onerror = () => reject(request.error)
+  })
+}
+
+export const putSession = async (session: Session): Promise<void> => {
   const database = await initDB()
   const transaction = database.transaction([SESSIONS_STORE], 'readwrite')
   const store = transaction.objectStore(SESSIONS_STORE)
 
-  store.clear()
-
-  for (const session of sessions) {
-    const sessionToStore = {
-      ...session,
-      startTime: session.startTime.toISOString(),
-      intervals: session.intervals.map(interval => ({
-        ...interval,
-        startTime: interval.startTime.toISOString(),
-        endTime: interval.endTime ? interval.endTime.toISOString() : undefined
-      }))
-    }
-    store.add(sessionToStore)
+  const sessionToStore = {
+    ...session,
+    startTime: session.startTime.toISOString(),
+    intervals: session.intervals.map(interval => ({
+      ...interval,
+      startTime: interval.startTime.toISOString(),
+      endTime: interval.endTime ? interval.endTime.toISOString() : undefined
+    }))
   }
+  store.put(sessionToStore)
+
+  return new Promise((resolve, reject) => {
+    transaction.oncomplete = () => resolve()
+    transaction.onerror = () => reject(transaction.error)
+  })
+}
+
+export const deleteSessionRecord = async (sessionId: string): Promise<void> => {
+  const database = await initDB()
+  const transaction = database.transaction([SESSIONS_STORE], 'readwrite')
+  const store = transaction.objectStore(SESSIONS_STORE)
+
+  store.delete(sessionId)
 
   return new Promise((resolve, reject) => {
     transaction.oncomplete = () => resolve()

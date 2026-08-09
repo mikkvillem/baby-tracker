@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState, useEffect } from 'preact/hooks'
 import { SessionList } from '../components/SessionList'
-import { loadSessions, saveSessions, saveMiscEvent, initDB } from '../db'
+import { loadSessions, putSession, saveMiscEvent, initDB } from '../db'
 import type { Session, MiscEvent } from '../app'
 
 export const Route = createFileRoute('/')({
@@ -11,7 +11,6 @@ export const Route = createFileRoute('/')({
 function SessionListRoute() {
   const navigate = useNavigate()
   const [sessions, setSessions] = useState<Session[]>([])
-  const [dbReady, setDbReady] = useState(false)
 
   useEffect(() => {
     initDB().then(() => {
@@ -20,16 +19,9 @@ function SessionListRoute() {
           b.startTime.getTime() - a.startTime.getTime()
         )
         setSessions(sortedSessions)
-        setDbReady(true)
       })
     })
   }, [])
-
-  useEffect(() => {
-    if (dbReady && sessions.length >= 0) {
-      saveSessions(sessions)
-    }
-  }, [sessions, dbReady])
 
   const startNewSession = async () => {
     const newSession: Session = {
@@ -38,18 +30,16 @@ function SessionListRoute() {
       intervals: [],
       isActive: true
     }
-    const updatedSessions = [newSession, ...sessions]
-    setSessions(updatedSessions)
-    await saveSessions(updatedSessions)
+    await putSession(newSession)
+    setSessions([newSession, ...sessions])
     navigate({ to: '/session/$sessionId/active', params: { sessionId: newSession.id } })
   }
 
   const addManualSession = async (session: Session) => {
-    const updatedSessions = [session, ...sessions].sort((a, b) =>
+    await putSession(session)
+    setSessions([session, ...sessions].sort((a, b) =>
       b.startTime.getTime() - a.startTime.getTime()
-    )
-    setSessions(updatedSessions)
-    await saveSessions(updatedSessions)
+    ))
     navigate({ to: '/session/$sessionId/details', params: { sessionId: session.id } })
   }
 
