@@ -1,9 +1,10 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState, useEffect, useMemo } from 'preact/hooks'
-import { loadSessions, loadMiscEvents, deleteMiscEvent, initDB, exportDataAsJSON } from '../db'
+import { useState, useEffect, useMemo, useRef } from 'preact/hooks'
+import { loadSessions, loadMiscEvents, deleteMiscEvent, initDB, exportDataAsJSON, importDataFromJSON } from '../db'
 import type { Session, MiscEvent } from '../app'
 import { formatDurationMin, formatDurationShort, getSideCounts } from '../utils/sessionFormatters'
-import { Download, ChevronRight, X, Baby, Pill, Ruler, PenLine, Droplets } from 'lucide-preact'
+import { ErrorBanner } from '../components/ErrorBanner'
+import { Download, Upload, ChevronRight, X, Baby, Pill, Ruler, PenLine, Droplets } from 'lucide-preact'
 
 export const Route = createFileRoute('/history')({
   component: HistoryRoute
@@ -25,10 +26,13 @@ function HistoryRoute() {
   const [miscEvents, setMiscEvents] = useState<MiscEvent[]>([])
   const [visibleDays, setVisibleDays] = useState(3)
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set())
+  const [error, setError] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const loadData = () => {
-    initDB().then(() => {
-      Promise.all([loadSessions(), loadMiscEvents()]).then(([loadedSessions, loadedEvents]) => {
+    initDB()
+      .then(() => Promise.all([loadSessions(), loadMiscEvents()]))
+      .then(([loadedSessions, loadedEvents]) => {
         const sortedSessions = loadedSessions.sort((a, b) =>
           b.startTime.getTime() - a.startTime.getTime()
         )
@@ -37,8 +41,12 @@ function HistoryRoute() {
         )
         setSessions(sortedSessions)
         setMiscEvents(sortedEvents)
+        setError(null)
       })
-    })
+      .catch(err => {
+        console.error('Failed to load history:', err)
+        setError('Failed to load your history. Please reload the page and try again.')
+      })
   }
 
   useEffect(() => {
@@ -196,6 +204,35 @@ function HistoryRoute() {
     }
   }
 
+  const handleImportClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleImportFileSelected = async (e: Event) => {
+    const input = e.currentTarget as HTMLInputElement
+    const file = input.files?.[0]
+    input.value = ''
+    if (!file) return
+
+    try {
+      const text = await file.text()
+      const result = await importDataFromJSON(text)
+      loadData()
+
+      const importedTotal = result.sessionsImported + result.eventsImported
+      const skippedTotal = result.sessionsSkipped + result.eventsSkipped
+      alert(
+        importedTotal === 0
+          ? 'No new data to import — everything in this file was already imported.'
+          : `Import complete: added ${result.sessionsImported} session(s) and ${result.eventsImported} event(s).` +
+            (skippedTotal > 0 ? ` Skipped ${skippedTotal} already-imported item(s).` : '')
+      )
+    } catch (error) {
+      console.error('Failed to import data:', error)
+      alert(error instanceof Error ? error.message : 'Failed to import data. Please try again.')
+    }
+  }
+
   const getEventIcon = (type: string) => {
     switch (type) {
       case 'diaper': return <Droplets size={16} />
@@ -223,14 +260,32 @@ function HistoryRoute() {
       {/* Top bar */}
       <div class="flex items-center justify-between">
         <h1 class="m-0 text-xl font-semibold text-surface-800 dark:text-surface-100">History</h1>
-        <button
-          class="flex items-center gap-1.5 text-primary-500 bg-transparent border-none cursor-pointer text-sm font-medium hover:text-primary-600 transition-colors p-0"
-          onClick={handleExport}
-        >
-          <Download size={16} />
-          Export
-        </button>
+        <div class="flex items-center gap-4">
+          <button
+            class="flex items-center gap-1.5 text-primary-500 bg-transparent border-none cursor-pointer text-sm font-medium hover:text-primary-600 transition-colors p-0"
+            onClick={handleImportClick}
+          >
+            <Upload size={16} />
+            Import
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json,.json"
+            class="hidden"
+            onChange={handleImportFileSelected}
+          />
+          <button
+            class="flex items-center gap-1.5 text-primary-500 bg-transparent border-none cursor-pointer text-sm font-medium hover:text-primary-600 transition-colors p-0"
+            onClick={handleExport}
+          >
+            <Download size={16} />
+            Export
+          </button>
+        </div>
       </div>
+
+      {error && <ErrorBanner message={error} onDismiss={() => setError(null)} />}
 
       {sessions.length === 0 && miscEvents.length === 0 ? (
         <div class="text-center py-16 px-5 text-surface-400">
@@ -329,8 +384,13 @@ function HistoryRoute() {
                               onClick={async (e) => {
                                 e.stopPropagation()
                                 if (confirm('Delete this event?')) {
-                                  await deleteMiscEvent(event.id)
-                                  loadData()
+                                  try {
+                                    await deleteMiscEvent(event.id)
+                                    loadData()
+                                  } catch (err) {
+                                    console.error('Failed to delete event:', err)
+                                    setError('Failed to delete the event. Please try again.')
+                                  }
                                 }
                               }}
                             >

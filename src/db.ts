@@ -5,175 +5,380 @@ const DB_VERSION = 2
 const SESSIONS_STORE = 'sessions'
 const MISC_EVENTS_STORE = 'misc-events'
 
+export class DBError extends Error {
+  readonly cause?: unknown
+
+  constructor(message: string, cause?: unknown) {
+    super(message)
+    this.name = 'DBError'
+    this.cause = cause
+  }
+}
+
 let db: IDBDatabase | null = null
+let dbPromise: Promise<IDBDatabase> | null = null
+
+const describeRequestError = (error: DOMException | null, fallback: string): string =>
+  error ? `${fallback}: ${error.name} - ${error.message}` : fallback
 
 export const initDB = (): Promise<IDBDatabase> => {
-  return new Promise((resolve, reject) => {
-    if (db) {
-      resolve(db)
+  if (db) {
+    return Promise.resolve(db)
+  }
+
+  if (dbPromise) {
+    return dbPromise
+  }
+
+  dbPromise = new Promise((resolve, reject) => {
+    if (typeof indexedDB === 'undefined') {
+      dbPromise = null
+      reject(new DBError('IndexedDB is not available in this browser'))
       return
     }
 
-    const request = indexedDB.open(DB_NAME, DB_VERSION)
+    let request: IDBOpenDBRequest
+    try {
+      request = indexedDB.open(DB_NAME, DB_VERSION)
+    } catch (error) {
+      dbPromise = null
+      reject(new DBError('Failed to open database', error))
+      return
+    }
 
-    request.onerror = () => reject(request.error)
+    request.onerror = () => {
+      dbPromise = null
+      reject(new DBError(describeRequestError(request.error, 'Failed to open database'), request.error))
+    }
+
+    request.onblocked = () => {
+      dbPromise = null
+      reject(new DBError('Database upgrade is blocked by another open tab. Please close other tabs of this app and retry.'))
+    }
+
     request.onsuccess = () => {
       db = request.result
+      db.onversionchange = () => {
+        db?.close()
+        db = null
+      }
+      db.onclose = () => {
+        db = null
+      }
       resolve(db)
     }
 
     request.onupgradeneeded = (event) => {
-      const database = (event.target as IDBOpenDBRequest).result
-      
-      if (!database.objectStoreNames.contains(SESSIONS_STORE)) {
-        database.createObjectStore(SESSIONS_STORE, { keyPath: 'id' })
-      }
-      
-      if (!database.objectStoreNames.contains(MISC_EVENTS_STORE)) {
-        database.createObjectStore(MISC_EVENTS_STORE, { keyPath: 'id' })
+      try {
+        const database = (event.target as IDBOpenDBRequest).result
+
+        if (!database.objectStoreNames.contains(SESSIONS_STORE)) {
+          database.createObjectStore(SESSIONS_STORE, { keyPath: 'id' })
+        }
+
+        if (!database.objectStoreNames.contains(MISC_EVENTS_STORE)) {
+          database.createObjectStore(MISC_EVENTS_STORE, { keyPath: 'id' })
+        }
+      } catch (error) {
+        dbPromise = null
+        reject(new DBError('Failed to set up database schema', error))
       }
     }
   })
+
+  return dbPromise
 }
+
+const sessionToRecord = (session: Session) => ({
+  ...session,
+  startTime: session.startTime.toISOString(),
+  intervals: session.intervals.map(interval => ({
+    ...interval,
+    startTime: interval.startTime.toISOString(),
+    endTime: interval.endTime ? interval.endTime.toISOString() : undefined
+  }))
+})
+
+const recordToSession = (session: any): Session => ({
+  ...session,
+  startTime: new Date(session.startTime),
+  intervals: session.intervals.map((interval: any) => ({
+    ...interval,
+    startTime: new Date(interval.startTime),
+    endTime: interval.endTime ? new Date(interval.endTime) : undefined
+  }))
+})
 
 export const getSession = async (sessionId: string): Promise<Session | null> => {
   const database = await initDB()
-  const transaction = database.transaction([SESSIONS_STORE], 'readonly')
-  const store = transaction.objectStore(SESSIONS_STORE)
-  const request = store.get(sessionId)
+
+  let request: IDBRequest<any>
+  try {
+    const transaction = database.transaction([SESSIONS_STORE], 'readonly')
+    const store = transaction.objectStore(SESSIONS_STORE)
+    request = store.get(sessionId)
+  } catch (error) {
+    throw new DBError('Failed to load session', error)
+  }
 
   return new Promise((resolve, reject) => {
     request.onsuccess = () => {
-      const session = request.result
-      if (!session) {
-        resolve(null)
-        return
+      try {
+        resolve(request.result ? recordToSession(request.result) : null)
+      } catch (error) {
+        reject(new DBError('Failed to parse stored session', error))
       }
-      resolve({
-        ...session,
-        startTime: new Date(session.startTime),
-        intervals: session.intervals.map((interval: any) => ({
-          ...interval,
-          startTime: new Date(interval.startTime),
-          endTime: interval.endTime ? new Date(interval.endTime) : undefined
-        }))
-      })
     }
-    request.onerror = () => reject(request.error)
+    request.onerror = () => reject(new DBError(describeRequestError(request.error, 'Failed to load session'), request.error))
   })
 }
 
 export const putSession = async (session: Session): Promise<void> => {
   const database = await initDB()
-  const transaction = database.transaction([SESSIONS_STORE], 'readwrite')
-  const store = transaction.objectStore(SESSIONS_STORE)
 
-  const sessionToStore = {
-    ...session,
-    startTime: session.startTime.toISOString(),
-    intervals: session.intervals.map(interval => ({
-      ...interval,
-      startTime: interval.startTime.toISOString(),
-      endTime: interval.endTime ? interval.endTime.toISOString() : undefined
-    }))
+  let transaction: IDBTransaction
+  try {
+    transaction = database.transaction([SESSIONS_STORE], 'readwrite')
+    const store = transaction.objectStore(SESSIONS_STORE)
+    store.put(sessionToRecord(session))
+  } catch (error) {
+    throw new DBError('Failed to save session', error)
   }
-  store.put(sessionToStore)
 
   return new Promise((resolve, reject) => {
     transaction.oncomplete = () => resolve()
-    transaction.onerror = () => reject(transaction.error)
+    transaction.onerror = () => reject(new DBError(describeRequestError(transaction.error, 'Failed to save session'), transaction.error))
+    transaction.onabort = () => reject(new DBError(describeRequestError(transaction.error, 'Save session transaction was aborted'), transaction.error))
   })
 }
 
 export const deleteSessionRecord = async (sessionId: string): Promise<void> => {
   const database = await initDB()
-  const transaction = database.transaction([SESSIONS_STORE], 'readwrite')
-  const store = transaction.objectStore(SESSIONS_STORE)
 
-  store.delete(sessionId)
+  let transaction: IDBTransaction
+  try {
+    transaction = database.transaction([SESSIONS_STORE], 'readwrite')
+    const store = transaction.objectStore(SESSIONS_STORE)
+    store.delete(sessionId)
+  } catch (error) {
+    throw new DBError('Failed to delete session', error)
+  }
 
   return new Promise((resolve, reject) => {
     transaction.oncomplete = () => resolve()
-    transaction.onerror = () => reject(transaction.error)
+    transaction.onerror = () => reject(new DBError(describeRequestError(transaction.error, 'Failed to delete session'), transaction.error))
+    transaction.onabort = () => reject(new DBError(describeRequestError(transaction.error, 'Delete session transaction was aborted'), transaction.error))
+  })
+}
+
+// Upserts each given session as its own record (no clear/rewrite of unrelated
+// sessions) — used for bulk seeding/import, not for single-session edits.
+export const saveSessions = async (sessions: Session[]): Promise<void> => {
+  const database = await initDB()
+
+  let transaction: IDBTransaction
+  try {
+    transaction = database.transaction([SESSIONS_STORE], 'readwrite')
+    const store = transaction.objectStore(SESSIONS_STORE)
+    for (const session of sessions) {
+      store.put(sessionToRecord(session))
+    }
+  } catch (error) {
+    throw new DBError('Failed to save sessions', error)
+  }
+
+  return new Promise((resolve, reject) => {
+    transaction.oncomplete = () => resolve()
+    transaction.onerror = () => reject(new DBError(describeRequestError(transaction.error, 'Failed to save sessions'), transaction.error))
+    transaction.onabort = () => reject(new DBError(describeRequestError(transaction.error, 'Save sessions transaction was aborted'), transaction.error))
   })
 }
 
 export const loadSessions = async (): Promise<Session[]> => {
   const database = await initDB()
-  const transaction = database.transaction([SESSIONS_STORE], 'readonly')
-  const store = transaction.objectStore(SESSIONS_STORE)
-  const request = store.getAll()
+
+  let request: IDBRequest<any[]>
+  try {
+    const transaction = database.transaction([SESSIONS_STORE], 'readonly')
+    const store = transaction.objectStore(SESSIONS_STORE)
+    request = store.getAll()
+  } catch (error) {
+    throw new DBError('Failed to load sessions', error)
+  }
 
   return new Promise((resolve, reject) => {
     request.onsuccess = () => {
-      const sessions = request.result.map((session: any) => ({
-        ...session,
-        startTime: new Date(session.startTime),
-        intervals: session.intervals.map((interval: any) => ({
-          ...interval,
-          startTime: new Date(interval.startTime),
-          endTime: interval.endTime ? new Date(interval.endTime) : undefined
+      try {
+        const sessions = request.result.map((session: any) => ({
+          ...session,
+          startTime: new Date(session.startTime),
+          intervals: session.intervals.map((interval: any) => ({
+            ...interval,
+            startTime: new Date(interval.startTime),
+            endTime: interval.endTime ? new Date(interval.endTime) : undefined
+          }))
         }))
-      }))
-      resolve(sessions)
+        resolve(sessions)
+      } catch (error) {
+        reject(new DBError('Failed to parse stored sessions', error))
+      }
     }
-    request.onerror = () => reject(request.error)
+    request.onerror = () => reject(new DBError(describeRequestError(request.error, 'Failed to load sessions'), request.error))
   })
 }
 
 export const saveMiscEvent = async (event: MiscEvent): Promise<void> => {
   const database = await initDB()
-  const transaction = database.transaction([MISC_EVENTS_STORE], 'readwrite')
-  const store = transaction.objectStore(MISC_EVENTS_STORE)
 
-  const eventToStore = {
-    ...event,
-    timestamp: event.timestamp.toISOString()
+  let transaction: IDBTransaction
+  try {
+    transaction = database.transaction([MISC_EVENTS_STORE], 'readwrite')
+    const store = transaction.objectStore(MISC_EVENTS_STORE)
+
+    const eventToStore = {
+      ...event,
+      timestamp: event.timestamp.toISOString()
+    }
+
+    store.add(eventToStore)
+  } catch (error) {
+    throw new DBError('Failed to save event', error)
   }
-  
-  store.add(eventToStore)
 
   return new Promise((resolve, reject) => {
     transaction.oncomplete = () => resolve()
-    transaction.onerror = () => reject(transaction.error)
+    transaction.onerror = () => reject(new DBError(describeRequestError(transaction.error, 'Failed to save event'), transaction.error))
+    transaction.onabort = () => reject(new DBError(describeRequestError(transaction.error, 'Save event transaction was aborted'), transaction.error))
   })
 }
 
 export const loadMiscEvents = async (): Promise<MiscEvent[]> => {
   const database = await initDB()
-  const transaction = database.transaction([MISC_EVENTS_STORE], 'readonly')
-  const store = transaction.objectStore(MISC_EVENTS_STORE)
-  const request = store.getAll()
+
+  let request: IDBRequest<any[]>
+  try {
+    const transaction = database.transaction([MISC_EVENTS_STORE], 'readonly')
+    const store = transaction.objectStore(MISC_EVENTS_STORE)
+    request = store.getAll()
+  } catch (error) {
+    throw new DBError('Failed to load events', error)
+  }
 
   return new Promise((resolve, reject) => {
     request.onsuccess = () => {
-      const events = request.result.map((event: any) => ({
-        ...event,
-        timestamp: new Date(event.timestamp)
-      }))
-      resolve(events)
+      try {
+        const events = request.result.map((event: any) => ({
+          ...event,
+          timestamp: new Date(event.timestamp)
+        }))
+        resolve(events)
+      } catch (error) {
+        reject(new DBError('Failed to parse stored events', error))
+      }
     }
-    request.onerror = () => reject(request.error)
+    request.onerror = () => reject(new DBError(describeRequestError(request.error, 'Failed to load events'), request.error))
   })
 }
 
 export const deleteMiscEvent = async (eventId: string): Promise<void> => {
   const database = await initDB()
-  const transaction = database.transaction([MISC_EVENTS_STORE], 'readwrite')
-  const store = transaction.objectStore(MISC_EVENTS_STORE)
-  
-  store.delete(eventId)
+
+  let transaction: IDBTransaction
+  try {
+    transaction = database.transaction([MISC_EVENTS_STORE], 'readwrite')
+    const store = transaction.objectStore(MISC_EVENTS_STORE)
+    store.delete(eventId)
+  } catch (error) {
+    throw new DBError('Failed to delete event', error)
+  }
 
   return new Promise((resolve, reject) => {
     transaction.oncomplete = () => resolve()
-    transaction.onerror = () => reject(transaction.error)
+    transaction.onerror = () => reject(new DBError(describeRequestError(transaction.error, 'Failed to delete event'), transaction.error))
+    transaction.onabort = () => reject(new DBError(describeRequestError(transaction.error, 'Delete event transaction was aborted'), transaction.error))
   })
+}
+
+export type ImportResult = {
+  sessionsImported: number
+  sessionsSkipped: number
+  eventsImported: number
+  eventsSkipped: number
+}
+
+const isValidSession = (session: any): session is Session => {
+  if (!session || typeof session.id !== 'string' || isNaN(new Date(session.startTime).getTime())) {
+    return false
+  }
+  return Array.isArray(session.intervals) && session.intervals.every((interval: any) =>
+    (interval.side === 'left' || interval.side === 'right') &&
+    !isNaN(new Date(interval.startTime).getTime()) &&
+    (interval.endTime === undefined || !isNaN(new Date(interval.endTime).getTime()))
+  )
+}
+
+const isValidMiscEvent = (event: any): event is MiscEvent => {
+  return !!event && typeof event.id === 'string' && typeof event.type === 'string' &&
+    !isNaN(new Date(event.timestamp).getTime())
+}
+
+export const importDataFromJSON = async (jsonString: string): Promise<ImportResult> => {
+  let parsed: any
+  try {
+    parsed = JSON.parse(jsonString)
+  } catch (error) {
+    throw new DBError('The selected file is not valid JSON', error)
+  }
+
+  if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.sessions) || !Array.isArray(parsed.miscEvents)) {
+    throw new DBError('The selected file does not match the expected backup format')
+  }
+
+  const importedSessions: Session[] = parsed.sessions
+    .filter(isValidSession)
+    .map((session: any) => ({
+      ...session,
+      startTime: new Date(session.startTime),
+      intervals: session.intervals.map((interval: any) => ({
+        ...interval,
+        startTime: new Date(interval.startTime),
+        endTime: interval.endTime ? new Date(interval.endTime) : undefined
+      }))
+    }))
+
+  const importedEvents: MiscEvent[] = parsed.miscEvents
+    .filter(isValidMiscEvent)
+    .map((event: any) => ({
+      ...event,
+      timestamp: new Date(event.timestamp)
+    }))
+
+  const existingSessions = await loadSessions()
+  const existingSessionIds = new Set(existingSessions.map(s => s.id))
+  const newSessions = importedSessions.filter(s => !existingSessionIds.has(s.id))
+  if (newSessions.length > 0) {
+    await saveSessions(newSessions)
+  }
+
+  const existingEvents = await loadMiscEvents()
+  const existingEventIds = new Set(existingEvents.map(e => e.id))
+  const newEvents = importedEvents.filter(e => !existingEventIds.has(e.id))
+  for (const event of newEvents) {
+    await saveMiscEvent(event)
+  }
+
+  return {
+    sessionsImported: newSessions.length,
+    sessionsSkipped: importedSessions.length - newSessions.length,
+    eventsImported: newEvents.length,
+    eventsSkipped: importedEvents.length - newEvents.length
+  }
 }
 
 export const exportDataAsJSON = async (): Promise<void> => {
   const sessions = await loadSessions()
   const miscEvents = await loadMiscEvents()
-  
+
   const exportData = {
     exportDate: new Date().toISOString(),
     version: '2.0',
@@ -195,13 +400,15 @@ export const exportDataAsJSON = async (): Promise<void> => {
   const jsonString = JSON.stringify(exportData, null, 2)
   const blob = new Blob([jsonString], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
-  
-  const link = document.createElement('a')
-  link.href = url
-  link.download = `baby-tracker-backup-${new Date().toISOString().slice(0, 10)}.json`
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  
-  URL.revokeObjectURL(url)
+
+  try {
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `baby-tracker-backup-${new Date().toISOString().slice(0, 10)}.json`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  } finally {
+    URL.revokeObjectURL(url)
+  }
 }
