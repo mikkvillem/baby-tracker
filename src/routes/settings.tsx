@@ -1,12 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { feedingSettings, updateSettings } from '../store/settings'
-import { AlarmClock } from 'lucide-preact'
+import { AlarmClock, Timer } from 'lucide-preact'
 
 export const Route = createFileRoute('/settings')({
   component: SettingsRoute
 })
 
 const PRESET_HOURS = [2, 2.5, 3, 3.5, 4]
+const SIGNIFICANT_INTERVAL_PRESETS = [5, 10, 15, 20]
+
+const inputClass = 'w-full px-3 py-2.5 border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-800 dark:text-surface-100 rounded-xl text-sm focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 transition-all'
 
 function SettingsRoute() {
   const intervalMinutes = feedingSettings.value.intervalMinutes
@@ -16,6 +19,14 @@ function SettingsRoute() {
   const setIntervalMinutes = (value: number) => {
     if (Number.isFinite(value) && value > 0) {
       updateSettings({ intervalMinutes: Math.round(value) })
+    }
+  }
+
+  const significantIntervalMinutes = feedingSettings.value.significantIntervalMinutes
+
+  const setSignificantIntervalMinutes = (value: number) => {
+    if (Number.isFinite(value) && value > 0) {
+      updateSettings({ significantIntervalMinutes: Math.round(value) })
     }
   }
 
@@ -64,7 +75,7 @@ function SettingsRoute() {
               step="1"
               value={hours}
               onInput={(e) => setIntervalMinutes(parseInt((e.target as HTMLInputElement).value || '0') * 60 + minutes)}
-              class="w-full px-3 py-2.5 border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-800 dark:text-surface-100 rounded-xl text-sm focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 transition-all"
+              class={inputClass}
             />
           </div>
           <div class="flex-1">
@@ -76,13 +87,61 @@ function SettingsRoute() {
               step="5"
               value={minutes}
               onInput={(e) => setIntervalMinutes(hours * 60 + (parseInt((e.target as HTMLInputElement).value || '0')))}
-              class="w-full px-3 py-2.5 border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-800 dark:text-surface-100 rounded-xl text-sm focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 transition-all"
+              class={inputClass}
             />
           </div>
         </div>
 
         <p class="m-0 text-xs text-surface-400">
           Suggests a feeding roughly every {hours > 0 ? `${hours}h ` : ''}{minutes > 0 || hours === 0 ? `${minutes}m` : ''} after the last one ends.
+        </p>
+      </div>
+
+      <div class="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl p-4 flex flex-col gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-500/15 flex items-center justify-center shrink-0">
+            <Timer size={16} class="text-primary-500" />
+          </div>
+          <div>
+            <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">Significant Interval</h2>
+            <p class="m-0 text-xs text-surface-500">Minimum duration for a nursing interval to count as a real feed</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          {SIGNIFICANT_INTERVAL_PRESETS.map(m => {
+            const isActive = m === significantIntervalMinutes
+            return (
+              <button
+                key={m}
+                type="button"
+                class={`px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer transition-all duration-200 border ${
+                  isActive
+                    ? 'bg-primary-500 border-primary-500 text-white'
+                    : 'bg-white dark:bg-surface-800 border-surface-200 dark:border-surface-700 text-surface-600 dark:text-surface-300 hover:border-surface-300 dark:hover:border-surface-600'
+                }`}
+                onClick={() => setSignificantIntervalMinutes(m)}
+              >
+                {m}m
+              </button>
+            )
+          })}
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium mb-1.5 text-surface-500">Minutes</label>
+          <input
+            type="number"
+            min="1"
+            step="1"
+            value={significantIntervalMinutes}
+            onInput={(e) => setSignificantIntervalMinutes(parseInt((e.target as HTMLInputElement).value || '0'))}
+            class={inputClass}
+          />
+        </div>
+
+        <p class="m-0 text-xs text-surface-400">
+          Side switches shorter than {significantIntervalMinutes}m are treated as noise and ignored when finding the last feeding time.
         </p>
       </div>
     </div>

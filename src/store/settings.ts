@@ -2,10 +2,12 @@ import { signal, effect } from '@preact/signals'
 
 export type FeedingSettings = {
   intervalMinutes: number
+  significantIntervalMinutes: number
 }
 
 const DEFAULT_SETTINGS: FeedingSettings = {
-  intervalMinutes: 180 // 3 hours
+  intervalMinutes: 180, // 3 hours
+  significantIntervalMinutes: 10
 }
 
 const loadSettings = (): FeedingSettings => {
