@@ -227,6 +227,82 @@ export const deleteMiscEvent = async (eventId: string): Promise<void> => {
   })
 }
 
+export type ImportResult = {
+  sessionsImported: number
+  sessionsSkipped: number
+  eventsImported: number
+  eventsSkipped: number
+}
+
+const isValidSession = (session: any): session is Session => {
+  if (!session || typeof session.id !== 'string' || isNaN(new Date(session.startTime).getTime())) {
+    return false
+  }
+  return Array.isArray(session.intervals) && session.intervals.every((interval: any) =>
+    (interval.side === 'left' || interval.side === 'right') &&
+    !isNaN(new Date(interval.startTime).getTime()) &&
+    (interval.endTime === undefined || !isNaN(new Date(interval.endTime).getTime()))
+  )
+}
+
+const isValidMiscEvent = (event: any): event is MiscEvent => {
+  return !!event && typeof event.id === 'string' && typeof event.type === 'string' &&
+    !isNaN(new Date(event.timestamp).getTime())
+}
+
+export const importDataFromJSON = async (jsonString: string): Promise<ImportResult> => {
+  let parsed: any
+  try {
+    parsed = JSON.parse(jsonString)
+  } catch (error) {
+    throw new DBError('The selected file is not valid JSON', error)
+  }
+
+  if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.sessions) || !Array.isArray(parsed.miscEvents)) {
+    throw new DBError('The selected file does not match the expected backup format')
+  }
+
+  const importedSessions: Session[] = parsed.sessions
+    .filter(isValidSession)
+    .map((session: any) => ({
+      ...session,
+      startTime: new Date(session.startTime),
+      intervals: session.intervals.map((interval: any) => ({
+        ...interval,
+        startTime: new Date(interval.startTime),
+        endTime: interval.endTime ? new Date(interval.endTime) : undefined
+      }))
+    }))
+
+  const importedEvents: MiscEvent[] = parsed.miscEvents
+    .filter(isValidMiscEvent)
+    .map((event: any) => ({
+      ...event,
+      timestamp: new Date(event.timestamp)
+    }))
+
+  const existingSessions = await loadSessions()
+  const existingSessionIds = new Set(existingSessions.map(s => s.id))
+  const newSessions = importedSessions.filter(s => !existingSessionIds.has(s.id))
+  if (newSessions.length > 0) {
+    await saveSessions([...existingSessions, ...newSessions])
+  }
+
+  const existingEvents = await loadMiscEvents()
+  const existingEventIds = new Set(existingEvents.map(e => e.id))
+  const newEvents = importedEvents.filter(e => !existingEventIds.has(e.id))
+  for (const event of newEvents) {
+    await saveMiscEvent(event)
+  }
+
+  return {
+    sessionsImported: newSessions.length,
+    sessionsSkipped: importedSessions.length - newSessions.length,
+    eventsImported: newEvents.length,
+    eventsSkipped: importedEvents.length - newEvents.length
+  }
+}
+
 export const exportDataAsJSON = async (): Promise<void> => {
   const sessions = await loadSessions()
   const miscEvents = await loadMiscEvents()
