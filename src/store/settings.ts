@@ -2,10 +2,25 @@ import { signal, effect } from '@preact/signals'
 
 export type FeedingSettings = {
   intervalMinutes: number
+  significantIntervalMinutes: number
+  medicineOptions: string[]
 }
 
+export const DEFAULT_MEDICINE_OPTIONS = [
+  'Vitamin D',
+  'Probiotic',
+  'Paracetamol',
+  'Ibuprofen',
+  'Gripe water',
+  'Gas drops',
+  'Iron supplement',
+  'Other'
+]
+
 const DEFAULT_SETTINGS: FeedingSettings = {
-  intervalMinutes: 180 // 3 hours
+  intervalMinutes: 180, // 3 hours
+  significantIntervalMinutes: 10,
+  medicineOptions: DEFAULT_MEDICINE_OPTIONS
 }
 
 const loadSettings = (): FeedingSettings => {

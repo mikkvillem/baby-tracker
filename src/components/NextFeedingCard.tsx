@@ -10,7 +10,11 @@ type Props = {
 
 export function NextFeedingCard({ sessions }: Props) {
   useCurrentTime(60000)
-  const prediction = suggestNextFeeding(sessions, feedingSettings.value.intervalMinutes)
+  const prediction = suggestNextFeeding(
+    sessions,
+    feedingSettings.value.intervalMinutes,
+    feedingSettings.value.significantIntervalMinutes
+  )
 
   if (!prediction.suggestedTime) return null
 

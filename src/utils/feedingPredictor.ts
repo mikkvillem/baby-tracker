@@ -6,32 +6,34 @@ export type FeedingPrediction = {
 }
 
 const DEFAULT_INTERVAL_MINUTES = 180 // 3 hours
+const DEFAULT_SIGNIFICANT_INTERVAL_MINUTES = 10
 
-function getLastFeedingReferenceTime(sessions: Session[]): Date | null {
+function getLastFeedingReferenceTime(sessions: Session[], significantIntervalMinutes: number): Date | null {
   if (sessions.length === 0) return null
-  
+
   const lastSession = sessions[0]
-  
-  // Check for intervals of at least 10 minutes
+
+  // Check for intervals of at least the significant threshold
   const significantIntervals = lastSession.intervals.filter(interval => {
     if (!interval.endTime) return false
     const duration = interval.endTime.getTime() - interval.startTime.getTime()
-    return duration >= 10 * 60000 // 10 minutes in milliseconds
+    return duration >= significantIntervalMinutes * 60000
   })
-  
+
   // If we have significant intervals, use the end time of the most recent one
   if (significantIntervals.length > 0) {
     const lastSignificantInterval = significantIntervals[significantIntervals.length - 1]
     return lastSignificantInterval.endTime!
   }
-  
+
   // Otherwise, use the session start time
   return lastSession.startTime
 }
 
 export function suggestNextFeeding(
   sessions: Session[],
-  intervalMinutes: number = DEFAULT_INTERVAL_MINUTES
+  intervalMinutes: number = DEFAULT_INTERVAL_MINUTES,
+  significantIntervalMinutes: number = DEFAULT_SIGNIFICANT_INTERVAL_MINUTES
 ): FeedingPrediction {
   if (sessions.length === 0) {
     return {
@@ -39,8 +41,8 @@ export function suggestNextFeeding(
       reasoning: `Every ${intervalMinutes / 60} hours`
     }
   }
-  
-  const referenceTime = getLastFeedingReferenceTime(sessions)
+
+  const referenceTime = getLastFeedingReferenceTime(sessions, significantIntervalMinutes)
   if (!referenceTime) {
     return {
       suggestedTime: new Date(Date.now() + intervalMinutes * 60000),
