@@ -1,4 +1,5 @@
 import type { Session } from '../app'
+import type { NotificationTiming } from '../store/settings'
 
 export type FeedingPrediction = {
   suggestedTime: Date | null
@@ -54,6 +55,17 @@ export function suggestNextFeeding(
     suggestedTime: new Date(referenceTime.getTime() + intervalMinutes * 60000),
     reasoning: `Every ${intervalMinutes / 60} hours`
   }
+}
+
+export function getNotificationFireTime(
+  suggestedTime: Date | null,
+  timing: NotificationTiming,
+  leadMinutes: number,
+  overdueMinutes: number
+): Date | null {
+  if (!suggestedTime) return null
+  const offsetMinutes = timing === 'before' ? -leadMinutes : overdueMinutes
+  return new Date(suggestedTime.getTime() + offsetMinutes * 60000)
 }
 
 export function formatTimeUntil(date: Date): string {

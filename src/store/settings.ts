@@ -1,9 +1,15 @@
 import { signal, effect } from '@preact/signals'
 
+export type NotificationTiming = 'before' | 'overdue'
+
 export type FeedingSettings = {
   intervalMinutes: number
   significantIntervalMinutes: number
   medicineOptions: string[]
+  notificationsEnabled: boolean
+  notificationTiming: NotificationTiming
+  notificationLeadMinutes: number
+  notificationOverdueMinutes: number
 }
 
 export const DEFAULT_MEDICINE_OPTIONS = [
@@ -20,7 +26,11 @@ export const DEFAULT_MEDICINE_OPTIONS = [
 const DEFAULT_SETTINGS: FeedingSettings = {
   intervalMinutes: 180, // 3 hours
   significantIntervalMinutes: 10,
-  medicineOptions: DEFAULT_MEDICINE_OPTIONS
+  medicineOptions: DEFAULT_MEDICINE_OPTIONS,
+  notificationsEnabled: false,
+  notificationTiming: 'before',
+  notificationLeadMinutes: 15,
+  notificationOverdueMinutes: 15
 }
 
 const loadSettings = (): FeedingSettings => {

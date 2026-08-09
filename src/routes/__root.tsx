@@ -1,8 +1,10 @@
 import { createRootRoute, Outlet, useNavigate, useMatches } from '@tanstack/react-router'
 import { Home, Clock, Settings } from 'lucide-preact'
+import { useFeedingNotificationScheduler } from '../hooks/useFeedingNotificationScheduler'
 import '../app.css'
 
 function AppShell() {
+  useFeedingNotificationScheduler()
   const navigate = useNavigate()
   const matches = useMatches()
   const currentPath = matches[matches.length - 1]?.pathname ?? '/'
