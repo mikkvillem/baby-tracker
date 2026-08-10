@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'preact/hooks'
 
-const DISMISSED_KEY = 'pwa-install-dismissed'
+const DISMISSED_KEY = 'pwa-install-dismissed-at'
+const RE_PROMPT_INTERVAL_MS = 14 * 24 * 60 * 60 * 1000 // 14 days
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>
@@ -9,7 +10,9 @@ type BeforeInstallPromptEvent = Event & {
 
 function isDismissed() {
   try {
-    return localStorage.getItem(DISMISSED_KEY) === 'true'
+    const dismissedAt = localStorage.getItem(DISMISSED_KEY)
+    if (!dismissedAt) return false
+    return Date.now() - Number(dismissedAt) < RE_PROMPT_INTERVAL_MS
   } catch (e) {
     console.error('Failed to read PWA install dismissal:', e)
     return false
@@ -26,7 +29,7 @@ export function useInstallPrompt() {
 
   const dismiss = useCallback(() => {
     try {
-      localStorage.setItem(DISMISSED_KEY, 'true')
+      localStorage.setItem(DISMISSED_KEY, String(Date.now()))
     } catch (e) {
       console.error('Failed to persist PWA install dismissal:', e)
     }
