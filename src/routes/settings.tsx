@@ -1,7 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'preact/hooks'
 import { feedingSettings, updateSettings, DEFAULT_MEDICINE_OPTIONS } from '../store/settings'
-import { AlarmClock, Timer, Pill, X, Plus } from 'lucide-preact'
+import { useNotificationPermission } from '../hooks/useNotificationPermission'
+import { showTestNotification } from '../utils/notifications'
+import { Switch } from '../components/Switch'
+import { AlarmClock, Timer, Pill, Bell, X, Plus } from 'lucide-preact'
 
 export const Route = createFileRoute('/settings')({
   component: SettingsRoute
@@ -11,6 +14,13 @@ const PRESET_HOURS = [2, 2.5, 3, 3.5, 4]
 const SIGNIFICANT_INTERVAL_PRESETS = [5, 10, 15, 20]
 
 const inputClass = 'w-full px-3 py-2.5 border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-800 dark:text-surface-100 rounded-xl text-sm focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 transition-all'
+
+const pillClass = (isActive: boolean) =>
+  `px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer transition-all duration-200 border ${
+    isActive
+      ? 'bg-primary-500 border-primary-500 text-white'
+      : 'bg-white dark:bg-surface-800 border-surface-200 dark:border-surface-700 text-surface-600 dark:text-surface-300 hover:border-surface-300 dark:hover:border-surface-600'
+  }`
 
 function SettingsRoute() {
   const intervalMinutes = feedingSettings.value.intervalMinutes
@@ -29,6 +39,48 @@ function SettingsRoute() {
     if (Number.isFinite(value) && value > 0) {
       updateSettings({ significantIntervalMinutes: Math.round(value) })
     }
+  }
+
+  const { supported: notificationsSupported, unsupportedReason, permission, requestPermission } = useNotificationPermission()
+  const notificationsEnabled = feedingSettings.value.notificationsEnabled
+  const notificationTiming = feedingSettings.value.notificationTiming
+  const notificationLeadMinutes = feedingSettings.value.notificationLeadMinutes
+  const notificationOverdueMinutes = feedingSettings.value.notificationOverdueMinutes
+  const notificationsBlocked = notificationsSupported && permission === 'denied'
+
+  const setNotificationLeadMinutes = (value: number) => {
+    if (Number.isFinite(value) && value > 0) {
+      updateSettings({ notificationLeadMinutes: Math.round(value) })
+    }
+  }
+
+  const setNotificationOverdueMinutes = (value: number) => {
+    if (Number.isFinite(value) && value > 0) {
+      updateSettings({ notificationOverdueMinutes: Math.round(value) })
+    }
+  }
+
+  const handleToggleNotifications = async (checked: boolean) => {
+    if (!checked) {
+      updateSettings({ notificationsEnabled: false })
+      return
+    }
+    const result = permission === 'granted' ? 'granted' : await requestPermission()
+    updateSettings({ notificationsEnabled: result === 'granted' })
+  }
+
+  const [testStatus, setTestStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+
+  const handleSendTestNotification = async () => {
+    setTestStatus('sending')
+    try {
+      await showTestNotification()
+      setTestStatus('sent')
+    } catch (error) {
+      console.error('Failed to send test notification:', error)
+      setTestStatus('error')
+    }
+    setTimeout(() => setTestStatus('idle'), 3000)
   }
 
   const medicineOptions = feedingSettings.value.medicineOptions
@@ -162,6 +214,106 @@ function SettingsRoute() {
         <p class="m-0 text-xs text-surface-400">
           Side switches shorter than {significantIntervalMinutes}m are treated as noise and ignored when finding the last feeding time.
         </p>
+      </div>
+
+      <div class="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl p-4 flex flex-col gap-3">
+        <div class="flex items-center justify-between gap-2.5">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-500/15 flex items-center justify-center shrink-0">
+              <Bell size={16} class="text-primary-500" />
+            </div>
+            <div>
+              <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">Feeding Notifications</h2>
+              <p class="m-0 text-xs text-surface-500">Get notified about the next feeding on this device</p>
+            </div>
+          </div>
+          <Switch
+            checked={notificationsEnabled && permission === 'granted'}
+            disabled={!notificationsSupported || notificationsBlocked}
+            onChange={handleToggleNotifications}
+            ariaLabel="Enable feeding notifications"
+          />
+        </div>
+
+        {!notificationsSupported && (
+          <p class="m-0 text-xs text-surface-400">
+            {unsupportedReason ?? 'Notifications are not supported on this device.'}
+          </p>
+        )}
+
+        {notificationsBlocked && (
+          <p class="m-0 text-xs text-danger-500">
+            Notifications are blocked for this app. Enable them in your browser or device settings to turn this on.
+          </p>
+        )}
+
+        {notificationsSupported && permission === 'granted' && (
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              class="text-xs font-medium text-primary-500 hover:text-primary-600 bg-transparent border-none cursor-pointer p-0 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={handleSendTestNotification}
+              disabled={testStatus === 'sending'}
+            >
+              Send test notification
+            </button>
+            {testStatus === 'sent' && <span class="text-xs text-surface-400">Sent — check your notifications</span>}
+            {testStatus === 'error' && <span class="text-xs text-danger-500">Failed to send</span>}
+          </div>
+        )}
+
+        {notificationsSupported && !notificationsBlocked && notificationsEnabled && (
+          <>
+            <div class="flex flex-wrap gap-2">
+              <button
+                type="button"
+                class={pillClass(notificationTiming === 'before')}
+                onClick={() => updateSettings({ notificationTiming: 'before' })}
+              >
+                Before feeding
+              </button>
+              <button
+                type="button"
+                class={pillClass(notificationTiming === 'overdue')}
+                onClick={() => updateSettings({ notificationTiming: 'overdue' })}
+              >
+                When overdue
+              </button>
+            </div>
+
+            {notificationTiming === 'before' ? (
+              <div>
+                <label class="block text-xs font-medium mb-1.5 text-surface-500">Minutes before</label>
+                <input
+                  type="number"
+                  min="1"
+                  step="5"
+                  value={notificationLeadMinutes}
+                  onInput={(e) => setNotificationLeadMinutes(parseInt((e.target as HTMLInputElement).value || '0'))}
+                  class={inputClass}
+                />
+                <p class="m-0 mt-1.5 text-xs text-surface-400">
+                  Notify {notificationLeadMinutes}m before the suggested feeding time.
+                </p>
+              </div>
+            ) : (
+              <div>
+                <label class="block text-xs font-medium mb-1.5 text-surface-500">Minutes overdue</label>
+                <input
+                  type="number"
+                  min="1"
+                  step="5"
+                  value={notificationOverdueMinutes}
+                  onInput={(e) => setNotificationOverdueMinutes(parseInt((e.target as HTMLInputElement).value || '0'))}
+                  class={inputClass}
+                />
+                <p class="m-0 mt-1.5 text-xs text-surface-400">
+                  Notify {notificationOverdueMinutes}m after the suggested feeding time has passed.
+                </p>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       <div class="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl p-4 flex flex-col gap-3">

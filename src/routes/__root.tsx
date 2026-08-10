@@ -1,8 +1,10 @@
-import { createRootRoute, Outlet, useNavigate, useMatches } from '@tanstack/react-router'
+import { createRootRoute, Link, Outlet, useNavigate, useMatches } from '@tanstack/react-router'
 import { Home, Clock, Settings } from 'lucide-preact'
+import { useFeedingNotificationScheduler } from '../hooks/useFeedingNotificationScheduler'
 import '../app.css'
 
 function AppShell() {
+  useFeedingNotificationScheduler()
   const navigate = useNavigate()
   const matches = useMatches()
   const currentPath = matches[matches.length - 1]?.pathname ?? '/'
@@ -13,8 +15,10 @@ function AppShell() {
     <div class="min-h-screen bg-surface-100 dark:bg-surface-900 flex flex-col">
       {/* Header */}
       <header class="bg-white dark:bg-surface-800 border-b border-surface-200 dark:border-surface-700 px-4 py-3 flex items-center gap-3 shrink-0">
-        <img src="/logo.svg" alt="" class="w-8 h-8" />
-        <h1 class="text-lg font-semibold text-surface-800 dark:text-surface-100 m-0">Baby Tracker</h1>
+        <Link to="/" class="flex items-center gap-3 no-underline">
+          <img src="/logo.svg" alt="" class="w-8 h-8" />
+          <h1 class="text-lg font-semibold text-surface-800 dark:text-surface-100 m-0">Baby Tracker</h1>
+        </Link>
       </header>
 
       {/* Content */}
