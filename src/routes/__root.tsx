@@ -1,6 +1,7 @@
 import { createRootRoute, Link, Outlet, useNavigate, useMatches } from '@tanstack/react-router'
 import { Home, Clock, Settings } from 'lucide-preact'
 import { useFeedingNotificationScheduler } from '../hooks/useFeedingNotificationScheduler'
+import { InstallPwaBanner } from '../components/InstallPwaBanner'
 import '../app.css'
 
 function AppShell() {
@@ -20,6 +21,8 @@ function AppShell() {
           <h1 class="text-lg font-semibold text-surface-800 dark:text-surface-100 m-0">Baby Tracker</h1>
         </Link>
       </header>
+
+      <InstallPwaBanner />
 
       {/* Content */}
       <main class="flex-1 overflow-y-auto pb-20">
