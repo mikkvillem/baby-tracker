@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'preact/hooks'
 import { feedingSettings, updateSettings, DEFAULT_MEDICINE_OPTIONS } from '../store/settings'
 import { useNotificationPermission } from '../hooks/useNotificationPermission'
+import { showTestNotification } from '../utils/notifications'
 import { Switch } from '../components/Switch'
 import { AlarmClock, Timer, Pill, Bell, X, Plus } from 'lucide-preact'
 
@@ -66,6 +67,20 @@ function SettingsRoute() {
     }
     const result = permission === 'granted' ? 'granted' : await requestPermission()
     updateSettings({ notificationsEnabled: result === 'granted' })
+  }
+
+  const [testStatus, setTestStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+
+  const handleSendTestNotification = async () => {
+    setTestStatus('sending')
+    try {
+      await showTestNotification()
+      setTestStatus('sent')
+    } catch (error) {
+      console.error('Failed to send test notification:', error)
+      setTestStatus('error')
+    }
+    setTimeout(() => setTestStatus('idle'), 3000)
   }
 
   const medicineOptions = feedingSettings.value.medicineOptions
@@ -230,6 +245,21 @@ function SettingsRoute() {
           <p class="m-0 text-xs text-danger-500">
             Notifications are blocked for this app. Enable them in your browser or device settings to turn this on.
           </p>
+        )}
+
+        {notificationsSupported && permission === 'granted' && (
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              class="text-xs font-medium text-primary-500 hover:text-primary-600 bg-transparent border-none cursor-pointer p-0 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={handleSendTestNotification}
+              disabled={testStatus === 'sending'}
+            >
+              Send test notification
+            </button>
+            {testStatus === 'sent' && <span class="text-xs text-surface-400">Sent — check your notifications</span>}
+            {testStatus === 'error' && <span class="text-xs text-danger-500">Failed to send</span>}
+          </div>
         )}
 
         {notificationsSupported && !notificationsBlocked && notificationsEnabled && (

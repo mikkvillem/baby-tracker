@@ -16,18 +16,7 @@ export function checkNotificationCapability(): NotificationCapability {
   return { supported: true }
 }
 
-export async function showFeedingNotification(isOverdue: boolean): Promise<void> {
-  const title = isOverdue ? 'Feeding overdue' : 'Feeding time approaching'
-  const body = isOverdue
-    ? "It's past the suggested feeding time."
-    : 'The suggested feeding time is coming up soon.'
-  const options: NotificationOptions = {
-    body,
-    icon: '/icons/icon-192.png',
-    badge: '/icons/icon-192.png',
-    tag: 'feeding-reminder'
-  }
-
+async function dispatchNotification(title: string, options: NotificationOptions): Promise<void> {
   if ('serviceWorker' in navigator) {
     try {
       const registration = await Promise.race([
@@ -49,4 +38,26 @@ export async function showFeedingNotification(isOverdue: boolean): Promise<void>
   } catch (error) {
     console.error('Failed to show notification:', error)
   }
+}
+
+export async function showFeedingNotification(isOverdue: boolean): Promise<void> {
+  const title = isOverdue ? 'Feeding overdue' : 'Feeding time approaching'
+  const body = isOverdue
+    ? "It's past the suggested feeding time."
+    : 'The suggested feeding time is coming up soon.'
+  await dispatchNotification(title, {
+    body,
+    icon: '/icons/icon-192.png',
+    badge: '/icons/icon-192.png',
+    tag: 'feeding-reminder'
+  })
+}
+
+export async function showTestNotification(): Promise<void> {
+  await dispatchNotification('Test notification', {
+    body: 'If you can see this, feeding notifications are working on this device.',
+    icon: '/icons/icon-192.png',
+    badge: '/icons/icon-192.png',
+    tag: 'feeding-reminder-test'
+  })
 }

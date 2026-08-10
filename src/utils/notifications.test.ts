@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { checkNotificationCapability, showFeedingNotification } from './notifications'
+import { checkNotificationCapability, showFeedingNotification, showTestNotification } from './notifications'
 
 describe('checkNotificationCapability', () => {
   afterEach(() => {
@@ -66,5 +66,25 @@ describe('showFeedingNotification', () => {
 
     expect(showNotification).toHaveBeenCalledTimes(1)
     expect(showNotification.mock.calls[0][0]).toBe('Feeding time approaching')
+  })
+})
+
+describe('showTestNotification', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('dispatches a distinctly-labeled test notification via the service worker', async () => {
+    const showNotification = vi.fn()
+    vi.stubGlobal('Notification', class {})
+    vi.stubGlobal('navigator', {
+      ...navigator,
+      serviceWorker: { ready: Promise.resolve({ showNotification }) }
+    })
+
+    await showTestNotification()
+
+    expect(showNotification).toHaveBeenCalledTimes(1)
+    expect(showNotification.mock.calls[0][0]).toBe('Test notification')
   })
 })
