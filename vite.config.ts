@@ -16,6 +16,10 @@ export default defineConfig({
 		VitePWA({
 			registerType: "autoUpdate",
 			includeAssets: ["logo.svg"],
+			devOptions: {
+				enabled: true,
+				type: "module",
+			},
 			manifest: {
 				name: "Baby Tracker",
 				short_name: "Baby Tracker",

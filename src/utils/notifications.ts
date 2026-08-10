@@ -30,9 +30,15 @@ export async function showFeedingNotification(isOverdue: boolean): Promise<void>
 
   if ('serviceWorker' in navigator) {
     try {
-      const registration = await navigator.serviceWorker.ready
-      await registration.showNotification(title, options)
-      return
+      const registration = await Promise.race([
+        navigator.serviceWorker.ready,
+        new Promise<null>(resolve => setTimeout(() => resolve(null), 3000))
+      ])
+      if (registration) {
+        await registration.showNotification(title, options)
+        return
+      }
+      console.warn('No active service worker after 3s, falling back to a plain notification')
     } catch (error) {
       console.error('Failed to show notification via service worker:', error)
     }
