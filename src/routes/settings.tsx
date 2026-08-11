@@ -1,10 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'preact/hooks'
 import { feedingSettings, updateSettings, DEFAULT_MEDICINE_OPTIONS } from '../store/settings'
+import { themeId, setThemeId } from '../store/theme'
+import { THEMES } from '../themes/registry'
 import { useNotificationPermission } from '../hooks/useNotificationPermission'
 import { showTestNotification } from '../utils/notifications'
 import { Switch } from '../components/Switch'
-import { AlarmClock, Timer, Pill, Bell, X, Plus } from 'lucide-preact'
+import { AlarmClock, Timer, Pill, Bell, X, Plus, Palette } from 'lucide-preact'
 
 export const Route = createFileRoute('/settings')({
   component: SettingsRoute
@@ -108,7 +110,55 @@ function SettingsRoute() {
       <div class="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl p-4 flex flex-col gap-3">
         <div class="flex items-center gap-2.5">
           <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-500/15 flex items-center justify-center shrink-0">
-            <AlarmClock size={16} class="text-primary-500" />
+            <Palette size={16} class="text-primary-500 dark:text-primary-300" />
+          </div>
+          <div>
+            <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">Appearance</h2>
+            <p class="m-0 text-xs text-surface-500">Pick how Baby Tracker looks on this device</p>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          {THEMES.map(theme => {
+            const isActive = themeId.value === theme.id
+            return (
+              <button
+                key={theme.id}
+                type="button"
+                class={`flex items-center gap-3 p-2.5 rounded-xl border text-left cursor-pointer transition-all duration-200 ${
+                  isActive
+                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-500/10'
+                    : 'border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 hover:border-surface-300 dark:hover:border-surface-600'
+                }`}
+                onClick={() => setThemeId(theme.id)}
+              >
+                <div
+                  class="w-10 h-10 rounded-lg relative shrink-0 border border-black/10 overflow-hidden"
+                  style={{ background: theme.swatch.bg }}
+                >
+                  <div
+                    class="absolute inset-1.5 rounded-md"
+                    style={{ background: theme.swatch.surface }}
+                  />
+                  <div
+                    class="absolute bottom-1 right-1 w-3 h-3 rounded-full"
+                    style={{ background: theme.swatch.accent }}
+                  />
+                </div>
+                <div class="min-w-0">
+                  <div class="text-sm font-medium text-surface-800 dark:text-surface-100">{theme.label}</div>
+                  <div class="text-xs text-surface-500 truncate">{theme.description}</div>
+                </div>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl p-4 flex flex-col gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-500/15 flex items-center justify-center shrink-0">
+            <AlarmClock size={16} class="text-primary-500 dark:text-primary-300" />
           </div>
           <div>
             <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">Feeding Reminder</h2>
@@ -171,7 +221,7 @@ function SettingsRoute() {
       <div class="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl p-4 flex flex-col gap-3">
         <div class="flex items-center gap-2.5">
           <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-500/15 flex items-center justify-center shrink-0">
-            <Timer size={16} class="text-primary-500" />
+            <Timer size={16} class="text-primary-500 dark:text-primary-300" />
           </div>
           <div>
             <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">Significant Interval</h2>
@@ -220,7 +270,7 @@ function SettingsRoute() {
         <div class="flex items-center justify-between gap-2.5">
           <div class="flex items-center gap-2.5">
             <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-500/15 flex items-center justify-center shrink-0">
-              <Bell size={16} class="text-primary-500" />
+              <Bell size={16} class="text-primary-500 dark:text-primary-300" />
             </div>
             <div>
               <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">Feeding Notifications</h2>
@@ -251,7 +301,7 @@ function SettingsRoute() {
           <div class="flex items-center gap-2">
             <button
               type="button"
-              class="text-xs font-medium text-primary-500 hover:text-primary-600 bg-transparent border-none cursor-pointer p-0 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="text-xs font-medium text-primary-500 dark:text-primary-300 hover:text-primary-600 dark:hover:text-primary-200 bg-transparent border-none cursor-pointer p-0 disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={handleSendTestNotification}
               disabled={testStatus === 'sending'}
             >
@@ -320,7 +370,7 @@ function SettingsRoute() {
         <div class="flex items-center justify-between gap-2.5">
           <div class="flex items-center gap-2.5">
             <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-500/15 flex items-center justify-center shrink-0">
-              <Pill size={16} class="text-primary-500" />
+              <Pill size={16} class="text-primary-500 dark:text-primary-300" />
             </div>
             <div>
               <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">Medicine List</h2>

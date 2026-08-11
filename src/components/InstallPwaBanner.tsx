@@ -17,7 +17,7 @@ export function InstallPwaBanner() {
         Install
       </button>
       <button
-        class="shrink-0 bg-transparent border-none text-primary-500 hover:text-primary-600 cursor-pointer p-0"
+        class="shrink-0 bg-transparent border-none text-primary-500 dark:text-primary-300 hover:text-primary-600 dark:hover:text-primary-200 cursor-pointer p-0"
         onClick={dismiss}
         aria-label="Dismiss"
       >

@@ -17,7 +17,7 @@ function AppShell() {
       {/* Header */}
       <header class="bg-white dark:bg-surface-800 border-b border-surface-200 dark:border-surface-700 px-4 py-3 flex items-center gap-3 shrink-0">
         <Link to="/" class="flex items-center gap-3 no-underline">
-          <img src="/logo.svg" alt="" class="w-8 h-8" />
+          <img id="app-logo" src="/logo.svg" alt="" class="w-8 h-8" />
           <h1 class="text-lg font-semibold text-surface-800 dark:text-surface-100 m-0">Baby Tracker</h1>
         </Link>
       </header>
@@ -35,7 +35,7 @@ function AppShell() {
           <button
             class={`flex flex-col items-center gap-0.5 py-2 px-4 rounded-lg transition-colors duration-200 border-none bg-transparent cursor-pointer ${
               currentPath === '/'
-                ? 'text-primary-500'
+                ? 'text-primary-500 dark:text-primary-300'
                 : 'text-surface-400 dark:text-surface-500 hover:text-surface-600 dark:hover:text-surface-300'
             }`}
             onClick={() => navigate({ to: '/' })}
@@ -47,7 +47,7 @@ function AppShell() {
           <button
             class={`flex flex-col items-center gap-0.5 py-2 px-4 rounded-lg transition-colors duration-200 border-none bg-transparent cursor-pointer ${
               currentPath === '/history'
-                ? 'text-primary-500'
+                ? 'text-primary-500 dark:text-primary-300'
                 : 'text-surface-400 dark:text-surface-500 hover:text-surface-600 dark:hover:text-surface-300'
             }`}
             onClick={() => navigate({ to: '/history' })}
@@ -59,7 +59,7 @@ function AppShell() {
           <button
             class={`flex flex-col items-center gap-0.5 py-2 px-4 rounded-lg transition-colors duration-200 border-none bg-transparent cursor-pointer ${
               currentPath === '/settings'
-                ? 'text-primary-500'
+                ? 'text-primary-500 dark:text-primary-300'
                 : 'text-surface-400 dark:text-surface-500 hover:text-surface-600 dark:hover:text-surface-300'
             }`}
             onClick={() => navigate({ to: '/settings' })}

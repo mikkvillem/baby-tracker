@@ -262,7 +262,7 @@ function HistoryRoute() {
         <h1 class="m-0 text-xl font-semibold text-surface-800 dark:text-surface-100">History</h1>
         <div class="flex items-center gap-4">
           <button
-            class="flex items-center gap-1.5 text-primary-500 bg-transparent border-none cursor-pointer text-sm font-medium hover:text-primary-600 transition-colors p-0"
+            class="flex items-center gap-1.5 text-primary-500 dark:text-primary-300 bg-transparent border-none cursor-pointer text-sm font-medium hover:text-primary-600 dark:hover:text-primary-200 transition-colors p-0"
             onClick={handleImportClick}
           >
             <Upload size={16} />
@@ -276,7 +276,7 @@ function HistoryRoute() {
             onChange={handleImportFileSelected}
           />
           <button
-            class="flex items-center gap-1.5 text-primary-500 bg-transparent border-none cursor-pointer text-sm font-medium hover:text-primary-600 transition-colors p-0"
+            class="flex items-center gap-1.5 text-primary-500 dark:text-primary-300 bg-transparent border-none cursor-pointer text-sm font-medium hover:text-primary-600 dark:hover:text-primary-200 transition-colors p-0"
             onClick={handleExport}
           >
             <Download size={16} />
@@ -329,7 +329,7 @@ function HistoryRoute() {
                             onClick={() => navigate({ to: `/session/${session.id}/${session.isActive ? 'active' : 'details'}` })}
                           >
                             <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-500/15 flex items-center justify-center shrink-0">
-                              <Baby size={16} class="text-primary-500" />
+                              <Baby size={16} class="text-primary-500 dark:text-primary-300" />
                             </div>
                             <div class="flex-1 min-w-0">
                               <div class="flex items-center gap-2">

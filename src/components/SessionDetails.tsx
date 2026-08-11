@@ -130,7 +130,7 @@ export function SessionDetails({ session, onBack, onUpdateSession, onDeleteSessi
         <div class="flex items-center justify-between mb-3">
           <h3 class="text-sm font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider m-0">Intervals</h3>
           <button
-            class="flex items-center gap-1.5 text-primary-500 bg-transparent border-none cursor-pointer text-sm font-medium hover:text-primary-600 transition-colors p-0"
+            class="flex items-center gap-1.5 text-primary-500 dark:text-primary-300 bg-transparent border-none cursor-pointer text-sm font-medium hover:text-primary-600 dark:hover:text-primary-200 transition-colors p-0"
             onClick={() => setShowAddModal(true)}
           >
             <Plus size={16} />

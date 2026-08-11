@@ -1,7 +1,17 @@
 @import "tailwindcss";
+@import "./styles/themes/kindle.css";
+
+/* Theme switching is driven by a `data-theme` attribute (which palette) and
+   a `.dark` class (which end of the palette's ramp) on <html>, set by
+   src/store/theme.ts. This makes `dark:` a manual variant instead of one
+   tied to the OS `prefers-color-scheme` media query. */
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  /* Warm, soft palette for a baby app */
+  /* Default theme — the base palette. Also defines the custom color
+     namespaces (surface, primary, side-*, event-*, success/warning/danger)
+     that Tailwind generates utilities for; other themes only need to
+     override these CSS variables, see src/styles/themes/. */
   --color-primary-50: #fdf2f8;
   --color-primary-100: #fce7f3;
   --color-primary-200: #fbcfe8;
@@ -66,22 +76,13 @@
     margin: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-family: var(--font-sans);
     background: var(--color-surface-100);
     color: var(--color-surface-800);
   }
 
-  @media (prefers-color-scheme: dark) {
-    body {
-      background: var(--color-surface-900);
-      color: var(--color-surface-200);
-    }
-  }
-}
-
-/* Dark mode overrides */
-@media (prefers-color-scheme: dark) {
-  .card {
-    background: var(--color-surface-800);
-    border-color: var(--color-surface-700);
+  :where(.dark) body {
+    background: var(--color-surface-900);
+    color: var(--color-surface-100);
   }
 }
