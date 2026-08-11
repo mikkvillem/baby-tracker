@@ -1,0 +1,93 @@
+/* Kindle theme — a flat, monochrome, e-ink inspired palette.
+ *
+ * These rules are intentionally plain (unlayered) CSS: Tailwind's own
+ * generated utilities live inside cascade layers, so unlayered
+ * declarations always win regardless of source order or specificity.
+ * That's what lets a theme override every `--color-*` token from
+ * src/app.css's `@theme` block without touching component files — every
+ * component already reads colors through `bg-surface-100`,
+ * `dark:text-primary-500`, etc, which resolve to these variables.
+ *
+ * Both "Kindle" and "Kindle Dark" (see src/themes/registry.ts) use this
+ * same palette — light vs. dark just toggles the `.dark` class, which is
+ * the same mechanism the default theme already uses for its own dark mode.
+ */
+
+[data-theme='kindle'] {
+  --color-white: #fbfbfb;
+  --color-black: #0a0a0a;
+
+  --color-primary-50: #eaeaea;
+  --color-primary-100: #dcdcdc;
+  --color-primary-200: #c2c2c2;
+  --color-primary-300: #9a9a9a;
+  --color-primary-400: #565656;
+  --color-primary-500: #1f1f1f;
+  --color-primary-600: #0d0d0d;
+
+  /* side-*-500 pulls triple duty (unconditional borders, unconditional
+     badge fills with white text, and — via existing `dark:text-side-*-500`
+     usages — dark-mode text) with no room for a per-mode override, so it's
+     tuned as a mid-gray that stays legible against both very light and
+     very dark surfaces rather than sitting at either extreme. */
+  --color-side-left-50: #f2f2f2;
+  --color-side-left-100: #e3e3e3;
+  --color-side-left-500: #737373;
+  --color-side-left-600: #4d4d4d;
+
+  --color-side-right-50: #e8e8e8;
+  --color-side-right-100: #d4d4d4;
+  --color-side-right-500: #595959;
+  --color-side-right-600: #333333;
+
+  --color-surface-50: #f7f7f7;
+  --color-surface-100: #ececec;
+  --color-surface-200: #dcdcdc;
+  --color-surface-300: #c2c2c2;
+  --color-surface-400: #9a9a9a;
+  --color-surface-500: #757575;
+  --color-surface-600: #565656;
+  --color-surface-700: #3d3d3d;
+  --color-surface-800: #232323;
+  --color-surface-900: #121212;
+
+  --color-success-50: #ececec;
+  --color-success-500: #4a4a4a;
+  --color-success-600: #333333;
+
+  --color-warning-50: #ececec;
+  --color-warning-500: #5c5c5c;
+  --color-warning-600: #404040;
+
+  --color-danger-50: #ececec;
+  --color-danger-500: #1a1a1a;
+  --color-danger-600: #000000;
+
+  --color-event-diaper: #5c5c5c;
+  --color-event-medicine: #383838;
+  --color-event-measurement: #4a4a4a;
+  --color-event-custom: #707070;
+
+  --font-sans: 'Literata', Georgia, 'Times New Roman', serif;
+  --font-mono: 'Courier New', Courier, monospace;
+}
+
+/* Flatten shadows and blur for a paper-flat, e-ink feel. */
+[data-theme='kindle'] .shadow-sm,
+[data-theme='kindle'] .shadow-md,
+[data-theme='kindle'] .shadow-lg,
+[data-theme='kindle'] .shadow-2xl,
+[data-theme='kindle'] [class*='shadow-side-'] {
+  --tw-shadow: 0 0 #0000;
+  box-shadow: none;
+}
+
+[data-theme='kindle'] .backdrop-blur-sm {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* The app logo is a static colored SVG; desaturate it to match. */
+[data-theme='kindle'] #app-logo {
+  filter: grayscale(1) contrast(1.05);
+}

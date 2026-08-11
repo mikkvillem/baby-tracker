@@ -11,7 +11,7 @@ type Props = {
 
 const EVENT_OPTIONS: { type: MiscEventType; label: string; icon: typeof Droplets; color: string; activeColor: string }[] = [
   { type: 'diaper', label: 'Diaper', icon: Droplets, color: 'bg-warning-50 dark:bg-warning-500/10 text-warning-600 dark:text-warning-500 border-warning-200 dark:border-warning-500/20', activeColor: 'bg-warning-500 text-white border-warning-500' },
-  { type: 'medicine', label: 'Medicine', icon: Pill, color: 'bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-500 border-orange-200 dark:border-orange-500/20', activeColor: 'bg-event-medicine text-white border-event-medicine' },
+  { type: 'medicine', label: 'Medicine', icon: Pill, color: 'bg-event-medicine/10 text-event-medicine border-event-medicine/20', activeColor: 'bg-event-medicine text-white border-event-medicine' },
   { type: 'measurement', label: 'Measure', icon: Ruler, color: 'bg-success-50 dark:bg-success-500/10 text-success-600 dark:text-success-500 border-success-200 dark:border-success-500/20', activeColor: 'bg-success-500 text-white border-success-500' },
   { type: 'custom', label: 'Custom', icon: PenLine, color: 'bg-side-right-50 dark:bg-side-right-500/10 text-side-right-600 dark:text-side-right-500 border-side-right-100 dark:border-side-right-500/20', activeColor: 'bg-event-custom text-white border-event-custom' }
 ]
@@ -136,7 +136,7 @@ export function MiscEventModal({ onClose, onSave }: Props) {
                     type="checkbox"
                     checked={diaperPoop}
                     onChange={(e) => setDiaperPoop((e.target as HTMLInputElement).checked)}
-                    class="w-4 h-4 rounded border-surface-300 text-primary-500 focus:ring-primary-400"
+                    class="w-4 h-4 rounded border-surface-300 text-primary-500 dark:text-primary-300 focus:ring-primary-400"
                   />
                   <span class="text-sm text-surface-700 dark:text-surface-300">Poop</span>
                 </label>
@@ -145,7 +145,7 @@ export function MiscEventModal({ onClose, onSave }: Props) {
                     type="checkbox"
                     checked={diaperPee}
                     onChange={(e) => setDiaperPee((e.target as HTMLInputElement).checked)}
-                    class="w-4 h-4 rounded border-surface-300 text-primary-500 focus:ring-primary-400"
+                    class="w-4 h-4 rounded border-surface-300 text-primary-500 dark:text-primary-300 focus:ring-primary-400"
                   />
                   <span class="text-sm text-surface-700 dark:text-surface-300">Pee</span>
                 </label>

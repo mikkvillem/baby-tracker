@@ -5,15 +5,30 @@
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#fce7f3" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#1f1b18" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#fce7f3" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Baby Tracker" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script>
+      // Applies the saved theme before first paint to avoid a flash of the wrong theme.
+      // Keep this in sync with the resolution logic in src/store/theme.ts.
+      (() => {
+        try {
+          const id = localStorage.getItem('theme-preference') || 'system'
+          const palettes = { system: 'default', light: 'default', dark: 'default', kindle: 'kindle', 'kindle-dark': 'kindle' }
+          const dark = id === 'dark' || id === 'kindle-dark' ||
+            (id === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+          const root = document.documentElement
+          root.dataset.theme = palettes[id] || 'default'
+          root.classList.toggle('dark', dark)
+          root.style.colorScheme = dark ? 'dark' : 'light'
+        } catch (_e) {}
+      })()
+    </script>
     <title>Baby Tracker</title>
   </head>
   <body>
