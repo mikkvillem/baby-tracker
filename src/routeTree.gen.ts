@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ReportRouteImport } from './routes/report'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SessionSessionIdDetailsRouteImport } from './routes/session.$sessionId.details'
@@ -18,6 +19,11 @@ import { Route as SessionSessionIdActiveRouteImport } from './routes/session.$se
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportRoute = ReportRouteImport.update({
+  id: '/report',
+  path: '/report',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HistoryRoute = HistoryRouteImport.update({
@@ -44,6 +50,7 @@ const SessionSessionIdActiveRoute = SessionSessionIdActiveRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/history': typeof HistoryRoute
+  '/report': typeof ReportRoute
   '/settings': typeof SettingsRoute
   '/session/$sessionId/active': typeof SessionSessionIdActiveRoute
   '/session/$sessionId/details': typeof SessionSessionIdDetailsRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/history': typeof HistoryRoute
+  '/report': typeof ReportRoute
   '/settings': typeof SettingsRoute
   '/session/$sessionId/active': typeof SessionSessionIdActiveRoute
   '/session/$sessionId/details': typeof SessionSessionIdDetailsRoute
@@ -59,6 +67,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/history': typeof HistoryRoute
+  '/report': typeof ReportRoute
   '/settings': typeof SettingsRoute
   '/session/$sessionId/active': typeof SessionSessionIdActiveRoute
   '/session/$sessionId/details': typeof SessionSessionIdDetailsRoute
@@ -68,6 +77,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/history'
+    | '/report'
     | '/settings'
     | '/session/$sessionId/active'
     | '/session/$sessionId/details'
@@ -75,6 +85,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/history'
+    | '/report'
     | '/settings'
     | '/session/$sessionId/active'
     | '/session/$sessionId/details'
@@ -82,6 +93,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/history'
+    | '/report'
     | '/settings'
     | '/session/$sessionId/active'
     | '/session/$sessionId/details'
@@ -90,6 +102,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HistoryRoute: typeof HistoryRoute
+  ReportRoute: typeof ReportRoute
   SettingsRoute: typeof SettingsRoute
   SessionSessionIdActiveRoute: typeof SessionSessionIdActiveRoute
   SessionSessionIdDetailsRoute: typeof SessionSessionIdDetailsRoute
@@ -102,6 +115,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/report': {
+      id: '/report'
+      path: '/report'
+      fullPath: '/report'
+      preLoaderRoute: typeof ReportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/history': {
@@ -138,6 +158,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HistoryRoute: HistoryRoute,
+  ReportRoute: ReportRoute,
   SettingsRoute: SettingsRoute,
   SessionSessionIdActiveRoute: SessionSessionIdActiveRoute,
   SessionSessionIdDetailsRoute: SessionSessionIdDetailsRoute,

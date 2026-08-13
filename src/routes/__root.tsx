@@ -1,5 +1,5 @@
 import { createRootRoute, Link, Outlet, useNavigate, useMatches } from '@tanstack/react-router'
-import { Home, Clock, Settings } from 'lucide-preact'
+import { Home, Clock, Sparkles, Settings } from 'lucide-preact'
 import { useFeedingNotificationScheduler } from '../hooks/useFeedingNotificationScheduler'
 import { InstallPwaBanner } from '../components/InstallPwaBanner'
 import '../app.css'
@@ -54,6 +54,18 @@ function AppShell() {
           >
             <Clock size={22} strokeWidth={currentPath === '/history' ? 2.5 : 2} />
             <span class="text-[11px] font-medium">History</span>
+          </button>
+
+          <button
+            class={`flex flex-col items-center gap-0.5 py-2 px-4 rounded-lg transition-colors duration-200 border-none bg-transparent cursor-pointer ${
+              currentPath === '/report'
+                ? 'text-primary-500 dark:text-primary-300'
+                : 'text-surface-400 dark:text-surface-500 hover:text-surface-600 dark:hover:text-surface-300'
+            }`}
+            onClick={() => navigate({ to: '/report' })}
+          >
+            <Sparkles size={22} strokeWidth={currentPath === '/report' ? 2.5 : 2} />
+            <span class="text-[11px] font-medium">Report</span>
           </button>
 
           <button
