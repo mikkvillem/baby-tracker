@@ -5,6 +5,7 @@ import { ErrorBanner } from '../components/ErrorBanner'
 import { loadSessions } from '../db'
 import { updateSessionIntervals, deleteSession as deleteSessionService } from '../services/sessionService'
 import type { Session, Interval } from '../app'
+import { translations } from '../i18n'
 
 export const Route = createFileRoute('/session/$sessionId/details')({
   component: SessionDetailsRoute
@@ -13,6 +14,7 @@ export const Route = createFileRoute('/session/$sessionId/details')({
 function SessionDetailsRoute() {
   const { sessionId } = Route.useParams()
   const navigate = useNavigate()
+  const t = translations.value.sessionDetails
   const [session, setSession] = useState<Session | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -28,7 +30,7 @@ function SessionDetailsRoute() {
       })
       .catch(err => {
         console.error('Failed to load session:', err)
-        setError('Failed to load this session. Please reload the page and try again.')
+        setError(t.errorLoad)
       })
   }, [sessionId, navigate])
 
@@ -42,7 +44,7 @@ function SessionDetailsRoute() {
       if (updated) setSession(updated)
     } catch (err) {
       console.error('Failed to update session:', err)
-      setError('Failed to save your changes. Please try again.')
+      setError(t.errorUpdate)
     }
   }
 
@@ -52,7 +54,7 @@ function SessionDetailsRoute() {
       navigate({ to: '/' })
     } catch (err) {
       console.error('Failed to delete session:', err)
-      setError('Failed to delete the session. Please try again.')
+      setError(t.errorDelete)
     }
   }
 
@@ -62,7 +64,7 @@ function SessionDetailsRoute() {
         <ErrorBanner message={error} onDismiss={() => setError(null)} />
       </div>
     ) : (
-      <div>Loading...</div>
+      <div>{translations.value.common.loading}</div>
     )
   }
 

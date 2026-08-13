@@ -1,6 +1,7 @@
 import type { Interval } from '../app'
 import { formatIntervalDuration } from '../utils/sessionFormatters'
 import { Trash2 } from 'lucide-preact'
+import { translations } from '../i18n'
 
 type Props = {
   interval: Interval
@@ -16,6 +17,7 @@ const timeFormat: Intl.DateTimeFormatOptions = {
 }
 
 export function IntervalRow({ interval, onDelete, onEdit }: Props) {
+  const t = translations.value.intervalRow
   const canEdit = interval.endTime && onEdit
   const showDelete = interval.endTime && onDelete
 
@@ -44,7 +46,7 @@ export function IntervalRow({ interval, onDelete, onEdit }: Props) {
       {!interval.endTime && (
         <span class="ml-auto flex items-center gap-1.5 text-success-500">
           <span class="w-1.5 h-1.5 rounded-full bg-success-500 animate-pulse" />
-          <span class="font-medium text-xs">Recording</span>
+          <span class="font-medium text-xs">{t.recording}</span>
         </span>
       )}
       {showDelete && (
@@ -55,7 +57,7 @@ export function IntervalRow({ interval, onDelete, onEdit }: Props) {
             e.stopPropagation()
             onDelete!()
           }}
-          title="Delete interval"
+          title={t.deleteInterval}
         >
           <Trash2 size={14} />
         </button>

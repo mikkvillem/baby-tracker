@@ -10,6 +10,7 @@ import {
 import { IntervalRow } from './IntervalRow'
 import { Square, ChevronLeft } from 'lucide-preact'
 import { useNavigate } from '@tanstack/react-router'
+import { translations } from '../i18n'
 
 type Props = {
   session: Session
@@ -27,6 +28,7 @@ function getResumedState(intervals: Interval[]) {
 
 export function ActiveSession({ session, onEndSession, onUpdateSession }: Props) {
   const navigate = useNavigate()
+  const t = translations.value.activeSession
   const resumed = getResumedState(session.intervals)
   const [activeLeft, setActiveLeft] = useState(resumed?.activeSide === 'left')
   const [activeRight, setActiveRight] = useState(resumed?.activeSide === 'right')
@@ -97,16 +99,16 @@ export function ActiveSession({ session, onEndSession, onUpdateSession }: Props)
           onClick={() => navigate({ to: '/' })}
         >
           <ChevronLeft size={18} />
-          Home
+          {t.home}
         </button>
         <div class="text-sm font-medium text-surface-500 dark:text-surface-400">
-          {intervals.length > 0 ? `Started ${intervals[0].startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}` : 'Ready'}
+          {intervals.length > 0 ? t.started({ time: intervals[0].startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) }) : t.ready}
         </div>
       </div>
 
       {/* Total duration badge */}
       <div class="text-center">
-        <div class="text-sm font-medium text-surface-500 dark:text-surface-400 mb-1">Total</div>
+        <div class="text-sm font-medium text-surface-500 dark:text-surface-400 mb-1">{t.total}</div>
         <div class="text-lg font-bold text-surface-800 dark:text-surface-100">{formatDurationMin(intervals)}</div>
       </div>
 
@@ -123,7 +125,7 @@ export function ActiveSession({ session, onEndSession, onUpdateSession }: Props)
         >
           <div class={`text-xs font-semibold uppercase tracking-wider mb-2 ${
             activeLeft ? 'text-side-left-600 dark:text-side-left-500' : 'text-surface-500'
-          }`}>Left</div>
+          }`}>{t.left}</div>
           <div class={`text-4xl sm:text-5xl font-bold font-mono mb-3 ${
             activeLeft ? 'text-side-left-600 dark:text-side-left-500' : 'text-surface-700 dark:text-surface-300'
           }`}>
@@ -137,9 +139,9 @@ export function ActiveSession({ session, onEndSession, onUpdateSession }: Props)
             {activeLeft ? (
               <>
                 <span class="w-2 h-2 rounded-full bg-white animate-pulse" />
-                Tap to stop
+                {t.tapToStop}
               </>
-            ) : 'Tap to start'}
+            ) : t.tapToStart}
           </div>
         </button>
 
@@ -154,7 +156,7 @@ export function ActiveSession({ session, onEndSession, onUpdateSession }: Props)
         >
           <div class={`text-xs font-semibold uppercase tracking-wider mb-2 ${
             activeRight ? 'text-side-right-600 dark:text-side-right-500' : 'text-surface-500'
-          }`}>Right</div>
+          }`}>{t.right}</div>
           <div class={`text-4xl sm:text-5xl font-bold font-mono mb-3 ${
             activeRight ? 'text-side-right-600 dark:text-side-right-500' : 'text-surface-700 dark:text-surface-300'
           }`}>
@@ -168,26 +170,26 @@ export function ActiveSession({ session, onEndSession, onUpdateSession }: Props)
             {activeRight ? (
               <>
                 <span class="w-2 h-2 rounded-full bg-white animate-pulse" />
-                Tap to stop
+                {t.tapToStop}
               </>
-            ) : 'Tap to start'}
+            ) : t.tapToStart}
           </div>
         </button>
       </div>
 
       {/* End session */}
-      <button 
+      <button
         class="w-full bg-danger-500 hover:bg-danger-600 text-white border-none py-3.5 rounded-xl text-base font-semibold cursor-pointer transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2"
         onClick={onEndSession}
       >
         <Square size={16} fill="currentColor" />
-        End Session
+        {t.endSession}
       </button>
 
       {/* Interval history */}
       {intervals.length > 0 && (
         <div>
-          <h3 class="text-sm font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider m-0 mb-3">Intervals</h3>
+          <h3 class="text-sm font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider m-0 mb-3">{t.intervals}</h3>
           <div class="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl overflow-hidden">
             <div class="flex flex-col divide-y divide-surface-100 dark:divide-surface-700">
               {intervals.map((interval, idx) => (

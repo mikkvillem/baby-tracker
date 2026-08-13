@@ -5,6 +5,7 @@ import type { Session, MiscEvent } from '../app'
 import { formatDurationMin, formatDurationShort, getSideCounts } from '../utils/sessionFormatters'
 import { ErrorBanner } from '../components/ErrorBanner'
 import { Download, Upload, ChevronRight, X, Baby, Pill, Ruler, PenLine, Droplets } from 'lucide-preact'
+import { translations, language, LANGUAGE_META } from '../i18n'
 
 export const Route = createFileRoute('/history')({
   component: HistoryRoute
@@ -22,6 +23,8 @@ type GroupedTimeline = {
 
 function HistoryRoute() {
   const navigate = useNavigate()
+  const t = translations.value.history
+  const localeTag = LANGUAGE_META[language.value].localeTag
   const [sessions, setSessions] = useState<Session[]>([])
   const [miscEvents, setMiscEvents] = useState<MiscEvent[]>([])
   const [visibleDays, setVisibleDays] = useState(3)
@@ -45,7 +48,7 @@ function HistoryRoute() {
       })
       .catch(err => {
         console.error('Failed to load history:', err)
-        setError('Failed to load your history. Please reload the page and try again.')
+        setError(t.errorLoad)
       })
   }
 
@@ -54,7 +57,7 @@ function HistoryRoute() {
   }, [])
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', {
+    return date.toLocaleTimeString(localeTag, {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false
@@ -78,11 +81,11 @@ function HistoryRoute() {
 
         let displayDate: string
         if (date.getTime() === today.getTime()) {
-          displayDate = 'Today'
+          displayDate = t.today
         } else if (date.getTime() === yesterday.getTime()) {
-          displayDate = 'Yesterday'
+          displayDate = t.yesterday
         } else {
-          displayDate = date.toLocaleDateString('en-US', {
+          displayDate = date.toLocaleDateString(localeTag, {
             weekday: 'long',
             month: 'short',
             day: 'numeric'
@@ -113,11 +116,11 @@ function HistoryRoute() {
 
         let displayDate: string
         if (date.getTime() === today.getTime()) {
-          displayDate = 'Today'
+          displayDate = t.today
         } else if (date.getTime() === yesterday.getTime()) {
-          displayDate = 'Yesterday'
+          displayDate = t.yesterday
         } else {
-          displayDate = date.toLocaleDateString('en-US', {
+          displayDate = date.toLocaleDateString(localeTag, {
             weekday: 'long',
             month: 'short',
             day: 'numeric'
@@ -146,7 +149,7 @@ function HistoryRoute() {
     return Array.from(groups.values()).sort((a, b) =>
       new Date(b.date).getTime() - new Date(a.date).getTime()
     )
-  }, [sessions, miscEvents])
+  }, [sessions, miscEvents, t, localeTag])
 
   const visibleGroups = groupedTimeline.slice(0, visibleDays)
   const hasMore = visibleDays < groupedTimeline.length
@@ -200,7 +203,7 @@ function HistoryRoute() {
       await exportDataAsJSON()
     } catch (error) {
       console.error('Failed to export data:', error)
-      alert('Failed to export data. Please try again.')
+      alert(t.errorExport)
     }
   }
 
@@ -223,13 +226,13 @@ function HistoryRoute() {
       const skippedTotal = result.sessionsSkipped + result.eventsSkipped
       alert(
         importedTotal === 0
-          ? 'No new data to import — everything in this file was already imported.'
-          : `Import complete: added ${result.sessionsImported} session(s) and ${result.eventsImported} event(s).` +
-            (skippedTotal > 0 ? ` Skipped ${skippedTotal} already-imported item(s).` : '')
+          ? t.importNoNew
+          : t.importSummary({ sessions: result.sessionsImported, events: result.eventsImported }) +
+            (skippedTotal > 0 ? t.importSkipped({ count: skippedTotal }) : '')
       )
     } catch (error) {
       console.error('Failed to import data:', error)
-      alert(error instanceof Error ? error.message : 'Failed to import data. Please try again.')
+      alert(error instanceof Error ? error.message : t.errorImport)
     }
   }
 
@@ -259,14 +262,14 @@ function HistoryRoute() {
     <div class="max-w-lg mx-auto px-4 pt-4 pb-6 flex flex-col gap-4">
       {/* Top bar */}
       <div class="flex items-center justify-between">
-        <h1 class="m-0 text-xl font-semibold text-surface-800 dark:text-surface-100">History</h1>
+        <h1 class="m-0 text-xl font-semibold text-surface-800 dark:text-surface-100">{t.title}</h1>
         <div class="flex items-center gap-4">
           <button
             class="flex items-center gap-1.5 text-primary-500 dark:text-primary-300 bg-transparent border-none cursor-pointer text-sm font-medium hover:text-primary-600 dark:hover:text-primary-200 transition-colors p-0"
             onClick={handleImportClick}
           >
             <Upload size={16} />
-            Import
+            {t.import}
           </button>
           <input
             ref={fileInputRef}
@@ -280,7 +283,7 @@ function HistoryRoute() {
             onClick={handleExport}
           >
             <Download size={16} />
-            Export
+            {t.export}
           </button>
         </div>
       </div>
@@ -290,8 +293,8 @@ function HistoryRoute() {
       {sessions.length === 0 && miscEvents.length === 0 ? (
         <div class="text-center py-16 px-5 text-surface-400">
           <Baby size={40} class="mx-auto mb-3 opacity-50" />
-          <p class="text-base font-medium mb-1 m-0">No activity yet</p>
-          <p class="text-sm m-0">Start tracking to see your history</p>
+          <p class="text-base font-medium mb-1 m-0">{t.noActivity}</p>
+          <p class="text-sm m-0">{t.startTracking}</p>
         </div>
       ) : (
         <>
@@ -336,7 +339,7 @@ function HistoryRoute() {
                                 <span class="text-sm font-semibold text-surface-800 dark:text-surface-100">{formatTime(session.startTime)}</span>
                                 {session.isActive && (
                                   <span class="bg-success-500 text-white px-2 py-0.5 rounded-full text-[10px] font-semibold">
-                                    Active
+                                    {t.active}
                                   </span>
                                 )}
                               </div>
@@ -350,21 +353,21 @@ function HistoryRoute() {
                       } else {
                         const event = item.data
                         let label: string
-                        if (event.type === 'custom') label = event.customLabel ?? 'Custom'
-                        else if (event.type === 'medicine') label = event.medicineName ?? 'Medicine'
-                        else if (event.type === 'vitamin') label = 'Vitamin D'
-                        else if (event.type === 'probiotic') label = 'Probiotic'
+                        if (event.type === 'custom') label = event.customLabel ?? t.custom
+                        else if (event.type === 'medicine') label = event.medicineName ?? t.medicine
+                        else if (event.type === 'vitamin') label = t.vitamin
+                        else if (event.type === 'probiotic') label = t.probiotic
                         else if (event.type === 'measurement' && event.measurementKind != null && event.measurementValue != null) {
-                          const kindLabels = { weight: 'Weight', height: 'Height', headCircumference: 'Head' }
+                          const kindLabels = { weight: t.weight, height: t.height, headCircumference: t.head }
                           const unit = event.measurementUnit ?? (event.measurementKind === 'weight' ? 'kg' : 'cm')
                           label = `${kindLabels[event.measurementKind]} ${event.measurementValue} ${unit}`
-                        } else if (event.type === 'measurement') label = 'Measurement'
+                        } else if (event.type === 'measurement') label = t.measurement
                         else if (event.type === 'diaper') {
                           const parts = []
-                          if (event.diaperPoop) parts.push('poop')
-                          if (event.diaperPee) parts.push('pee')
-                          label = parts.length > 0 ? `Diaper (${parts.join(', ')})` : 'Diaper'
-                        } else label = 'Diaper'
+                          if (event.diaperPoop) parts.push(t.poop)
+                          if (event.diaperPee) parts.push(t.pee)
+                          label = parts.length > 0 ? t.diaperWithContents({ contents: parts.join(', ') }) : t.diaper
+                        } else label = t.diaper
                         return (
                           <div
                             key={event.id}
@@ -383,13 +386,13 @@ function HistoryRoute() {
                               class="w-7 h-7 flex items-center justify-center bg-transparent border-none text-surface-300 dark:text-surface-600 hover:text-danger-500 cursor-pointer transition-colors rounded-md p-0"
                               onClick={async (e) => {
                                 e.stopPropagation()
-                                if (confirm('Delete this event?')) {
+                                if (confirm(t.confirmDeleteEvent)) {
                                   try {
                                     await deleteMiscEvent(event.id)
                                     loadData()
                                   } catch (err) {
                                     console.error('Failed to delete event:', err)
-                                    setError('Failed to delete the event. Please try again.')
+                                    setError(t.errorDeleteEvent)
                                   }
                                 }
                               }}
@@ -410,7 +413,7 @@ function HistoryRoute() {
               class="w-full bg-white dark:bg-surface-800 text-surface-500 border border-surface-200 dark:border-surface-700 py-3 rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-surface-50 dark:hover:bg-surface-700 hover:border-surface-300 active:scale-[0.98]"
               onClick={loadMore}
             >
-              Load Previous Day
+              {t.loadPreviousDay}
             </button>
           )}
         </>

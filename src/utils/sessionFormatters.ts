@@ -1,4 +1,5 @@
 import type { Session, Interval } from '../app'
+import { translations } from '../i18n'
 
 export function getTotalTimeForSide(
   intervals: Interval[],
@@ -50,7 +51,7 @@ export function formatDuration(intervals: Interval[]): string {
   }, 0)
   const minutes = Math.floor(total / 60000)
   const seconds = Math.floor((total % 60000) / 1000)
-  return `${minutes}m ${seconds}s`
+  return translations.value.duration.minutesSeconds({ m: minutes, s: seconds })
 }
 
 export function formatDurationMin(intervals: Interval[]): string {
@@ -59,15 +60,15 @@ export function formatDurationMin(intervals: Interval[]): string {
     return sum + (interval.endTime.getTime() - interval.startTime.getTime())
   }, 0)
   const minutes = Math.floor(total / 60000)
-  return `${minutes} min`
+  return translations.value.duration.minutesShort({ m: minutes })
 }
 
 export function formatDurationShort(ms: number): string {
   const totalMinutes = Math.floor(ms / 60000)
   const hours = Math.floor(totalMinutes / 60)
   const minutes = totalMinutes % 60
-  if (hours > 0) return `${hours}h ${minutes}m`
-  return `${minutes}m`
+  if (hours > 0) return translations.value.duration.hoursMinutes({ h: hours, m: minutes })
+  return translations.value.duration.minutesOnly({ m: minutes })
 }
 
 export function formatTimer(seconds: number): string {
@@ -80,7 +81,7 @@ export function formatIntervalDuration(startTime: Date, endTime: Date): string {
   const totalSeconds = Math.floor((endTime.getTime() - startTime.getTime()) / 1000)
   const mins = Math.floor(totalSeconds / 60)
   const secs = totalSeconds % 60
-  return `${mins}m ${secs}s`
+  return translations.value.duration.minutesSeconds({ m: mins, s: secs })
 }
 
 export function getSideCounts(intervals: Interval[]): { left: number; right: number } {

@@ -3,6 +3,7 @@ import { feedingSettings } from '../store/settings'
 import { suggestNextFeeding, formatTimeUntil } from '../utils/feedingPredictor'
 import { useCurrentTime } from '../hooks/useCurrentTime'
 import { AlarmClock } from 'lucide-preact'
+import { translations } from '../i18n'
 
 type Props = {
   sessions: Session[]
@@ -10,6 +11,7 @@ type Props = {
 
 export function NextFeedingCard({ sessions }: Props) {
   useCurrentTime(60000)
+  const t = translations.value.nextFeeding
   const prediction = suggestNextFeeding(
     sessions,
     feedingSettings.value.intervalMinutes,
@@ -31,7 +33,7 @@ export function NextFeedingCard({ sessions }: Props) {
           <AlarmClock size={20} />
         </div>
         <div>
-          <div class="text-xs font-medium opacity-80">Next Feeding</div>
+          <div class="text-xs font-medium opacity-80">{t.label}</div>
           <div class="text-xl font-bold font-mono">
             {prediction.suggestedTime.toLocaleTimeString('en-US', {
               hour: '2-digit',

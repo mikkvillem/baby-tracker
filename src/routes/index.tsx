@@ -4,6 +4,7 @@ import { SessionList } from '../components/SessionList'
 import { ErrorBanner } from '../components/ErrorBanner'
 import { loadSessions, putSession, saveMiscEvent, initDB } from '../db'
 import type { Session, MiscEvent } from '../app'
+import { translations } from '../i18n'
 
 export const Route = createFileRoute('/')({
   component: SessionListRoute
@@ -11,6 +12,7 @@ export const Route = createFileRoute('/')({
 
 function SessionListRoute() {
   const navigate = useNavigate()
+  const t = translations.value.home
   const [sessions, setSessions] = useState<Session[]>([])
   const [error, setError] = useState<string | null>(null)
 
@@ -25,7 +27,7 @@ function SessionListRoute() {
       })
       .catch(err => {
         console.error('Failed to load sessions:', err)
-        setError('Failed to load your data. Please reload the page and try again.')
+        setError(t.errorLoad)
       })
   }, [])
 
@@ -42,7 +44,7 @@ function SessionListRoute() {
       navigate({ to: '/session/$sessionId/active', params: { sessionId: newSession.id } })
     } catch (err) {
       console.error('Failed to start session:', err)
-      setError('Failed to start a new session. Please try again.')
+      setError(t.errorStart)
     }
   }
 
@@ -55,7 +57,7 @@ function SessionListRoute() {
       navigate({ to: '/session/$sessionId/details', params: { sessionId: session.id } })
     } catch (err) {
       console.error('Failed to add session:', err)
-      setError('Failed to save the session. Please try again.')
+      setError(t.errorAddManual)
     }
   }
 
@@ -64,7 +66,7 @@ function SessionListRoute() {
       await saveMiscEvent(event)
     } catch (err) {
       console.error('Failed to save event:', err)
-      setError('Failed to save the event. Please try again.')
+      setError(t.errorAddEvent)
     }
   }
 

@@ -6,7 +6,8 @@ import { THEMES } from '../themes/registry'
 import { useNotificationPermission } from '../hooks/useNotificationPermission'
 import { showTestNotification } from '../utils/notifications'
 import { Switch } from '../components/Switch'
-import { AlarmClock, Timer, Pill, Bell, X, Plus, Palette } from 'lucide-preact'
+import { AlarmClock, Timer, Pill, Bell, X, Plus, Palette, Languages } from 'lucide-preact'
+import { translations, language, setLanguage, LANGUAGES, LANGUAGE_META } from '../i18n'
 
 export const Route = createFileRoute('/settings')({
   component: SettingsRoute
@@ -25,6 +26,7 @@ const pillClass = (isActive: boolean) =>
   }`
 
 function SettingsRoute() {
+  const t = translations.value.settings
   const intervalMinutes = feedingSettings.value.intervalMinutes
   const hours = Math.floor(intervalMinutes / 60)
   const minutes = intervalMinutes % 60
@@ -105,7 +107,7 @@ function SettingsRoute() {
 
   return (
     <div class="max-w-lg mx-auto px-4 pt-4 pb-6 flex flex-col gap-4">
-      <h1 class="m-0 text-xl font-semibold text-surface-800 dark:text-surface-100">Settings</h1>
+      <h1 class="m-0 text-xl font-semibold text-surface-800 dark:text-surface-100">{t.title}</h1>
 
       <div class="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl p-4 flex flex-col gap-3">
         <div class="flex items-center gap-2.5">
@@ -113,14 +115,15 @@ function SettingsRoute() {
             <Palette size={16} class="text-primary-500 dark:text-primary-300" />
           </div>
           <div>
-            <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">Appearance</h2>
-            <p class="m-0 text-xs text-surface-500">Pick how Baby Tracker looks on this device</p>
+            <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">{t.appearance}</h2>
+            <p class="m-0 text-xs text-surface-500">{t.appearanceDescription}</p>
           </div>
         </div>
 
         <div class="flex flex-col gap-2">
           {THEMES.map(theme => {
             const isActive = themeId.value === theme.id
+            const themeText = t.themes[theme.id] ?? { label: theme.label, description: theme.description }
             return (
               <button
                 key={theme.id}
@@ -146,9 +149,37 @@ function SettingsRoute() {
                   />
                 </div>
                 <div class="min-w-0">
-                  <div class="text-sm font-medium text-surface-800 dark:text-surface-100">{theme.label}</div>
-                  <div class="text-xs text-surface-500 truncate">{theme.description}</div>
+                  <div class="text-sm font-medium text-surface-800 dark:text-surface-100">{themeText.label}</div>
+                  <div class="text-xs text-surface-500 truncate">{themeText.description}</div>
                 </div>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl p-4 flex flex-col gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-500/15 flex items-center justify-center shrink-0">
+            <Languages size={16} class="text-primary-500 dark:text-primary-300" />
+          </div>
+          <div>
+            <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">{t.language}</h2>
+            <p class="m-0 text-xs text-surface-500">{t.languageDescription}</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          {LANGUAGES.map(lang => {
+            const isActive = language.value === lang
+            return (
+              <button
+                key={lang}
+                type="button"
+                class={pillClass(isActive)}
+                onClick={() => setLanguage(lang)}
+              >
+                {LANGUAGE_META[lang].nativeLabel}
               </button>
             )
           })}
@@ -161,8 +192,8 @@ function SettingsRoute() {
             <AlarmClock size={16} class="text-primary-500 dark:text-primary-300" />
           </div>
           <div>
-            <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">Feeding Reminder</h2>
-            <p class="m-0 text-xs text-surface-500">Used to suggest the next feeding time on the home screen</p>
+            <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">{t.feedingReminder}</h2>
+            <p class="m-0 text-xs text-surface-500">{t.feedingReminderDescription}</p>
           </div>
         </div>
 
@@ -181,7 +212,7 @@ function SettingsRoute() {
                 }`}
                 onClick={() => setIntervalMinutes(presetMinutes)}
               >
-                {h % 1 === 0 ? `${h}h` : `${Math.floor(h)}h 30m`}
+                {h % 1 === 0 ? translations.value.duration.hoursOnly({ h }) : translations.value.duration.hoursMinutes({ h: Math.floor(h), m: 30 })}
               </button>
             )
           })}
@@ -189,7 +220,7 @@ function SettingsRoute() {
 
         <div class="flex items-center gap-3">
           <div class="flex-1">
-            <label class="block text-xs font-medium mb-1.5 text-surface-500">Hours</label>
+            <label class="block text-xs font-medium mb-1.5 text-surface-500">{t.hours}</label>
             <input
               type="number"
               min="0"
@@ -200,7 +231,7 @@ function SettingsRoute() {
             />
           </div>
           <div class="flex-1">
-            <label class="block text-xs font-medium mb-1.5 text-surface-500">Minutes</label>
+            <label class="block text-xs font-medium mb-1.5 text-surface-500">{t.minutes}</label>
             <input
               type="number"
               min="0"
@@ -214,7 +245,12 @@ function SettingsRoute() {
         </div>
 
         <p class="m-0 text-xs text-surface-400">
-          Suggests a feeding roughly every {hours > 0 ? `${hours}h ` : ''}{minutes > 0 || hours === 0 ? `${minutes}m` : ''} after the last one ends.
+          {t.suggestsFeeding({
+            duration: [
+              hours > 0 ? translations.value.duration.hoursOnly({ h: hours }) : '',
+              minutes > 0 || hours === 0 ? translations.value.duration.minutesOnly({ m: minutes }) : ''
+            ].filter(Boolean).join(' ')
+          })}
         </p>
       </div>
 
@@ -224,8 +260,8 @@ function SettingsRoute() {
             <Timer size={16} class="text-primary-500 dark:text-primary-300" />
           </div>
           <div>
-            <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">Significant Interval</h2>
-            <p class="m-0 text-xs text-surface-500">Minimum duration for a nursing interval to count as a real feed</p>
+            <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">{t.significantInterval}</h2>
+            <p class="m-0 text-xs text-surface-500">{t.significantIntervalDescription}</p>
           </div>
         </div>
 
@@ -243,14 +279,14 @@ function SettingsRoute() {
                 }`}
                 onClick={() => setSignificantIntervalMinutes(m)}
               >
-                {m}m
+                {translations.value.duration.minutesOnly({ m })}
               </button>
             )
           })}
         </div>
 
         <div>
-          <label class="block text-xs font-medium mb-1.5 text-surface-500">Minutes</label>
+          <label class="block text-xs font-medium mb-1.5 text-surface-500">{t.minutes}</label>
           <input
             type="number"
             min="1"
@@ -262,7 +298,7 @@ function SettingsRoute() {
         </div>
 
         <p class="m-0 text-xs text-surface-400">
-          Side switches shorter than {significantIntervalMinutes}m are treated as noise and ignored when finding the last feeding time.
+          {t.sideSwitchesNote({ m: significantIntervalMinutes })}
         </p>
       </div>
 
@@ -273,27 +309,27 @@ function SettingsRoute() {
               <Bell size={16} class="text-primary-500 dark:text-primary-300" />
             </div>
             <div>
-              <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">Feeding Notifications</h2>
-              <p class="m-0 text-xs text-surface-500">Get notified about the next feeding on this device</p>
+              <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">{t.feedingNotifications}</h2>
+              <p class="m-0 text-xs text-surface-500">{t.feedingNotificationsDescription}</p>
             </div>
           </div>
           <Switch
             checked={notificationsEnabled && permission === 'granted'}
             disabled={!notificationsSupported || notificationsBlocked}
             onChange={handleToggleNotifications}
-            ariaLabel="Enable feeding notifications"
+            ariaLabel={t.feedingNotifications}
           />
         </div>
 
         {!notificationsSupported && (
           <p class="m-0 text-xs text-surface-400">
-            {unsupportedReason ?? 'Notifications are not supported on this device.'}
+            {unsupportedReason ?? t.notificationsUnsupported}
           </p>
         )}
 
         {notificationsBlocked && (
           <p class="m-0 text-xs text-danger-500">
-            Notifications are blocked for this app. Enable them in your browser or device settings to turn this on.
+            {t.notificationsBlocked}
           </p>
         )}
 
@@ -305,10 +341,10 @@ function SettingsRoute() {
               onClick={handleSendTestNotification}
               disabled={testStatus === 'sending'}
             >
-              Send test notification
+              {t.sendTestNotification}
             </button>
-            {testStatus === 'sent' && <span class="text-xs text-surface-400">Sent — check your notifications</span>}
-            {testStatus === 'error' && <span class="text-xs text-danger-500">Failed to send</span>}
+            {testStatus === 'sent' && <span class="text-xs text-surface-400">{t.sentCheckNotifications}</span>}
+            {testStatus === 'error' && <span class="text-xs text-danger-500">{t.failedToSend}</span>}
           </div>
         )}
 
@@ -320,20 +356,20 @@ function SettingsRoute() {
                 class={pillClass(notificationTiming === 'before')}
                 onClick={() => updateSettings({ notificationTiming: 'before' })}
               >
-                Before feeding
+                {t.beforeFeeding}
               </button>
               <button
                 type="button"
                 class={pillClass(notificationTiming === 'overdue')}
                 onClick={() => updateSettings({ notificationTiming: 'overdue' })}
               >
-                When overdue
+                {t.whenOverdue}
               </button>
             </div>
 
             {notificationTiming === 'before' ? (
               <div>
-                <label class="block text-xs font-medium mb-1.5 text-surface-500">Minutes before</label>
+                <label class="block text-xs font-medium mb-1.5 text-surface-500">{t.minutesBefore}</label>
                 <input
                   type="number"
                   min="1"
@@ -343,12 +379,12 @@ function SettingsRoute() {
                   class={inputClass}
                 />
                 <p class="m-0 mt-1.5 text-xs text-surface-400">
-                  Notify {notificationLeadMinutes}m before the suggested feeding time.
+                  {t.notifyBefore({ m: notificationLeadMinutes })}
                 </p>
               </div>
             ) : (
               <div>
-                <label class="block text-xs font-medium mb-1.5 text-surface-500">Minutes overdue</label>
+                <label class="block text-xs font-medium mb-1.5 text-surface-500">{t.minutesOverdue}</label>
                 <input
                   type="number"
                   min="1"
@@ -358,7 +394,7 @@ function SettingsRoute() {
                   class={inputClass}
                 />
                 <p class="m-0 mt-1.5 text-xs text-surface-400">
-                  Notify {notificationOverdueMinutes}m after the suggested feeding time has passed.
+                  {t.notifyOverdue({ m: notificationOverdueMinutes })}
                 </p>
               </div>
             )}
@@ -373,8 +409,8 @@ function SettingsRoute() {
               <Pill size={16} class="text-primary-500 dark:text-primary-300" />
             </div>
             <div>
-              <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">Medicine List</h2>
-              <p class="m-0 text-xs text-surface-500">Options shown when logging a medicine event</p>
+              <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">{t.medicineList}</h2>
+              <p class="m-0 text-xs text-surface-500">{t.medicineListDescription}</p>
             </div>
           </div>
           <button
@@ -382,7 +418,7 @@ function SettingsRoute() {
             class="text-xs font-medium text-surface-400 hover:text-surface-600 dark:hover:text-surface-300 bg-transparent border-none cursor-pointer p-0 shrink-0"
             onClick={resetMedicineOptions}
           >
-            Reset
+            {t.reset}
           </button>
         </div>
 
@@ -398,7 +434,7 @@ function SettingsRoute() {
                   type="button"
                   class="w-4 h-4 flex items-center justify-center bg-transparent border-none text-surface-400 hover:text-danger-500 cursor-pointer p-0 rounded-full transition-colors"
                   onClick={() => removeMedicine(name)}
-                  aria-label={`Remove ${name}`}
+                  aria-label={t.removeMedicine({ name })}
                 >
                   <X size={12} />
                 </button>
@@ -418,7 +454,7 @@ function SettingsRoute() {
                 addMedicine()
               }
             }}
-            placeholder="e.g. Teething gel"
+            placeholder={t.medicinePlaceholder}
             class={`flex-1 ${inputClass}`}
           />
           <button
