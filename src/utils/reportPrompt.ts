@@ -7,6 +7,7 @@ export type ReportRangeDays = 3 | 7 | 14 | 30
 export type ReportOptions = {
   types: ReportType[]
   rangeDays: ReportRangeDays
+  personalNotes?: string
   /** Injectable for tests; defaults to the current time. */
   now?: Date
 }
@@ -83,7 +84,7 @@ Using only the data provided below, write a short report with these sections:
 3. **Notable Points** — anything unusual, worth double-checking, or worth celebrating. Skip this section if nothing stands out.
 4. **Questions for Your Pediatrician** — only include specific questions if the data genuinely warrants them; otherwise omit this section.
 
-Keep the tone warm, concise, and free of medical jargon. Do not invent data that isn't provided, and do not estimate the baby's age unless a birth date is given. If the data is too sparse to say anything meaningful, say so honestly instead of guessing.`
+Keep the tone warm, concise, and free of medical jargon. Do not invent data that isn't provided, and do not estimate the baby's age unless a birth date is given. If the data is too sparse to say anything meaningful, say so honestly instead of guessing. If the parent included personal notes below, treat them as trusted context (e.g. teething, illness, schedule changes) and factor them into the report.`
 
 export function buildReportPrompt(sessions: Session[], miscEvents: MiscEvent[], options: ReportOptions): string {
   const now = options.now ?? new Date()
@@ -94,6 +95,11 @@ export function buildReportPrompt(sessions: Session[], miscEvents: MiscEvent[], 
   const typeLabels = types.map(type => REPORT_TYPE_LABELS[type]).join(' + ')
 
   const sections = types.map(type => SECTION_BUILDERS[type](sessions, miscEvents, start, end))
+
+  const trimmedNotes = options.personalNotes?.trim()
+  if (trimmedNotes) {
+    sections.unshift(`## Notes from the Parent\n${trimmedNotes}`)
+  }
 
   return [
     INSTRUCTIONS,

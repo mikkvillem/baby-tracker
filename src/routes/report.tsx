@@ -3,8 +3,9 @@ import { useEffect, useMemo, useState } from 'preact/hooks'
 import { initDB, loadMiscEvents, loadSessions } from '../db'
 import type { MiscEvent, Session } from '../app'
 import { buildReportPrompt, type ReportRangeDays, type ReportType } from '../utils/reportPrompt'
+import { reportNotes, setReportNotes } from '../store/reportNotes'
 import { ErrorBanner } from '../components/ErrorBanner'
-import { Check, Copy, Sparkles } from 'lucide-preact'
+import { Check, Copy, NotebookPen, Sparkles } from 'lucide-preact'
 
 export const Route = createFileRoute('/report')({
   component: ReportRoute
@@ -58,8 +59,8 @@ function ReportRoute() {
   }
 
   const prompt = useMemo(
-    () => buildReportPrompt(sessions, miscEvents, { types: selectedTypes, rangeDays }),
-    [sessions, miscEvents, selectedTypes, rangeDays]
+    () => buildReportPrompt(sessions, miscEvents, { types: selectedTypes, rangeDays, personalNotes: reportNotes.value }),
+    [sessions, miscEvents, selectedTypes, rangeDays, reportNotes.value]
   )
 
   const handleCopy = async () => {
@@ -123,6 +124,26 @@ function ReportRoute() {
             ))}
           </div>
         </div>
+      </div>
+
+      <div class="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl p-4 flex flex-col gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-500/15 flex items-center justify-center shrink-0">
+            <NotebookPen size={16} class="text-primary-500 dark:text-primary-300" />
+          </div>
+          <div>
+            <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">Personal Notes</h2>
+            <p class="m-0 text-xs text-surface-500">Add context for the AI — saved on this device</p>
+          </div>
+        </div>
+
+        <textarea
+          value={reportNotes.value}
+          onInput={(e) => setReportNotes((e.target as HTMLTextAreaElement).value)}
+          rows={3}
+          placeholder="e.g. Started teething this week, fussier at night than usual..."
+          class="w-full px-3 py-2.5 border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-800 dark:text-surface-100 rounded-xl text-sm focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 transition-all resize-y"
+        />
       </div>
 
       <div class="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl p-4 flex flex-col gap-3">

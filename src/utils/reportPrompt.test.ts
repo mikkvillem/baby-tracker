@@ -80,6 +80,24 @@ describe('buildReportPrompt', () => {
     expect(prompt).toContain('## Measurements')
   })
 
+  it('includes personal notes as their own section when provided', () => {
+    const prompt = buildReportPrompt([], [], {
+      types: ['feeding'],
+      rangeDays: 7,
+      now: NOW,
+      personalNotes: 'Started teething this week, fussier at night.'
+    })
+    expect(prompt).toContain('## Notes from the Parent')
+    expect(prompt).toContain('Started teething this week, fussier at night.')
+  })
+
+  it('omits the personal notes section when notes are blank or missing', () => {
+    const promptMissing = buildReportPrompt([], [], { types: ['feeding'], rangeDays: 7, now: NOW })
+    const promptBlank = buildReportPrompt([], [], { types: ['feeding'], rangeDays: 7, now: NOW, personalNotes: '   ' })
+    expect(promptMissing).not.toContain('## Notes from the Parent')
+    expect(promptBlank).not.toContain('## Notes from the Parent')
+  })
+
   it('respects the rangeDays window boundary', () => {
     const events = [sampleMeasurement({ timestamp: new Date('2026-08-05T09:00:00.000Z') })]
     const withinRange = buildReportPrompt([], events, { types: ['measurements'], rangeDays: 14, now: NOW })
