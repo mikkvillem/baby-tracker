@@ -8,6 +8,7 @@ import { Play, PenLine, CalendarPlus, ChevronRight } from 'lucide-preact'
 import { useNavigate } from '@tanstack/react-router'
 import { useIntervalTick } from '../hooks/useIntervalTick'
 import { formatDurationMin } from '../utils/sessionFormatters'
+import { translations } from '../i18n'
 
 type Props = {
   sessions: Session[]
@@ -18,6 +19,7 @@ type Props = {
 
 export function SessionList({ sessions, onStartNewSession, onAddManualSession, onAddMiscEvent }: Props) {
   const navigate = useNavigate()
+  const t = translations.value.home
   const [showManualModal, setShowManualModal] = useState(false)
   const [showMiscEventModal, setShowMiscEventModal] = useState(false)
 
@@ -46,7 +48,7 @@ export function SessionList({ sessions, onStartNewSession, onAddManualSession, o
             <span class="w-3 h-3 rounded-full bg-white animate-pulse" />
           </div>
           <div class="flex-1 min-w-0">
-            <div class="text-xs font-medium opacity-80">Session in progress</div>
+            <div class="text-xs font-medium opacity-80">{t.sessionInProgress}</div>
             <div class="text-lg font-bold font-mono">
               {formatDurationMin(activeSession.intervals)}
             </div>
@@ -63,7 +65,7 @@ export function SessionList({ sessions, onStartNewSession, onAddManualSession, o
         onClick={onStartNewSession}
       >
         <Play size={22} fill="currentColor" />
-        Start Feeding
+        {t.startFeeding}
       </button>
 
       {/* Secondary actions */}
@@ -73,7 +75,7 @@ export function SessionList({ sessions, onStartNewSession, onAddManualSession, o
           onClick={() => setShowManualModal(true)}
         >
           <PenLine size={18} class="text-surface-500" />
-          Manual Entry
+          {t.manualEntry}
         </button>
 
         <button
@@ -81,13 +83,13 @@ export function SessionList({ sessions, onStartNewSession, onAddManualSession, o
           onClick={() => setShowMiscEventModal(true)}
         >
           <CalendarPlus size={18} class="text-surface-500" />
-          Log Event
+          {t.logEvent}
         </button>
       </div>
 
       {/* Today's stats */}
       <div>
-        <h2 class="text-sm font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider m-0 mb-3">Today</h2>
+        <h2 class="text-sm font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider m-0 mb-3">{t.today}</h2>
         <DailyStats sessions={sessions} />
       </div>
 

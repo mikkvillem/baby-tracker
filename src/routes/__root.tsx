@@ -2,11 +2,13 @@ import { createRootRoute, Link, Outlet, useNavigate, useMatches } from '@tanstac
 import { Home, Clock, Sparkles, Settings } from 'lucide-preact'
 import { useFeedingNotificationScheduler } from '../hooks/useFeedingNotificationScheduler'
 import { InstallPwaBanner } from '../components/InstallPwaBanner'
+import { translations } from '../i18n'
 import '../app.css'
 
 function AppShell() {
   useFeedingNotificationScheduler()
   const navigate = useNavigate()
+  const t = translations.value.nav
   const matches = useMatches()
   const currentPath = matches[matches.length - 1]?.pathname ?? '/'
 
@@ -41,7 +43,7 @@ function AppShell() {
             onClick={() => navigate({ to: '/' })}
           >
             <Home size={22} strokeWidth={currentPath === '/' ? 2.5 : 2} />
-            <span class="text-[11px] font-medium">Home</span>
+            <span class="text-[11px] font-medium">{t.home}</span>
           </button>
 
           <button
@@ -53,7 +55,7 @@ function AppShell() {
             onClick={() => navigate({ to: '/history' })}
           >
             <Clock size={22} strokeWidth={currentPath === '/history' ? 2.5 : 2} />
-            <span class="text-[11px] font-medium">History</span>
+            <span class="text-[11px] font-medium">{t.history}</span>
           </button>
 
           <button
@@ -65,7 +67,7 @@ function AppShell() {
             onClick={() => navigate({ to: '/report' })}
           >
             <Sparkles size={22} strokeWidth={currentPath === '/report' ? 2.5 : 2} />
-            <span class="text-[11px] font-medium">Report</span>
+            <span class="text-[11px] font-medium">{t.report}</span>
           </button>
 
           <button
@@ -77,7 +79,7 @@ function AppShell() {
             onClick={() => navigate({ to: '/settings' })}
           >
             <Settings size={22} strokeWidth={currentPath === '/settings' ? 2.5 : 2} />
-            <span class="text-[11px] font-medium">Settings</span>
+            <span class="text-[11px] font-medium">{t.settings}</span>
           </button>
         </nav>
       )}

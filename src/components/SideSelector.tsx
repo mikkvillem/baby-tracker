@@ -1,13 +1,16 @@
+import { translations } from '../i18n'
+
 type Props = {
   value: 'left' | 'right'
   onChange: (side: 'left' | 'right') => void
   label?: string
 }
 
-export function SideSelector({ value, onChange, label = 'Side' }: Props) {
+export function SideSelector({ value, onChange, label }: Props) {
+  const t = translations.value.sideSelector
   return (
     <div class="mb-4">
-      <label class="block text-sm font-medium mb-2 text-surface-600 dark:text-surface-400">{label}</label>
+      <label class="block text-sm font-medium mb-2 text-surface-600 dark:text-surface-400">{label ?? t.label}</label>
       <div class="flex gap-2">
         <button
           type="button"
@@ -18,7 +21,7 @@ export function SideSelector({ value, onChange, label = 'Side' }: Props) {
           }`}
           onClick={() => onChange('left')}
         >
-          Left
+          {t.left}
         </button>
         <button
           type="button"
@@ -29,7 +32,7 @@ export function SideSelector({ value, onChange, label = 'Side' }: Props) {
           }`}
           onClick={() => onChange('right')}
         >
-          Right
+          {t.right}
         </button>
       </div>
     </div>

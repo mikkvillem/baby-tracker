@@ -2,6 +2,7 @@ import { useState } from 'preact/hooks'
 import type { Interval } from '../app'
 import { Modal } from './Modal'
 import { SideSelector } from './SideSelector'
+import { translations } from '../i18n'
 
 const inputClass = 'w-full px-3 py-2.5 border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-800 dark:text-surface-100 rounded-xl text-sm focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 transition-all'
 
@@ -13,6 +14,8 @@ type Props = {
 }
 
 export function IntervalModal({ interval, onClose, onSave, onDelete }: Props) {
+  const t = translations.value.intervalModal
+  const common = translations.value.common
   const isEdit = !!interval
   const now = new Date()
   const [side, setSide] = useState<'left' | 'right'>(interval?.side || 'left')
@@ -34,41 +37,41 @@ export function IntervalModal({ interval, onClose, onSave, onDelete }: Props) {
     const start = new Date(`${startDate}T${startTime}`)
     const end = new Date(`${endDate}T${endTime}`)
     if (end <= start) {
-      alert('End time must be after start time')
+      alert(t.errorEndBeforeStart)
       return
     }
     onSave({ side, startTime: start, endTime: end })
   }
 
   return (
-    <Modal title={isEdit ? 'Edit Interval' : 'Add Interval'} onClose={onClose}>
+    <Modal title={isEdit ? t.editTitle : t.addTitle} onClose={onClose}>
       <form onSubmit={handleSubmit}>
         <SideSelector value={side} onChange={setSide} />
         <div class="mb-4">
-          <label class="block text-sm font-medium mb-1.5 text-surface-600 dark:text-surface-400">Start Date</label>
+          <label class="block text-sm font-medium mb-1.5 text-surface-600 dark:text-surface-400">{t.startDate}</label>
           <input type="date" value={startDate} onInput={(e) => setStartDate((e.target as HTMLInputElement).value)} required class={inputClass} />
         </div>
         <div class="mb-4">
-          <label class="block text-sm font-medium mb-1.5 text-surface-600 dark:text-surface-400">Start Time</label>
+          <label class="block text-sm font-medium mb-1.5 text-surface-600 dark:text-surface-400">{t.startTime}</label>
           <input type="time" value={startTime} onInput={(e) => setStartTime((e.target as HTMLInputElement).value)} required class={inputClass} />
         </div>
         <div class="mb-4">
-          <label class="block text-sm font-medium mb-1.5 text-surface-600 dark:text-surface-400">End Date</label>
+          <label class="block text-sm font-medium mb-1.5 text-surface-600 dark:text-surface-400">{t.endDate}</label>
           <input type="date" value={endDate} onInput={(e) => setEndDate((e.target as HTMLInputElement).value)} required class={inputClass} />
         </div>
         <div class="mb-4">
-          <label class="block text-sm font-medium mb-1.5 text-surface-600 dark:text-surface-400">End Time</label>
+          <label class="block text-sm font-medium mb-1.5 text-surface-600 dark:text-surface-400">{t.endTime}</label>
           <input type="time" value={endTime} onInput={(e) => setEndTime((e.target as HTMLInputElement).value)} required class={inputClass} />
         </div>
         <div class="flex mt-6 gap-3">
           {isEdit && onDelete && (
             <button type="button" class="px-4 py-2.5 border-none bg-danger-500 text-white rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-danger-600" onClick={onDelete}>
-              Delete
+              {common.delete}
             </button>
           )}
           <div class="ml-auto flex gap-3">
-            <button type="button" class="px-4 py-2.5 border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-700 dark:text-surface-300 rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-surface-50 dark:hover:bg-surface-700" onClick={onClose}>Cancel</button>
-            <button type="submit" class="px-4 py-2.5 border-none bg-primary-500 text-white rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-primary-600">{isEdit ? 'Save' : 'Add'}</button>
+            <button type="button" class="px-4 py-2.5 border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-700 dark:text-surface-300 rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-surface-50 dark:hover:bg-surface-700" onClick={onClose}>{common.cancel}</button>
+            <button type="submit" class="px-4 py-2.5 border-none bg-primary-500 text-white rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-primary-600">{isEdit ? common.save : common.add}</button>
           </div>
         </div>
       </form>

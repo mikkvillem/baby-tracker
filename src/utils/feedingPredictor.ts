@@ -1,5 +1,6 @@
 import type { Session } from '../app'
 import type { NotificationTiming } from '../store/settings'
+import { translations } from '../i18n'
 
 export type FeedingPrediction = {
   suggestedTime: Date | null
@@ -71,24 +72,25 @@ export function getNotificationFireTime(
 export function formatTimeUntil(date: Date): string {
   const now = Date.now()
   const diff = date.getTime() - now
-  
+  const t = translations.value.feedingPredictor
+
   if (diff < 0) {
     const absDiff = Math.abs(diff)
     const minutes = Math.floor(absDiff / 60000)
     const hours = Math.floor(minutes / 60)
-    
+
     if (hours > 0) {
-      return `${hours}h ${minutes % 60}m overdue`
+      return t.overdueHoursMinutes({ h: hours, m: minutes % 60 })
     }
-    return `${minutes}m overdue`
+    return t.overdueMinutes({ m: minutes })
   }
-  
+
   const minutes = Math.floor(diff / 60000)
   const hours = Math.floor(minutes / 60)
-  
+
   if (hours > 0) {
-    return `in ${hours}h ${minutes % 60}m`
+    return t.inHoursMinutes({ h: hours, m: minutes % 60 })
   }
-  return `in ${minutes}m`
+  return t.inMinutes({ m: minutes })
 }
 

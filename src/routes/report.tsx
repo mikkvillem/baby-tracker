@@ -6,22 +6,18 @@ import { buildReportPrompt, type ReportRangeDays, type ReportType } from '../uti
 import { reportNotes, setReportNotes } from '../store/reportNotes'
 import { ErrorBanner } from '../components/ErrorBanner'
 import { Check, Copy, NotebookPen, Sparkles } from 'lucide-preact'
+import { translations, type TranslationDict } from '../i18n'
 
 export const Route = createFileRoute('/report')({
   component: ReportRoute
 })
 
-const REPORT_TYPES: { id: ReportType; label: string; description: string }[] = [
-  { id: 'feeding', label: 'Feeding', description: 'Nursing sessions and side timing' },
-  { id: 'measurements', label: 'Measurements', description: 'Weight, height, head circumference' }
+const getReportTypes = (t: TranslationDict['report']): { id: ReportType; label: string; description: string }[] => [
+  { id: 'feeding', label: t.feeding, description: t.feedingDescription },
+  { id: 'measurements', label: t.measurements, description: t.measurementsDescription }
 ]
 
-const RANGE_PRESETS: { days: ReportRangeDays; label: string }[] = [
-  { days: 3, label: '3 days' },
-  { days: 7, label: '7 days' },
-  { days: 14, label: '14 days' },
-  { days: 30, label: '30 days' }
-]
+const RANGE_DAYS: ReportRangeDays[] = [3, 7, 14, 30]
 
 const pillClass = (isActive: boolean) =>
   `px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer transition-all duration-200 border ${
@@ -31,6 +27,8 @@ const pillClass = (isActive: boolean) =>
   }`
 
 function ReportRoute() {
+  const t = translations.value.report
+  const REPORT_TYPES = getReportTypes(t)
   const [sessions, setSessions] = useState<Session[]>([])
   const [miscEvents, setMiscEvents] = useState<MiscEvent[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -48,7 +46,7 @@ function ReportRoute() {
       })
       .catch(err => {
         console.error('Failed to load data for report:', err)
-        setError('Failed to load your data. Please reload the page and try again.')
+        setError(t.errorLoad)
       })
   }, [])
 
@@ -77,9 +75,9 @@ function ReportRoute() {
   return (
     <div class="max-w-lg mx-auto px-4 pt-4 pb-6 flex flex-col gap-4">
       <div>
-        <h1 class="m-0 text-xl font-semibold text-surface-800 dark:text-surface-100">AI Report</h1>
+        <h1 class="m-0 text-xl font-semibold text-surface-800 dark:text-surface-100">{t.title}</h1>
         <p class="m-0 mt-1 text-xs text-surface-500">
-          Build a ready-to-paste prompt from your tracked data. Copy it into your favorite AI chat to get a summary of patterns and trends.
+          {t.subtitle}
         </p>
       </div>
 
@@ -91,8 +89,8 @@ function ReportRoute() {
             <Sparkles size={16} class="text-primary-500 dark:text-primary-300" />
           </div>
           <div>
-            <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">Report Types</h2>
-            <p class="m-0 text-xs text-surface-500">Choose what to include</p>
+            <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">{t.reportTypes}</h2>
+            <p class="m-0 text-xs text-surface-500">{t.chooseWhatToInclude}</p>
           </div>
         </div>
 
@@ -110,16 +108,16 @@ function ReportRoute() {
         </div>
 
         <div>
-          <label class="block text-xs font-medium mb-1.5 text-surface-500">Time period</label>
+          <label class="block text-xs font-medium mb-1.5 text-surface-500">{t.timePeriod}</label>
           <div class="flex flex-wrap gap-2">
-            {RANGE_PRESETS.map(preset => (
+            {RANGE_DAYS.map(days => (
               <button
-                key={preset.days}
+                key={days}
                 type="button"
-                class={pillClass(rangeDays === preset.days)}
-                onClick={() => setRangeDays(preset.days)}
+                class={pillClass(rangeDays === days)}
+                onClick={() => setRangeDays(days)}
               >
-                {preset.label}
+                {t.days({ n: days })}
               </button>
             ))}
           </div>
@@ -132,8 +130,8 @@ function ReportRoute() {
             <NotebookPen size={16} class="text-primary-500 dark:text-primary-300" />
           </div>
           <div>
-            <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">Personal Notes</h2>
-            <p class="m-0 text-xs text-surface-500">Add context for the AI — saved on this device</p>
+            <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">{t.personalNotes}</h2>
+            <p class="m-0 text-xs text-surface-500">{t.personalNotesDescription}</p>
           </div>
         </div>
 
@@ -141,14 +139,14 @@ function ReportRoute() {
           value={reportNotes.value}
           onInput={(e) => setReportNotes((e.target as HTMLTextAreaElement).value)}
           rows={3}
-          placeholder="e.g. Started teething this week, fussier at night than usual..."
+          placeholder={t.notesPlaceholder}
           class="w-full px-3 py-2.5 border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-800 dark:text-surface-100 rounded-xl text-sm focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 transition-all resize-y"
         />
       </div>
 
       <div class="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl p-4 flex flex-col gap-3">
         <div class="flex items-center justify-between gap-2.5">
-          <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">Prompt Preview</h2>
+          <h2 class="m-0 text-sm font-semibold text-surface-800 dark:text-surface-100">{t.promptPreview}</h2>
           <button
             type="button"
             disabled={selectedTypes.length === 0}
@@ -156,16 +154,16 @@ function ReportRoute() {
             onClick={handleCopy}
           >
             {copyStatus === 'copied' ? <Check size={14} /> : <Copy size={14} />}
-            {copyStatus === 'copied' ? 'Copied' : 'Copy prompt'}
+            {copyStatus === 'copied' ? t.copied : t.copyPrompt}
           </button>
         </div>
 
         {copyStatus === 'error' && (
-          <p class="m-0 text-xs text-danger-500">Couldn't copy automatically — select the text below and copy it manually.</p>
+          <p class="m-0 text-xs text-danger-500">{t.copyError}</p>
         )}
 
         {selectedTypes.length === 0 ? (
-          <p class="m-0 text-xs text-surface-400">Pick at least one report type above to build a prompt.</p>
+          <p class="m-0 text-xs text-surface-400">{t.pickTypeHint}</p>
         ) : (
           <textarea
             readOnly
@@ -177,7 +175,7 @@ function ReportRoute() {
       </div>
 
       <p class="m-0 text-xs text-surface-400">
-        Your data never leaves this device unless you paste it into an AI chat yourself. This isn't medical advice — always check anything concerning with your pediatrician.
+        {t.footerNote}
       </p>
     </div>
   )

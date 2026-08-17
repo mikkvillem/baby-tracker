@@ -1,17 +1,20 @@
+import { translations } from '../i18n'
+
 export type NotificationCapability = {
   supported: boolean
   reason?: string
 }
 
 export function checkNotificationCapability(): NotificationCapability {
+  const t = translations.value.notifications
   if (typeof window === 'undefined' || typeof navigator === 'undefined') {
-    return { supported: false, reason: 'Notifications require a browser environment' }
+    return { supported: false, reason: t.unsupportedNoBrowser }
   }
   if (!('Notification' in window)) {
-    return { supported: false, reason: 'This browser does not support notifications' }
+    return { supported: false, reason: t.unsupportedNoApi }
   }
   if (!('serviceWorker' in navigator)) {
-    return { supported: false, reason: 'This browser does not support background notifications' }
+    return { supported: false, reason: t.unsupportedNoServiceWorker }
   }
   return { supported: true }
 }
@@ -41,10 +44,9 @@ async function dispatchNotification(title: string, options: NotificationOptions)
 }
 
 export async function showFeedingNotification(isOverdue: boolean): Promise<void> {
-  const title = isOverdue ? 'Feeding overdue' : 'Feeding time approaching'
-  const body = isOverdue
-    ? "It's past the suggested feeding time."
-    : 'The suggested feeding time is coming up soon.'
+  const t = translations.value.notifications
+  const title = isOverdue ? t.feedingOverdueTitle : t.feedingApproachingTitle
+  const body = isOverdue ? t.feedingOverdueBody : t.feedingApproachingBody
   await dispatchNotification(title, {
     body,
     icon: '/icons/icon-192.png',
@@ -54,8 +56,9 @@ export async function showFeedingNotification(isOverdue: boolean): Promise<void>
 }
 
 export async function showTestNotification(): Promise<void> {
-  await dispatchNotification('Test notification', {
-    body: 'If you can see this, feeding notifications are working on this device.',
+  const t = translations.value.notifications
+  await dispatchNotification(t.testTitle, {
+    body: t.testBody,
     icon: '/icons/icon-192.png',
     badge: '/icons/icon-192.png',
     tag: 'feeding-reminder-test'
