@@ -1,0 +1,46 @@
+{
+  "packageId": "com.mikkvillem.babytracker",
+  "host": "REPLACE_WITH_YOUR_DOMAIN",
+  "name": "Baby Tracker",
+  "launcherName": "Baby Tracker",
+  "display": "standalone",
+  "themeColor": "#fce7f3",
+  "themeColorDark": "#1f1b18",
+  "navigationColor": "#fce7f3",
+  "navigationColorDark": "#1f1b18",
+  "navigationDividerColor": "#fce7f3",
+  "navigationDividerColorDark": "#1f1b18",
+  "backgroundColor": "#fce7f3",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://REPLACE_WITH_YOUR_DOMAIN/icons/icon-512.png",
+  "maskableIconUrl": "https://REPLACE_WITH_YOUR_DOMAIN/icons/icon-512-maskable.png",
+  "monochromeIconUrl": "",
+  "shortcuts": [],
+  "generatorApp": "hand-authored, see twa/README.md",
+  "webManifestUrl": "https://REPLACE_WITH_YOUR_DOMAIN/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {
+    "playBilling": {
+      "enabled": true
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://REPLACE_WITH_YOUR_DOMAIN/",
+  "orientation": "default",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "android"
+  },
+  "splashScreenFadeOutDuration": 300
+}
