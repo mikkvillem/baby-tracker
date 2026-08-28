@@ -15,7 +15,7 @@ function AppShell() {
   const isActiveSession = currentPath.includes('/active')
 
   return (
-    <div class="min-h-screen bg-surface-100 dark:bg-surface-900 flex flex-col">
+    <div class="min-h-screen sm:min-h-0 sm:h-[calc(100vh-3rem)] max-w-md sm:mx-auto sm:my-6 bg-surface-100 dark:bg-surface-900 flex flex-col sm:rounded-3xl sm:shadow-2xl sm:overflow-hidden sm:border sm:border-surface-200 dark:sm:border-surface-700">
       {/* Header */}
       <header class="bg-white dark:bg-surface-800 border-b border-surface-200 dark:border-surface-700 px-4 py-3 flex items-center gap-3 shrink-0">
         <Link to="/" class="flex items-center gap-3 no-underline">
@@ -27,13 +27,13 @@ function AppShell() {
       <InstallPwaBanner />
 
       {/* Content */}
-      <main class="flex-1 overflow-y-auto pb-20">
+      <main class="flex-1 min-h-0 overflow-y-auto pb-20 sm:pb-0">
         <Outlet />
       </main>
 
       {/* Bottom Tab Bar - hidden during active session */}
       {!isActiveSession && (
-        <nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-surface-800 border-t border-surface-200 dark:border-surface-700 flex items-center justify-around px-2 py-1 z-50 safe-area-bottom">
+        <nav class="fixed sm:relative bottom-0 sm:bottom-auto left-0 right-0 sm:left-auto sm:right-auto bg-white dark:bg-surface-800 border-t border-surface-200 dark:border-surface-700 flex items-center justify-around px-2 py-1 z-50 safe-area-bottom">
           <button
             class={`flex flex-col items-center gap-0.5 py-2 px-4 rounded-lg transition-colors duration-200 border-none bg-transparent cursor-pointer ${
               currentPath === '/'

@@ -85,4 +85,17 @@
     background: var(--color-surface-900);
     color: var(--color-surface-100);
   }
+
+  /* Above phone width the app is shown as a centered, framed "card" (see
+     __root.tsx) instead of stretching edge-to-edge, so give it a neutral
+     backdrop to sit on. */
+  @media (min-width: 640px) {
+    body {
+      background: var(--color-surface-300);
+    }
+
+    :where(.dark) body {
+      background: #000;
+    }
+  }
 }
