@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" fill="none">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ec4899" />
+      <stop offset="0.5" stop-color="#8b5cf6" />
+      <stop offset="1" stop-color="#14b8a6" />
+    </linearGradient>
+    <linearGradient id="g2" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#14b8a6" />
+      <stop offset="1" stop-color="#ec4899" />
+    </linearGradient>
+  </defs>
+
+  <!-- large converging rings, top-left and bottom-right, leading the eye toward the centered card -->
+  <circle cx="60" cy="40" r="260" stroke="url(#g1)" stroke-width="1.5" opacity="0.32" />
+  <circle cx="180" cy="150" r="140" stroke="#ec4899" stroke-width="1.5" opacity="0.28" />
+  <circle cx="1540" cy="860" r="300" stroke="url(#g2)" stroke-width="1.5" opacity="0.3" />
+  <circle cx="1420" cy="760" r="160" stroke="#14b8a6" stroke-width="1.5" opacity="0.26" />
+
+  <!-- smaller accent rings -->
+  <circle cx="1500" cy="120" r="70" stroke="#8b5cf6" stroke-width="1.5" opacity="0.28" />
+  <circle cx="90" cy="800" r="54" stroke="#14b8a6" stroke-width="1.5" opacity="0.26" />
+
+  <!-- rotated square / diamond accents for geometric variety -->
+  <rect x="1330" y="40" width="90" height="90" rx="12" transform="rotate(18 1375 85)" stroke="#ec4899" stroke-width="1.5" opacity="0.24" />
+  <rect x="70" y="620" width="70" height="70" rx="10" transform="rotate(-14 105 655)" stroke="#8b5cf6" stroke-width="1.5" opacity="0.24" />
+
+  <!-- short diagonal accent strokes ("stripes") -->
+  <g stroke="url(#g1)" stroke-width="3" stroke-linecap="round" opacity="0.22">
+    <line x1="1260" y1="0" x2="1600" y2="340" />
+    <line x1="1310" y1="0" x2="1600" y2="290" />
+    <line x1="1360" y1="0" x2="1600" y2="240" />
+  </g>
+  <g stroke="url(#g2)" stroke-width="3" stroke-linecap="round" opacity="0.2">
+    <line x1="0" y1="560" x2="340" y2="900" />
+    <line x1="0" y1="510" x2="290" y2="900" />
+    <line x1="0" y1="460" x2="240" y2="900" />
+  </g>
+
+  <!-- dot clusters -->
+  <g fill="#8b5cf6" opacity="0.4">
+    <circle cx="1230" cy="130" r="3.5" />
+    <circle cx="1256" cy="158" r="3.5" />
+    <circle cx="1282" cy="186" r="3.5" />
+    <circle cx="1204" cy="158" r="3.5" />
+    <circle cx="1230" cy="186" r="3.5" />
+  </g>
+  <g fill="#ec4899" opacity="0.4">
+    <circle cx="250" cy="740" r="3.5" />
+    <circle cx="276" cy="768" r="3.5" />
+    <circle cx="302" cy="796" r="3.5" />
+    <circle cx="224" cy="768" r="3.5" />
+    <circle cx="250" cy="796" r="3.5" />
+  </g>
+</svg>
