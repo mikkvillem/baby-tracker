@@ -15,12 +15,12 @@ function AppShell() {
   const isActiveSession = currentPath.includes('/active')
 
   return (
-    <div class="min-h-screen sm:min-h-0 sm:h-[calc(100vh-3rem)] max-w-md sm:mx-auto sm:my-6 bg-surface-100 dark:bg-surface-900 flex flex-col sm:rounded-3xl sm:shadow-2xl sm:overflow-hidden sm:border sm:border-surface-200 dark:sm:border-surface-700">
+    <div class="min-h-screen sm:min-h-0 sm:h-[min(900px,calc(100vh-3rem))] sm:max-h-[900px] max-w-md w-full bg-surface-100 dark:bg-surface-900 flex flex-col sm:rounded-3xl sm:shadow-2xl sm:overflow-hidden sm:border sm:border-surface-200 dark:sm:border-surface-700">
       {/* Header */}
-      <header class="bg-white dark:bg-surface-800 border-b border-surface-200 dark:border-surface-700 px-4 py-3 flex items-center gap-3 shrink-0">
-        <Link to="/" class="flex items-center gap-3 no-underline">
-          <img id="app-logo" src="/logo.svg" alt="" class="w-8 h-8" />
-          <h1 class="text-lg font-semibold text-surface-800 dark:text-surface-100 m-0">Baby Tracker</h1>
+      <header class="bg-white dark:bg-surface-800 border-b border-surface-200 dark:border-surface-700 px-4 py-3 flex items-center gap-3 flex-nowrap shrink-0">
+        <Link to="/" class="flex items-center gap-3 flex-nowrap no-underline">
+          <img id="app-logo" src="/logo.svg" alt="" class="w-8 h-8 shrink-0" />
+          <h1 class="text-lg font-semibold text-surface-800 dark:text-surface-100 m-0 whitespace-nowrap">Baby Tracker</h1>
         </Link>
       </header>
 
@@ -38,7 +38,7 @@ function AppShell() {
             class={`flex flex-col items-center gap-0.5 py-2 px-4 rounded-lg transition-colors duration-200 border-none bg-transparent cursor-pointer ${
               currentPath === '/'
                 ? 'text-primary-500 dark:text-primary-300'
-                : 'text-surface-400 dark:text-surface-500 hover:text-surface-600 dark:hover:text-surface-300'
+                : 'text-surface-600 dark:text-surface-300 hover:text-surface-800 dark:hover:text-surface-100'
             }`}
             onClick={() => navigate({ to: '/' })}
           >
@@ -50,7 +50,7 @@ function AppShell() {
             class={`flex flex-col items-center gap-0.5 py-2 px-4 rounded-lg transition-colors duration-200 border-none bg-transparent cursor-pointer ${
               currentPath === '/history'
                 ? 'text-primary-500 dark:text-primary-300'
-                : 'text-surface-400 dark:text-surface-500 hover:text-surface-600 dark:hover:text-surface-300'
+                : 'text-surface-600 dark:text-surface-300 hover:text-surface-800 dark:hover:text-surface-100'
             }`}
             onClick={() => navigate({ to: '/history' })}
           >
@@ -62,7 +62,7 @@ function AppShell() {
             class={`flex flex-col items-center gap-0.5 py-2 px-4 rounded-lg transition-colors duration-200 border-none bg-transparent cursor-pointer ${
               currentPath === '/report'
                 ? 'text-primary-500 dark:text-primary-300'
-                : 'text-surface-400 dark:text-surface-500 hover:text-surface-600 dark:hover:text-surface-300'
+                : 'text-surface-600 dark:text-surface-300 hover:text-surface-800 dark:hover:text-surface-100'
             }`}
             onClick={() => navigate({ to: '/report' })}
           >
@@ -74,7 +74,7 @@ function AppShell() {
             class={`flex flex-col items-center gap-0.5 py-2 px-4 rounded-lg transition-colors duration-200 border-none bg-transparent cursor-pointer ${
               currentPath === '/settings'
                 ? 'text-primary-500 dark:text-primary-300'
-                : 'text-surface-400 dark:text-surface-500 hover:text-surface-600 dark:hover:text-surface-300'
+                : 'text-surface-600 dark:text-surface-300 hover:text-surface-800 dark:hover:text-surface-100'
             }`}
             onClick={() => navigate({ to: '/settings' })}
           >

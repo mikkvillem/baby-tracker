@@ -87,11 +87,16 @@
   }
 
   /* Above phone width the app is shown as a centered, framed "card" (see
-     __root.tsx) instead of stretching edge-to-edge, so give it a neutral
-     backdrop to sit on. */
+     __root.tsx) capped at both a max width and a max height, instead of
+     stretching edge-to-edge or full viewport height, so give it a neutral
+     backdrop to sit on and center it. */
   @media (min-width: 640px) {
     body {
       background: var(--color-surface-300);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     :where(.dark) body {
