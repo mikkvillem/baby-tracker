@@ -44,7 +44,7 @@ export const et: TranslationDict = {
   home: {
     sessionInProgress: 'Toitmine käib',
     startFeeding: 'Toida karupoega',
-    manualEntry: 'Lisa päevikusse',
+    manualEntry: 'Lisa pesapäevikusse',
     logEvent: 'Lisa sündmus',
     today: 'Täna',
     errorLoad: 'Andmete laadimine ebaõnnestus. Palun laadi leht uuesti ja proovi uuesti.',
