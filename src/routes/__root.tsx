@@ -1,5 +1,5 @@
 import { createRootRoute, Link, Outlet, useNavigate, useMatches } from '@tanstack/react-router'
-import { Home, Clock, Sparkles, Settings } from 'lucide-preact'
+import { Home, Footprints, Sparkles, Settings } from 'lucide-preact'
 import { useFeedingNotificationScheduler } from '../hooks/useFeedingNotificationScheduler'
 import { InstallPwaBanner } from '../components/InstallPwaBanner'
 import { translations } from '../i18n'
@@ -54,7 +54,7 @@ function AppShell() {
             }`}
             onClick={() => navigate({ to: '/history' })}
           >
-            <Clock size={22} strokeWidth={currentPath === '/history' ? 2.5 : 2} />
+            <Footprints size={22} strokeWidth={currentPath === '/history' ? 2.5 : 2} />
             <span class="text-[11px] font-medium">{t.history}</span>
           </button>
 

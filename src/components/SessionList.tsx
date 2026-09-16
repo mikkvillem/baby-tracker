@@ -4,7 +4,8 @@ import { ManualSessionModal } from './ManualSessionModal'
 import { MiscEventModal } from './MiscEventModal'
 import { NextFeedingCard } from './NextFeedingCard'
 import { DailyStats } from './DailyStats'
-import { Play, PenLine, CalendarPlus, ChevronRight } from 'lucide-preact'
+import { BearScene } from './BearScene'
+import { PawPrint, PenLine, CalendarPlus, ChevronRight } from 'lucide-preact'
 import { useNavigate } from '@tanstack/react-router'
 import { useIntervalTick } from '../hooks/useIntervalTick'
 import { formatDurationMin } from '../utils/sessionFormatters'
@@ -38,6 +39,8 @@ export function SessionList({ sessions, onStartNewSession, onAddManualSession, o
 
   return (
     <div class="max-w-lg mx-auto px-4 pt-5 pb-4 flex flex-col gap-5">
+      <BearScene sessions={sessions} hasActiveSession={!!activeSession} />
+
       {/* Active session banner */}
       {activeSession && (
         <button
@@ -64,7 +67,7 @@ export function SessionList({ sessions, onStartNewSession, onAddManualSession, o
         class="w-full bg-primary-500 hover:bg-primary-600 text-white border-none py-4 rounded-2xl font-semibold text-lg cursor-pointer transition-all duration-200 active:scale-[0.98] shadow-md flex items-center justify-center gap-3"
         onClick={onStartNewSession}
       >
-        <Play size={22} fill="currentColor" />
+        <PawPrint size={22} fill="currentColor" />
         {t.startFeeding}
       </button>
 

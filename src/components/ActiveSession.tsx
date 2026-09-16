@@ -106,6 +106,21 @@ export function ActiveSession({ session, onEndSession, onUpdateSession }: Props)
         </div>
       </div>
 
+      {/* Cuddle illustration */}
+      <div class="rounded-2xl bg-gradient-to-r from-primary-100 to-primary-50 dark:from-surface-800 dark:to-surface-800 border border-primary-200/60 dark:border-surface-700 p-3 flex items-center gap-3">
+        <svg viewBox="0 0 60 48" class="w-14 h-11 shrink-0" role="img" aria-label={t.heroCaption}>
+          <circle cx="34" cy="22" r="9" class="fill-primary-300 dark:fill-primary-700" />
+          <circle cx="29" cy="15" r="3.4" class="fill-primary-300 dark:fill-primary-700" />
+          <circle cx="39" cy="15" r="3.4" class="fill-primary-300 dark:fill-primary-700" />
+          <ellipse cx="19" cy="33" rx="15" ry="11" class="fill-primary-500 dark:fill-primary-600" />
+          <circle cx="16" cy="16" r="10.5" class="fill-primary-500 dark:fill-primary-600" />
+          <circle cx="8" cy="8" r="4" class="fill-primary-500 dark:fill-primary-600" />
+          <circle cx="24" cy="8" r="4" class="fill-primary-500 dark:fill-primary-600" />
+          <path d="M45 8 q3 -4 6 0 q3 -4 6 0 q0 5 -6 9 q-6 -4 -6 -9 z" class="fill-danger-500" opacity="0.85" />
+        </svg>
+        <span class="text-sm font-medium text-surface-600 dark:text-surface-300">{t.heroCaption}</span>
+      </div>
+
       {/* Total duration badge */}
       <div class="text-center">
         <div class="text-sm font-medium text-surface-500 dark:text-surface-400 mb-1">{t.total}</div>

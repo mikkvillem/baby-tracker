@@ -43,14 +43,19 @@ export const et: TranslationDict = {
 
   home: {
     sessionInProgress: 'Toitmine käib',
-    startFeeding: 'Alusta toitmist',
+    startFeeding: 'Toida karupoega',
     manualEntry: 'Käsitsi sisestus',
     logEvent: 'Lisa sündmus',
     today: 'Täna',
     errorLoad: 'Andmete laadimine ebaõnnestus. Palun laadi leht uuesti ja proovi uuesti.',
     errorStart: 'Uue seansi alustamine ebaõnnestus. Palun proovi uuesti.',
     errorAddManual: 'Seansi salvestamine ebaõnnestus. Palun proovi uuesti.',
-    errorAddEvent: 'Sündmuse salvestamine ebaõnnestus. Palun proovi uuesti.'
+    errorAddEvent: 'Sündmuse salvestamine ebaõnnestus. Palun proovi uuesti.',
+    bearScene: {
+      idle: 'Karupoeg tukub urus',
+      hungry: 'Karupoeg on näljane',
+      feeding: 'Toitmise aeg!'
+    }
   },
 
   nextFeeding: {
@@ -72,6 +77,7 @@ export const et: TranslationDict = {
 
   activeSession: {
     home: 'Avaleht',
+    heroCaption: 'Kaisus ja toidab',
     started: ({ time }) => `Algas ${time}`,
     ready: 'Valmis',
     total: 'Kokku',

@@ -20,7 +20,7 @@ export const setThemeId = (id: ThemeId) => {
 }
 
 const THEME_COLOR: Record<string, string> = {
-  'default-light': '#fce7f3',
+  'default-light': '#fbe7cc',
   'default-dark': '#1f1b18',
   'kindle-light': '#ececec',
   'kindle-dark': '#121212'
