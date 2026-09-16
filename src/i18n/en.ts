@@ -13,7 +13,7 @@ export const en = {
 
   nav: {
     home: 'Home',
-    history: 'History',
+    history: 'Den Diary',
     report: 'Report',
     settings: 'Settings'
   },
@@ -41,14 +41,19 @@ export const en = {
 
   home: {
     sessionInProgress: 'Session in progress',
-    startFeeding: 'Start Feeding',
-    manualEntry: 'Manual Entry',
+    startFeeding: 'Feed the Cub',
+    manualEntry: 'Add to Diary',
     logEvent: 'Log Event',
     today: 'Today',
     errorLoad: 'Failed to load your data. Please reload the page and try again.',
     errorStart: 'Failed to start a new session. Please try again.',
     errorAddManual: 'Failed to save the session. Please try again.',
-    errorAddEvent: 'Failed to save the event. Please try again.'
+    errorAddEvent: 'Failed to save the event. Please try again.',
+    bearScene: {
+      idle: 'The cub is napping in the den',
+      hungry: 'The cub is getting hungry',
+      feeding: 'Feeding time!'
+    }
   },
 
   nextFeeding: {
@@ -70,14 +75,15 @@ export const en = {
 
   activeSession: {
     home: 'Home',
+    heroCaption: 'Cuddled up and feeding',
     started: ({ time }: { time: string }) => `Started ${time}`,
     ready: 'Ready',
     total: 'Total',
     left: 'Left',
     right: 'Right',
-    tapToStop: 'Tap to stop',
-    tapToStart: 'Tap to start',
-    endSession: 'End Session',
+    tapToStop: 'Pause',
+    tapToStart: 'Latch On',
+    endSession: 'Done Feeding',
     intervals: 'Intervals',
     errorLoad: 'Failed to load this session. Please reload the page and try again.',
     errorEnd: 'Failed to end the session. Please try again.',
@@ -157,7 +163,7 @@ export const en = {
   },
 
   history: {
-    title: 'History',
+    title: 'Den Diary',
     import: 'Import',
     export: 'Export',
     today: 'Today',

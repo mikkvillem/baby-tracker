@@ -15,7 +15,7 @@ export const et: TranslationDict = {
 
   nav: {
     home: 'Avaleht',
-    history: 'Ajalugu',
+    history: 'Pesapäevik',
     report: 'Raport',
     settings: 'Seaded'
   },
@@ -43,14 +43,19 @@ export const et: TranslationDict = {
 
   home: {
     sessionInProgress: 'Toitmine käib',
-    startFeeding: 'Alusta toitmist',
-    manualEntry: 'Käsitsi sisestus',
+    startFeeding: 'Toida karupoega',
+    manualEntry: 'Lisa pesapäevikusse',
     logEvent: 'Lisa sündmus',
     today: 'Täna',
     errorLoad: 'Andmete laadimine ebaõnnestus. Palun laadi leht uuesti ja proovi uuesti.',
     errorStart: 'Uue seansi alustamine ebaõnnestus. Palun proovi uuesti.',
     errorAddManual: 'Seansi salvestamine ebaõnnestus. Palun proovi uuesti.',
-    errorAddEvent: 'Sündmuse salvestamine ebaõnnestus. Palun proovi uuesti.'
+    errorAddEvent: 'Sündmuse salvestamine ebaõnnestus. Palun proovi uuesti.',
+    bearScene: {
+      idle: 'Karupoeg tukub urus',
+      hungry: 'Karupoeg on näljane',
+      feeding: 'Toitmise aeg!'
+    }
   },
 
   nextFeeding: {
@@ -72,14 +77,15 @@ export const et: TranslationDict = {
 
   activeSession: {
     home: 'Avaleht',
+    heroCaption: 'Kaisus ja toidab',
     started: ({ time }) => `Algas ${time}`,
     ready: 'Valmis',
     total: 'Kokku',
     left: 'Vasak',
     right: 'Parem',
-    tapToStop: 'Puuduta, et peatada',
-    tapToStart: 'Puuduta, et alustada',
-    endSession: 'Lõpeta seanss',
+    tapToStop: 'Paus',
+    tapToStart: 'Võta rinnale',
+    endSession: 'Toitmine tehtud',
     intervals: 'Intervallid',
     errorLoad: 'Selle seansi laadimine ebaõnnestus. Palun laadi leht uuesti ja proovi uuesti.',
     errorEnd: 'Seansi lõpetamine ebaõnnestus. Palun proovi uuesti.',
@@ -159,7 +165,7 @@ export const et: TranslationDict = {
   },
 
   history: {
-    title: 'Ajalugu',
+    title: 'Pesapäevik',
     import: 'Impordi',
     export: 'Ekspordi',
     today: 'Täna',
