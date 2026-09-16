@@ -15,7 +15,7 @@ export const et: TranslationDict = {
 
   nav: {
     home: 'Avaleht',
-    history: 'Ajalugu',
+    history: 'Pesapäevik',
     report: 'Raport',
     settings: 'Seaded'
   },
@@ -44,7 +44,7 @@ export const et: TranslationDict = {
   home: {
     sessionInProgress: 'Toitmine käib',
     startFeeding: 'Toida karupoega',
-    manualEntry: 'Käsitsi sisestus',
+    manualEntry: 'Lisa päevikusse',
     logEvent: 'Lisa sündmus',
     today: 'Täna',
     errorLoad: 'Andmete laadimine ebaõnnestus. Palun laadi leht uuesti ja proovi uuesti.',
@@ -83,9 +83,9 @@ export const et: TranslationDict = {
     total: 'Kokku',
     left: 'Vasak',
     right: 'Parem',
-    tapToStop: 'Puuduta, et peatada',
-    tapToStart: 'Puuduta, et alustada',
-    endSession: 'Lõpeta seanss',
+    tapToStop: 'Paus',
+    tapToStart: 'Võta rinnale',
+    endSession: 'Toitmine tehtud',
     intervals: 'Intervallid',
     errorLoad: 'Selle seansi laadimine ebaõnnestus. Palun laadi leht uuesti ja proovi uuesti.',
     errorEnd: 'Seansi lõpetamine ebaõnnestus. Palun proovi uuesti.',
@@ -165,7 +165,7 @@ export const et: TranslationDict = {
   },
 
   history: {
-    title: 'Ajalugu',
+    title: 'Pesapäevik',
     import: 'Impordi',
     export: 'Ekspordi',
     today: 'Täna',

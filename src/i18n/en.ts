@@ -13,7 +13,7 @@ export const en = {
 
   nav: {
     home: 'Home',
-    history: 'History',
+    history: 'Den Diary',
     report: 'Report',
     settings: 'Settings'
   },
@@ -42,7 +42,7 @@ export const en = {
   home: {
     sessionInProgress: 'Session in progress',
     startFeeding: 'Feed the Cub',
-    manualEntry: 'Manual Entry',
+    manualEntry: 'Add to Diary',
     logEvent: 'Log Event',
     today: 'Today',
     errorLoad: 'Failed to load your data. Please reload the page and try again.',
@@ -81,9 +81,9 @@ export const en = {
     total: 'Total',
     left: 'Left',
     right: 'Right',
-    tapToStop: 'Tap to stop',
-    tapToStart: 'Tap to start',
-    endSession: 'End Session',
+    tapToStop: 'Pause',
+    tapToStart: 'Latch On',
+    endSession: 'Done Feeding',
     intervals: 'Intervals',
     errorLoad: 'Failed to load this session. Please reload the page and try again.',
     errorEnd: 'Failed to end the session. Please try again.',
@@ -163,7 +163,7 @@ export const en = {
   },
 
   history: {
-    title: 'History',
+    title: 'Den Diary',
     import: 'Import',
     export: 'Export',
     today: 'Today',
