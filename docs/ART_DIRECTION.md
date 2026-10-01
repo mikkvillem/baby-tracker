@@ -57,12 +57,19 @@ selective print texture.
 Used for: home, landing screens, major sections, loading, achievements,
 seasonal experiences.
 
-## Current assets vs. the direction
+## Illustration palette
 
-| Asset | Mode | Status |
+Illustrations read `--art-*` CSS variables (`src/app.css`, with dark and Kindle
+overrides) rather than the UI colour ramps: paper (cream), far/mid/near (moss
+to forest), ink, slate, bear, honey (the single accent), muzzle, text.
+`public/backdrop.svg` / `backdrop-dark.svg` are static images, so they carry
+their own copy of the same colours.
+
+## Current assets
+
+| Asset | Mode | Notes |
 | --- | --- | --- |
-| `public/logo.svg` | A Icon | Close: 5 flat shapes. Uses a ring + honey-on-honey, so it lacks a strong silhouette; needs a forest/slate dominant. |
-| `src/components/BearScene.tsx` | B/C hybrid | Flat and mood-driven, but sky/hills are simple blobs with opacity; no layered poster depth, no texture, cub is centred (not asymmetrical). |
-| `public/backdrop.svg` | C Scene | Uses linear gradients and many opacity washes — the opposite of the "flat, no excessive gradients" rule. Bears are plain silhouettes. |
-| `app.css` backdrop | — | Stacks 4 radial gradients + dot grid + stripes: visual noise. |
-| Palette (`@theme`) | — | Dominant is honey/caramel; direction asks for cream/forest/moss/slate dominant with honey/coral as accent. Biggest open decision. |
+| `public/logo.svg`, `public/icons/*.png`, theme-color | A Icon | Cream bear head on a forest tile, honey muzzle. Five shapes; reads at favicon size. |
+| `src/components/BearScene.tsx` | C Scene | Sun / slate ridge / moss hills / pines / cub, off-centre, flat fills, subtle grain. Face + prop change with mood. |
+| `public/backdrop.svg` (+ `-dark`) | C Scene | Flat poster scene for the desktop margins, deliberately low-contrast. |
+| B Character | — | Not built yet (onboarding, empty states, achievements). |

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" fill="none">
+  <!-- Mode C scene, flat fills only (docs/ART_DIRECTION.md). Asymmetrical: sun top-right, treeline + bears bottom-left. -->
+  <rect width="1600" height="900" fill="#0d1511"/>
+  <circle cx="1330" cy="170" r="96" fill="#6b4a22"/>
+  <path d="M520 600 L760 330 L900 470 L1010 380 L1260 640 V900 H520 Z" fill="#27373a"/>
+  <path d="M0 620 Q 300 520 640 600 T 1250 580 T 1600 590 V900 H0 Z" fill="#1b2a22"/>
+  <g fill="#08100c"><path transform="translate(90 640) scale(3.2)" d="M0 -46 L13 -20 H6 L17 0 H-17 L-6 -20 H-13 Z"/><path transform="translate(170 660) scale(2.4)" d="M0 -46 L13 -20 H6 L17 0 H-17 L-6 -20 H-13 Z"/><path transform="translate(250 650) scale(2.9)" d="M0 -46 L13 -20 H6 L17 0 H-17 L-6 -20 H-13 Z"/><path transform="translate(330 670) scale(2.0)" d="M0 -46 L13 -20 H6 L17 0 H-17 L-6 -20 H-13 Z"/><path transform="translate(1250 610) scale(2.6)" d="M0 -46 L13 -20 H6 L17 0 H-17 L-6 -20 H-13 Z"/><path transform="translate(1330 640) scale(3.4)" d="M0 -46 L13 -20 H6 L17 0 H-17 L-6 -20 H-13 Z"/><path transform="translate(1420 625) scale(2.3)" d="M0 -46 L13 -20 H6 L17 0 H-17 L-6 -20 H-13 Z"/><path transform="translate(1510 650) scale(2.9)" d="M0 -46 L13 -20 H6 L17 0 H-17 L-6 -20 H-13 Z"/></g>
+  <path d="M0 740 Q 360 660 760 730 T 1600 700 V900 H0 Z" fill="#26402d"/>
+  <path d="M0 840 Q 420 780 860 830 T 1600 810 V900 H0 Z" fill="#14231a"/>
+  <g transform="translate(90 700) scale(1.35)" fill="#8f5f3e">
+    <ellipse cx="52" cy="76" rx="62" ry="36"/><circle cx="26" cy="10" r="12"/><circle cx="78" cy="10" r="12"/><circle cx="52" cy="34" r="34"/>
+    <circle cx="26" cy="10" r="5" fill="#6e4630"/><circle cx="78" cy="10" r="5" fill="#6e4630"/>
+    <ellipse cx="52" cy="42" rx="17" ry="12" fill="#e9dcc0"/><ellipse cx="52" cy="39" rx="5" ry="3.6" fill="#08100c"/>
+    <path d="M32 28 q6 5 12 0 M60 28 q6 5 12 0" stroke="#08100c" stroke-width="3" fill="none" stroke-linecap="round"/></g>
+  <g transform="translate(300 760) scale(0.6)" fill="#8f5f3e">
+    <ellipse cx="52" cy="76" rx="62" ry="36"/><circle cx="26" cy="10" r="12"/><circle cx="78" cy="10" r="12"/><circle cx="52" cy="34" r="34"/>
+    <circle cx="26" cy="10" r="5" fill="#6e4630"/><circle cx="78" cy="10" r="5" fill="#6e4630"/>
+    <ellipse cx="52" cy="42" rx="17" ry="12" fill="#e9dcc0"/><ellipse cx="52" cy="39" rx="5" ry="3.6" fill="#08100c"/>
+    <path d="M32 28 q6 5 12 0 M60 28 q6 5 12 0" stroke="#08100c" stroke-width="3" fill="none" stroke-linecap="round"/></g>
+</svg>
