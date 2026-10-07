@@ -68,6 +68,18 @@
   --color-event-measurement: #4a4a4a;
   --color-event-custom: #707070;
 
+  --art-paper: #ececec;
+  --art-far: #d0d0d0;
+  --art-mid: #9a9a9a;
+  --art-near: #565656;
+  --art-ink: #232323;
+  --art-slate: #b0b0b0;
+  --art-bear: #3d3d3d;
+  --art-bear-dark: #232323;
+  --art-honey: #737373;
+  --art-muzzle: #ececec;
+  --art-text: #232323;
+
   --font-sans: 'Literata', Georgia, 'Times New Roman', serif;
   --font-mono: 'Courier New', Courier, monospace;
 }
