@@ -29,8 +29,8 @@ export const et: TranslationDict = {
   },
 
   feedingPredictor: {
-    overdueHoursMinutes: ({ h, m }) => `${h}t ${m}min hilinenud`,
-    overdueMinutes: ({ m }) => `${m}min hilinenud`,
+    overdueHoursMinutes: ({ h, m }) => `${h}t ${m}min tagasi`,
+    overdueMinutes: ({ m }) => `${m}min tagasi`,
     inHoursMinutes: ({ h, m }) => `${h}t ${m}min pärast`,
     inMinutes: ({ m }) => `${m}min pärast`
   },

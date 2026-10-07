@@ -27,8 +27,8 @@ export const en = {
   },
 
   feedingPredictor: {
-    overdueHoursMinutes: ({ h, m }: { h: number; m: number }) => `${h}h ${m}m overdue`,
-    overdueMinutes: ({ m }: { m: number }) => `${m}m overdue`,
+    overdueHoursMinutes: ({ h, m }: { h: number; m: number }) => `${h}h ${m}m ago`,
+    overdueMinutes: ({ m }: { m: number }) => `${m}m ago`,
     inHoursMinutes: ({ h, m }: { h: number; m: number }) => `in ${h}h ${m}m`,
     inMinutes: ({ m }: { m: number }) => `in ${m}m`
   },

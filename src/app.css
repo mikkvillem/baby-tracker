@@ -28,11 +28,11 @@
   --color-side-left-500: #14b8a6;
   --color-side-left-600: #0d9488;
 
-  /* Right side - soft violet */
-  --color-side-right-50: #f5f3ff;
-  --color-side-right-100: #ede9fe;
-  --color-side-right-500: #8b5cf6;
-  --color-side-right-600: #7c3aed;
+  /* Right side - leaf green (same green as the den hills in the bear scene) */
+  --color-side-right-50: #f1f6f2;
+  --color-side-right-100: #dbe9de;
+  --color-side-right-500: #3f7d4a;
+  --color-side-right-600: #32663c;
 
   /* Surface colors */
   --color-surface-50: #faf9f7;
@@ -63,7 +63,7 @@
   --color-event-diaper: #f59e0b;
   --color-event-medicine: #f97316;
   --color-event-measurement: #22c55e;
-  --color-event-custom: #8b5cf6;
+  --color-event-custom: #3f7d4a;
 
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;

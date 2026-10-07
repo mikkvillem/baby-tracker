@@ -107,7 +107,7 @@ export function ActiveSession({ session, onEndSession, onUpdateSession }: Props)
       </div>
 
       {/* Cuddle illustration */}
-      <div class="rounded-2xl bg-gradient-to-r from-primary-100 to-primary-50 dark:from-surface-800 dark:to-surface-800 border border-primary-200/60 dark:border-surface-700 p-3 flex items-center gap-3">
+      <div class="rounded-3xl bg-primary-50 dark:bg-surface-800 p-3 flex items-center gap-3">
         <svg viewBox="0 0 60 48" class="w-14 h-11 shrink-0" role="img" aria-label={t.heroCaption}>
           <circle cx="34" cy="22" r="9" class="fill-primary-300 dark:fill-primary-700" />
           <circle cx="29" cy="15" r="3.4" class="fill-primary-300 dark:fill-primary-700" />
@@ -131,9 +131,9 @@ export function ActiveSession({ session, onEndSession, onUpdateSession }: Props)
       <div class="grid grid-cols-2 gap-3">
         {/* Left */}
         <button
-          class={`rounded-2xl p-5 text-center border-2 transition-all duration-200 cursor-pointer ${
+          class={`rounded-3xl p-5 text-center border-2 transition-all duration-200 cursor-pointer ${
             activeLeft
-              ? 'bg-side-left-50 dark:bg-side-left-500/15 border-side-left-500 shadow-lg shadow-side-left-500/20'
+              ? 'bg-side-left-50 dark:bg-side-left-500/15 border-side-left-500'
               : 'bg-white dark:bg-surface-800 border-surface-200 dark:border-surface-700 hover:border-side-left-500/50'
           }`}
           onClick={() => toggleSide('left')}
@@ -162,9 +162,9 @@ export function ActiveSession({ session, onEndSession, onUpdateSession }: Props)
 
         {/* Right */}
         <button
-          class={`rounded-2xl p-5 text-center border-2 transition-all duration-200 cursor-pointer ${
+          class={`rounded-3xl p-5 text-center border-2 transition-all duration-200 cursor-pointer ${
             activeRight
-              ? 'bg-side-right-50 dark:bg-side-right-500/15 border-side-right-500 shadow-lg shadow-side-right-500/20'
+              ? 'bg-side-right-50 dark:bg-side-right-500/15 border-side-right-500'
               : 'bg-white dark:bg-surface-800 border-surface-200 dark:border-surface-700 hover:border-side-right-500/50'
           }`}
           onClick={() => toggleSide('right')}
@@ -194,7 +194,7 @@ export function ActiveSession({ session, onEndSession, onUpdateSession }: Props)
 
       {/* End session */}
       <button
-        class="w-full bg-danger-500 hover:bg-danger-600 text-white border-none py-3.5 rounded-xl text-base font-semibold cursor-pointer transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2"
+        class="w-full bg-primary-500 hover:bg-primary-600 text-white border-none py-4 rounded-2xl text-base font-semibold cursor-pointer transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2"
         onClick={onEndSession}
       >
         <Square size={16} fill="currentColor" />
@@ -205,7 +205,7 @@ export function ActiveSession({ session, onEndSession, onUpdateSession }: Props)
       {intervals.length > 0 && (
         <div>
           <h3 class="text-sm font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider m-0 mb-3">{t.intervals}</h3>
-          <div class="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl overflow-hidden">
+          <div class="bg-white dark:bg-surface-800 rounded-2xl overflow-hidden">
             <div class="flex flex-col divide-y divide-surface-100 dark:divide-surface-700">
               {intervals.map((interval, idx) => (
                 <IntervalRow

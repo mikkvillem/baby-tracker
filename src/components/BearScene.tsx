@@ -33,7 +33,7 @@ export function BearScene({ sessions, hasActiveSession }: Props) {
   const isFeeding = mood === 'feeding'
 
   return (
-    <div class="rounded-2xl overflow-hidden bg-gradient-to-b from-primary-100 to-primary-50 dark:from-surface-800 dark:to-surface-800 border border-primary-200/60 dark:border-surface-700">
+    <div class="rounded-3xl overflow-hidden bg-primary-50 dark:bg-surface-800">
       <svg viewBox="0 0 400 190" class="w-full h-auto block" role="img" aria-label={t}>
         {/* sky + sun/moon */}
         <circle cx="340" cy="42" r="26" class="fill-primary-200 dark:fill-primary-900/60" opacity="0.8" />
@@ -109,7 +109,7 @@ export function BearScene({ sessions, hasActiveSession }: Props) {
           )}
         </g>
       </svg>
-      <p class="text-center text-sm font-medium text-surface-600 dark:text-surface-300 py-2.5 m-0 bg-white/50 dark:bg-black/10">
+      <p class="text-center text-sm font-medium text-surface-600 dark:text-surface-300 pb-3 m-0">
         {t}
       </p>
     </div>

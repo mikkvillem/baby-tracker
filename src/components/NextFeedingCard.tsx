@@ -2,7 +2,6 @@ import type { Session } from '../app'
 import { feedingSettings } from '../store/settings'
 import { suggestNextFeeding, formatTimeUntil } from '../utils/feedingPredictor'
 import { useCurrentTime } from '../hooks/useCurrentTime'
-import { AlarmClock } from 'lucide-preact'
 import { translations } from '../i18n'
 
 type Props = {
@@ -20,34 +19,17 @@ export function NextFeedingCard({ sessions }: Props) {
 
   if (!prediction.suggestedTime) return null
 
-  const isOverdue = prediction.suggestedTime.getTime() < Date.now()
-
   return (
-    <div class={`rounded-2xl p-4 text-white flex items-center justify-between ${
-      isOverdue
-        ? 'bg-gradient-to-r from-danger-500 to-primary-600'
-        : 'bg-gradient-to-r from-primary-400 to-primary-600'
-    }`}>
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-          <AlarmClock size={20} />
-        </div>
-        <div>
-          <div class="text-xs font-medium opacity-80">{t.label}</div>
-          <div class="text-xl font-bold font-mono">
-            {prediction.suggestedTime.toLocaleTimeString('en-US', {
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false
-            })}
-          </div>
-        </div>
-      </div>
-      <div class="text-right">
-        <div class="text-sm font-semibold bg-white/20 px-3 py-1 rounded-full">
-          {formatTimeUntil(prediction.suggestedTime)}
-        </div>
-      </div>
+    <div class="flex items-center justify-center gap-2 text-sm text-surface-600 dark:text-surface-300">
+      <span class="text-surface-500 dark:text-surface-400">{t.label}</span>
+      <span class="font-semibold font-mono text-surface-700 dark:text-surface-100">
+        {prediction.suggestedTime.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        })}
+      </span>
+      <span class="text-surface-500 dark:text-surface-400">· {formatTimeUntil(prediction.suggestedTime)}</span>
     </div>
   )
 }
