@@ -1,5 +1,5 @@
 import { createRootRoute, Link, Outlet, useNavigate, useMatches } from '@tanstack/react-router'
-import { Home, Footprints, Sparkles, Settings } from 'lucide-preact'
+import { HomeIcon, BookIcon, LeafIcon, GearIcon } from '../components/icons'
 import { useFeedingNotificationScheduler } from '../hooks/useFeedingNotificationScheduler'
 import { InstallPwaBanner } from '../components/InstallPwaBanner'
 import { translations } from '../i18n'
@@ -33,16 +33,16 @@ function AppShell() {
 
       {/* Bottom Tab Bar - hidden during active session */}
       {!isActiveSession && (
-        <nav class="fixed sm:relative bottom-0 sm:bottom-auto left-0 right-0 sm:left-auto sm:right-auto bg-white dark:bg-surface-800 border-t border-surface-200 dark:border-surface-700 flex items-center justify-around px-2 py-1 z-50 safe-area-bottom">
+        <nav class="fixed sm:relative bottom-0 sm:bottom-auto left-0 right-0 sm:left-auto sm:right-auto bg-surface-50 dark:bg-surface-800 flex items-center justify-around px-2 py-1 z-50 safe-area-bottom">
           <button
             class={`flex flex-col items-center gap-0.5 py-2 px-4 rounded-lg transition-colors duration-200 border-none bg-transparent cursor-pointer ${
               currentPath === '/'
                 ? 'text-primary-500 dark:text-primary-300'
-                : 'text-surface-600 dark:text-surface-300 hover:text-surface-800 dark:hover:text-surface-100'
+                : 'text-surface-400 dark:text-surface-500 hover:text-surface-700 dark:hover:text-surface-100'
             }`}
             onClick={() => navigate({ to: '/' })}
           >
-            <Home size={22} strokeWidth={currentPath === '/' ? 2.5 : 2} />
+            <HomeIcon size={26} />
             <span class="text-[11px] font-medium">{t.home}</span>
           </button>
 
@@ -50,11 +50,11 @@ function AppShell() {
             class={`flex flex-col items-center gap-0.5 py-2 px-4 rounded-lg transition-colors duration-200 border-none bg-transparent cursor-pointer ${
               currentPath === '/history'
                 ? 'text-primary-500 dark:text-primary-300'
-                : 'text-surface-600 dark:text-surface-300 hover:text-surface-800 dark:hover:text-surface-100'
+                : 'text-surface-400 dark:text-surface-500 hover:text-surface-700 dark:hover:text-surface-100'
             }`}
             onClick={() => navigate({ to: '/history' })}
           >
-            <Footprints size={22} strokeWidth={currentPath === '/history' ? 2.5 : 2} />
+            <BookIcon size={26} />
             <span class="text-[11px] font-medium">{t.history}</span>
           </button>
 
@@ -62,11 +62,11 @@ function AppShell() {
             class={`flex flex-col items-center gap-0.5 py-2 px-4 rounded-lg transition-colors duration-200 border-none bg-transparent cursor-pointer ${
               currentPath === '/report'
                 ? 'text-primary-500 dark:text-primary-300'
-                : 'text-surface-600 dark:text-surface-300 hover:text-surface-800 dark:hover:text-surface-100'
+                : 'text-surface-400 dark:text-surface-500 hover:text-surface-700 dark:hover:text-surface-100'
             }`}
             onClick={() => navigate({ to: '/report' })}
           >
-            <Sparkles size={22} strokeWidth={currentPath === '/report' ? 2.5 : 2} />
+            <LeafIcon size={26} />
             <span class="text-[11px] font-medium">{t.report}</span>
           </button>
 
@@ -74,11 +74,11 @@ function AppShell() {
             class={`flex flex-col items-center gap-0.5 py-2 px-4 rounded-lg transition-colors duration-200 border-none bg-transparent cursor-pointer ${
               currentPath === '/settings'
                 ? 'text-primary-500 dark:text-primary-300'
-                : 'text-surface-600 dark:text-surface-300 hover:text-surface-800 dark:hover:text-surface-100'
+                : 'text-surface-400 dark:text-surface-500 hover:text-surface-700 dark:hover:text-surface-100'
             }`}
             onClick={() => navigate({ to: '/settings' })}
           >
-            <Settings size={22} strokeWidth={currentPath === '/settings' ? 2.5 : 2} />
+            <GearIcon size={26} />
             <span class="text-[11px] font-medium">{t.settings}</span>
           </button>
         </nav>

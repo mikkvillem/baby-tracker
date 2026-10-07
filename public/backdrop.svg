@@ -1,72 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" fill="none">
-  <defs>
-    <linearGradient id="hill1" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#b85f1a" />
-      <stop offset="1" stop-color="#3f7d4a" />
-    </linearGradient>
-    <linearGradient id="hill2" x1="1" y1="0" x2="0" y2="0">
-      <stop offset="0" stop-color="#3f7d4a" />
-      <stop offset="1" stop-color="#a56a3a" />
-    </linearGradient>
-  </defs>
-
-  <!-- sun, top-right, warm glow leading the eye down toward the centered card -->
-  <circle cx="1460" cy="120" r="90" fill="#de8b34" opacity="0.28" />
-  <circle cx="1460" cy="120" r="46" fill="#eeae63" opacity="0.3" />
-
-  <!-- distant rolling hills spanning the bottom margin -->
-  <path d="M0 620 Q 200 540 420 600 T 820 580 T 1220 610 T 1600 560 V 900 H 0 Z" fill="url(#hill1)" opacity="0.16" />
-  <path d="M0 700 Q 260 640 540 690 T 1060 670 T 1600 700 V 900 H 0 Z" fill="url(#hill2)" opacity="0.2" />
-
-  <!-- simple pine treeline along the lower edge -->
-  <g fill="#3f7d4a" opacity="0.26">
-    <path d="M120 780 L138 740 L156 780 Z" />
-    <path d="M150 790 L172 738 L194 790 Z" />
-    <path d="M1360 800 L1380 750 L1400 800 Z" />
-    <path d="M1392 810 L1416 748 L1440 810 Z" />
-    <path d="M1424 800 L1444 754 L1464 800 Z" />
-  </g>
-
-  <!-- momma bear + cub silhouette, bottom-left corner -->
-  <g transform="translate(70 690)" fill="#a56a3a" opacity="0.32">
-    <!-- momma -->
-    <ellipse cx="70" cy="70" rx="58" ry="38" />
-    <circle cx="18" cy="34" r="26" />
-    <circle cx="2" cy="16" r="9" />
-    <circle cx="30" cy="12" r="9" />
-    <rect x="30" y="98" width="14" height="30" rx="6" />
-    <rect x="96" y="98" width="14" height="30" rx="6" />
-  </g>
-  <g transform="translate(190 730) scale(0.5)" fill="#a56a3a" opacity="0.3">
-    <!-- cub -->
-    <ellipse cx="70" cy="70" rx="58" ry="38" />
-    <circle cx="18" cy="34" r="26" />
-    <circle cx="2" cy="16" r="9" />
-    <circle cx="30" cy="12" r="9" />
-    <rect x="30" y="98" width="14" height="30" rx="6" />
-    <rect x="96" y="98" width="14" height="30" rx="6" />
-  </g>
-
-  <!-- soft honeycomb-style dot clusters, top-left and bottom-right -->
-  <g fill="#de8b34" opacity="0.4">
-    <circle cx="230" cy="130" r="3.5" />
-    <circle cx="256" cy="158" r="3.5" />
-    <circle cx="282" cy="186" r="3.5" />
-    <circle cx="204" cy="158" r="3.5" />
-    <circle cx="230" cy="186" r="3.5" />
-  </g>
-  <g fill="#3f7d4a" opacity="0.36">
-    <circle cx="1350" cy="740" r="3.5" />
-    <circle cx="1376" cy="768" r="3.5" />
-    <circle cx="1402" cy="796" r="3.5" />
-    <circle cx="1324" cy="768" r="3.5" />
-    <circle cx="1350" cy="796" r="3.5" />
-  </g>
-
-  <!-- faint diagonal accent strokes, echoing sun rays -->
-  <g stroke="#de8b34" stroke-width="3" stroke-linecap="round" opacity="0.2">
-    <line x1="1260" y1="0" x2="1600" y2="340" />
-    <line x1="1310" y1="0" x2="1600" y2="290" />
-    <line x1="1360" y1="0" x2="1600" y2="240" />
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" fill="none" preserveAspectRatio="xMidYMid slice">
+  <circle cx="1440" cy="130" r="70" fill="#f6b44b" opacity="0.7" />
+  <path d="M0 900 V700 L260 470 L520 700 Z" fill="#3e9ca8" opacity="0.28" />
+  <path d="M1600 900 V640 L1330 410 L1060 640 V900 Z" fill="#a7dbf0" opacity="0.5" />
+  <path d="M0 900 V790 Q 220 700 450 790 T 900 790 V900 Z" fill="#6b9468" opacity="0.35" />
+  <path d="M1600 900 V810 Q 1380 730 1160 810 T 700 810 V900 Z" fill="#1e4d3b" opacity="0.3" />
 </svg>

@@ -14,6 +14,11 @@
  */
 
 [data-theme='kindle'] {
+  --color-bear: #6e6e6e;
+  --color-bear-dark: #555555;
+  --color-bear-belly: #cfcfcf;
+  --color-sky: #e3e3e3;
+
   --color-white: #fbfbfb;
   --color-black: #0a0a0a;
 

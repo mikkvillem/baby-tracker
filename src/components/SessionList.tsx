@@ -5,7 +5,8 @@ import { MiscEventModal } from './MiscEventModal'
 import { NextFeedingCard } from './NextFeedingCard'
 import { DailyStats } from './DailyStats'
 import { BearScene } from './BearScene'
-import { PawPrint, PenLine, CalendarPlus, ChevronRight } from 'lucide-preact'
+import { ChevronRight } from 'lucide-preact'
+import { PawIcon, BookIcon, CalendarIcon } from './icons'
 import { useNavigate } from '@tanstack/react-router'
 import { useIntervalTick } from '../hooks/useIntervalTick'
 import { formatDurationMin } from '../utils/sessionFormatters'
@@ -61,7 +62,7 @@ export function SessionList({ sessions, onStartNewSession, onAddManualSession, o
           class="w-full bg-primary-500 hover:bg-primary-600 text-white border-none py-5 rounded-3xl font-semibold text-xl cursor-pointer transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-3"
           onClick={onStartNewSession}
         >
-          <PawPrint size={24} fill="currentColor" />
+          <PawIcon size={26} />
           {t.startFeeding}
         </button>
       )}
@@ -72,7 +73,7 @@ export function SessionList({ sessions, onStartNewSession, onAddManualSession, o
           class="bg-transparent text-surface-600 dark:text-surface-300 border-none py-3.5 rounded-2xl font-medium text-sm cursor-pointer transition-colors duration-200 hover:bg-surface-200/60 dark:hover:bg-surface-800 active:scale-[0.98] flex items-center justify-center gap-2"
           onClick={() => setShowManualModal(true)}
         >
-          <PenLine size={18} class="text-surface-500" />
+          <BookIcon size={20} class="text-warning-600" />
           {t.manualEntry}
         </button>
 
@@ -80,7 +81,7 @@ export function SessionList({ sessions, onStartNewSession, onAddManualSession, o
           class="bg-transparent text-surface-600 dark:text-surface-300 border-none py-3.5 rounded-2xl font-medium text-sm cursor-pointer transition-colors duration-200 hover:bg-surface-200/60 dark:hover:bg-surface-800 active:scale-[0.98] flex items-center justify-center gap-2"
           onClick={() => setShowMiscEventModal(true)}
         >
-          <CalendarPlus size={18} class="text-surface-500" />
+          <CalendarIcon size={20} class="text-side-left-500" />
           {t.logEvent}
         </button>
       </div>

@@ -30,7 +30,7 @@ export const THEMES: ThemeDefinition[] = [
     description: 'Match your device setting',
     palette: 'default',
     appearance: 'system',
-    swatch: { bg: '#faf9f7', surface: '#ffffff', accent: '#b85f1a', text: '#3d3731' }
+    swatch: { bg: '#f7f0e2', surface: '#ffffff', accent: '#1e4d3b', text: '#3d2920' }
   },
   {
     id: 'light',
@@ -38,7 +38,7 @@ export const THEMES: ThemeDefinition[] = [
     description: 'The default warm palette',
     palette: 'default',
     appearance: 'light',
-    swatch: { bg: '#faf9f7', surface: '#ffffff', accent: '#b85f1a', text: '#3d3731' }
+    swatch: { bg: '#f7f0e2', surface: '#ffffff', accent: '#1e4d3b', text: '#3d2920' }
   },
   {
     id: 'dark',
@@ -46,7 +46,7 @@ export const THEMES: ThemeDefinition[] = [
     description: 'The default palette, inverted',
     palette: 'default',
     appearance: 'dark',
-    swatch: { bg: '#1f1b18', surface: '#3d3731', accent: '#de8b34', text: '#f5f3f0' }
+    swatch: { bg: '#22160f', surface: '#3d2920', accent: '#7fae95', text: '#f7f0e2' }
   },
   {
     id: 'kindle',
